@@ -3,6 +3,7 @@
 #include "WindowsKeyCode.h"
 #include "Window.h"
 #include "Exception.h"
+#include <sstream>
 
 void ProcessKeyMessage(HWND hWnd, WinKeyCode a_key, bool bUpDown)
 {
@@ -74,9 +75,32 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPreviousInstance, LPSTR lpC
 			TranslateMessage(&msg); // Generate WM_Char Messages
 			DispatchMessage(&msg);
 
-			if(MainWindow.Kbd.KeyPressed(Alt))
+			while(MainWindow.GetMouse.IsEmpty() == false)
 			{
-				MessageBox(nullptr, "You pressed space!", "Well done!", MB_OK);
+				const Mouse::Event event = MainWindow.GetMouse.ReadEvent();
+				if(event.GetType() == Mouse::Event::Type::Move)
+				{
+					std::ostringstream oss;
+					oss << "Mouse Position: (" << event.GetX() << "," << event.GetY() << ")";
+					MainWindow.SetTitle(oss.str());
+				}
+				else if(event.GetType() == Mouse::Event::Type::Leave)
+				{
+					MainWindow.SetTitle("Mouse outside!");
+				}
+				else if(event.GetType() == Mouse::Event::Type::LBtnPress)
+				{
+					MainWindow.SetTitle("LBtnPressed!");
+				}
+				else if (event.GetType() == Mouse::Event::Type::MBtnPress)
+				{
+					MainWindow.SetTitle("MBtnPressed!");
+				}
+				else if (event.GetType() == Mouse::Event::Type::RBtnPress)
+				{
+					MainWindow.SetTitle("RBtnPressed!");
+				}
+				
 			}
 		}
 
@@ -86,7 +110,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPreviousInstance, LPSTR lpC
 		}
 
 		// Return exit code
-		return msg.wParam;	
+		return (int)msg.wParam;	
 	}
 	catch(const Exception& e)
 	{

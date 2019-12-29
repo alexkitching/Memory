@@ -1,5 +1,6 @@
 #pragma once
 #include <utility>
+#include <queue>
 
 class Mouse
 {
@@ -20,6 +21,8 @@ public:
 			WheelUp,
 			WheelDown,
 			Move,
+			Enter,
+			Leave
 		};
 
 		Event()
@@ -37,11 +40,11 @@ public:
 		Event(Type a_type, const Mouse& a_parent)
 			:
 		m_type(a_type),
-		m_bLeftPressed(a_parent.leftIsPressed),
-		m_bMiddlePressed(a_parent.middleIsPressed),
-		m_bRightPressed(a_parent.rightIsPressed),
-		m_x(a_parent.x),
-		m_y(a_parent.y)
+		m_bLeftPressed(a_parent.m_bLeftPressed),
+		m_bMiddlePressed(a_parent.m_bMiddlePressed),
+		m_bRightPressed(a_parent.m_bRightPressed),
+		m_x(a_parent.m_X),
+		m_y(a_parent.m_Y)
 		{
 			
 		}
@@ -57,7 +60,7 @@ public:
 		bool MiddleBtnPressed() const { return m_bMiddlePressed; }
 		bool RightBtnPressed() const { return m_bRightPressed; }
 	private:
-		          Type m_type;
+		Type m_type;
 		bool m_bLeftPressed;
 		bool m_bMiddlePressed;
 		bool m_bRightPressed;
@@ -69,5 +72,44 @@ public:
 	Mouse(const Mouse&) = delete;
 	Mouse& operator=(const Mouse&) = delete;
 
-	std::pair<int,int> Position() const { }
+	// State Info
+	std::pair<int, int> Position() const { return { m_X, m_Y }; }
+	int GetXPos() const { return m_X; }
+	int GetYPos() const { return m_Y; }
+	bool LeftButtonPressed() const { return m_bLeftPressed; }
+	bool MiddleButtonPressed() const { return m_bMiddlePressed; }
+	bool RightButtonPressed() const { return m_bRightPressed; }
+	bool IsInWindow() const { return m_bIsInWindow;  }
+
+	// Event System
+	Mouse::Event ReadEvent();
+	bool IsEmpty() const { return m_EventBuffer.empty();  }
+	void Flush();
+
+private:
+	void OnMouseMove(int a_posX, int a_posY);
+	void OnLeftPressed(int a_posX, int a_posY);
+	void OnLeftReleased(int a_posX, int a_posY);
+	void OnMiddlePressed(int a_posX, int a_posY);
+	void OnMiddleReleased(int a_posX, int a_posY);
+	void OnRightPressed(int a_posX, int a_posY);
+	void OnRightReleased(int a_posX, int a_posY);
+	void OnWheelUp(int a_posX, int a_posY);
+	void OnWheelDown(int a_posX, int a_posY);
+	void OnWheelDelta(int a_posX, int a_posY, int a_delta);
+	void OnMouseEnter();
+	void OnMouseLeave();
+
+	void TrimBuffer();
+
+	static constexpr unsigned int s_kBuffSize = 16u;
+	int m_X;
+	int m_Y;
+	int m_WheelDeltaAccum;
+	bool m_bLeftPressed;
+	bool m_bMiddlePressed;
+	bool m_bRightPressed;
+	bool m_bIsInWindow;
+
+	std::queue<Event> m_EventBuffer;
 };

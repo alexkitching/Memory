@@ -45,7 +45,8 @@ HINSTANCE Window::WindowClassDef::GetInstance()
 
 Window::Window(int a_width, int a_height, const char* a_name)
 	:
-Kbd(m_keyboard),
+GetKeyboard(m_keyboard),
+GetMouse(m_mouse),
 m_name(a_name),
 m_width(a_width),
 m_height(a_height)
@@ -56,7 +57,7 @@ m_height(a_height)
 	rect.top = 100;
 	rect.bottom = a_height + rect.top;
 
-	if(FAILED(AdjustWindowRect(&rect, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE))) // Ensures Client Area is correct width/height
+	if(AdjustWindowRect(&rect, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE) == false) // Ensures Client Area is correct width/height
 	{
 		throw WND_Last_Except();
 	}
@@ -81,6 +82,14 @@ m_height(a_height)
 Window::~Window()
 {
 	DestroyWindow(m_hWnd);
+}
+
+void Window::SetTitle(const std::string a_titleStr) const
+{
+	if(SetWindowText(m_hWnd, a_titleStr.c_str()) == false)
+	{
+		throw WND_Last_Except();
+	}
 }
 
 LRESULT CALLBACK Window::HandleMessageSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -143,19 +152,81 @@ LRESULT Window::HandleMessageInternal(HWND hWnd, UINT msg, WPARAM wParam, LPARAM
 		// Keyboard Events End
 		// Mouse Events Start
 	case WM_LBUTTONDOWN:
+		{
+			const POINTS pt = MAKEPOINTS(lParam);
+			m_mouse.OnLeftPressed(pt.x, pt.y);
+			break;
+		}
 	case WM_LBUTTONUP:
-	case WM_RBUTTONDOWN:
-	case WM_RBUTTONUP:
+		{
+			const POINTS pt = MAKEPOINTS(lParam);
+			m_mouse.OnLeftReleased(pt.x, pt.y);
+			break;
+		}
 	case WM_MBUTTONDOWN:
+		{
+			const POINTS pt = MAKEPOINTS(lParam);
+			m_mouse.OnMiddlePressed(pt.x, pt.y);
+			break;
+		}
 	case WM_MBUTTONUP:
+		{
+			const POINTS pt = MAKEPOINTS(lParam);
+			m_mouse.OnMiddleReleased(pt.x, pt.y);
+			break;
+		}
+		case WM_RBUTTONDOWN:
+		{
+			const POINTS pt = MAKEPOINTS(lParam);
+			m_mouse.OnRightPressed(pt.x, pt.y);
+			break;
+		}
+		case WM_RBUTTONUP:
+		{
+			const POINTS pt = MAKEPOINTS(lParam);
+			m_mouse.OnRightReleased(pt.x, pt.y);
+			break;
+		}
 	case WM_MOUSEWHEEL:
+		{
+			const POINTS pt = MAKEPOINTS(lParam);
+			const short wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+
+			m_mouse.OnWheelDelta(pt.x, pt.y, wheelDelta);
+			break;
+		}
 	case WM_MOUSEMOVE:
 		{
-			
+			const POINTS pt = MAKEPOINTS(lParam);
+
+			if(pt.x >= 0 && pt.x < m_width &&
+				pt.y >= 0 && pt.y < m_height) // Within Client Region
+			{
+				m_mouse.OnMouseMove(pt.x, pt.y);
+				if(m_mouse.IsInWindow() == false)
+				{
+					SetCapture(m_hWnd);
+					m_mouse.OnMouseEnter();
+				}
+			}
+			else // Not In Client Region
+			{
+				if(wParam & (MK_LBUTTON | MK_MBUTTON | MK_RBUTTON)) // Button is still pressed
+				{
+					m_mouse.OnMouseMove(pt.x, pt.y);
+				}
+				else
+				{
+					ReleaseCapture();
+					m_mouse.OnMouseLeave();
+				}
+			}
+			break;
 		}
 	case WM_KILLFOCUS: // Clear Keyboard State on Kill Focus
 		{
 			m_keyboard.ClearState();
+			break;
 		}
 	default:
 		break;

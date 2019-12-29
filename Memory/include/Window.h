@@ -4,6 +4,7 @@
 #include "WindowsMessageMap.h"
 #include "Exception.h"
 #include "Keyboard.h"
+#include "Mouse.h"
 
 class Window
 {
@@ -50,8 +51,11 @@ public:
 	Window(const Window&) = delete;
 	Window& operator=(const Window&) = delete;
 
-	Keyboard& Kbd;
+	Keyboard& GetKeyboard;
+	Mouse& GetMouse;
 	std::string GetName() const { return m_name; }
+
+	void SetTitle(const std::string a_titleStr) const;
 private:
 	static LRESULT CALLBACK HandleMessageSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -64,6 +68,7 @@ private:
 	int m_height;
 	HWND m_hWnd;
 	Keyboard m_keyboard;
+	Mouse m_mouse;
 };
 
 #define WND_Except(hr) Window::WindowException(__LINE__, __FILE__, hr)
