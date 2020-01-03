@@ -3,7 +3,7 @@
 #include <sstream>
 
 #pragma comment(lib, "d3d11.lib")
-
+#pragma comment(lib, "D3DCompiler.lib")
 
 D3DException::D3DException(int a_line, const char* a_pfileName, HRESULT a_HR, std::vector<std::string> a_infoMessages)
 	:
@@ -42,11 +42,6 @@ const char* D3DException::what() const
 	return m_whatBuffer.c_str();
 }
 
-const char* D3DException::GetType() const
-{
-	return "D3D Exception";
-}
-
 std::string D3DException::GetErrorCodeString() const
 {
 	return DXGetErrorString(m_hr);
@@ -57,6 +52,35 @@ std::string D3DException::GetErrorCodeDescription() const
 	char buf[512];
 	DXGetErrorDescription(m_hr, buf, sizeof(buf));
 	return buf;
+}
+
+D3DInfoException::D3DInfoException(int a_line, const char* a_file, std::vector<std::string> a_info)
+	:
+Exception(a_line, a_file)
+{
+	for(const std::string& info : a_info)
+	{
+		m_info += info;
+		m_info.push_back('\n');
+	}
+
+	if(m_info.empty() == false)
+	{
+		m_info.pop_back();
+	}
+}
+
+const char* D3DInfoException::what() const
+{
+	std::ostringstream oss;
+	oss << GetType()	<< std::endl 
+		<< "[Info] " << GetErrorInfo() << std::endl;
+
+	oss << GetOriginalString();
+
+	m_whatBuffer = oss.str();
+	
+	return m_whatBuffer.c_str();
 }
 
 const char* D3DDeviceRemovedException::GetType() const

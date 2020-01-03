@@ -6,7 +6,7 @@
 #endif
 
 #include <d3d11.h>
-
+#include <d3dcompiler.h>
 
 class D3DException : public Exception
 {
@@ -14,7 +14,7 @@ public:
 	D3DException(int a_line, const char* a_pfileName, HRESULT a_HR, std::vector<std::string> a_infoMessages = {});
 	
 	const char* what() const override;
-	const char* GetType() const override;
+	const char* GetType() const override { return TEXT(D3DException); }
 
 	HRESULT GetErrorCode() const { return m_hr; }
 	std::string GetErrorCodeString() const;
@@ -22,6 +22,18 @@ public:
 	std::string GetErrorInfo() const { return m_info; }
 private:
 	HRESULT m_hr;
+	std::string m_info;
+};
+
+class D3DInfoException : public Exception
+{
+public:
+	D3DInfoException(int a_line, const char* a_file, std::vector<std::string> a_info);
+	const char* what() const override;
+	const char* GetType() const override { return TEXT(D3DInfoException); }
+	std::string GetErrorInfo() const { return m_info; }
+
+private:
 	std::string m_info;
 };
 
@@ -48,9 +60,25 @@ public:
 #define D3D_THROW_DEVICE_REMOVED_EXCEPT_WITHINFO(hr) throw D3DDeviceRemovedException(__LINE__, __FILE__, (hr), DXGIInfoManager::Instance()->GetMessages());
 #define D3D_THROW_DEVICE_REMOVED_EXCEPT_NOINFO(hr) throw D3DDeviceRemovedException(__LINE__, __FILE__, (hr));
 #define D3D_THROW_DEVICE_REMOVED_EXCEPT(hr) if(DXGIInfoManager::Instance() == nullptr) { D3D_THROW_DEVICE_REMOVED_EXCEPT_NOINFO(hr)} else { D3D_THROW_DEVICE_REMOVED_EXCEPT_WITHINFO(hr)}
+
+#define D3D_THROW_INFO(call)												\
+if(DXGIInfoManager::Instance() != nullptr)									\
+{																			\
+	DXGIInfoManager::Instance()->Set();										\
+	(call);																	\
+	{																		\
+		auto dxgimsg = DXGIInfoManager::Instance()->GetMessages();			\
+		if(dxgimsg.empty() == false)										\
+		{																	\
+			throw D3DInfoException(__LINE__,__FILE__, dxgimsg);				\
+		}																	\
+		}																	\
+}																		    \
+
 #else
 #define D3D_EXCEPT(hr) D3DException(__LINE__, __FILE__, (hr))
 #define D3D_THROW_FAILED(hrcall) if(FAILED(hr = (hrcall))) throw D3DException(__LINE__, __FILE__, hr);
 #define D3D_DEVICE_REMOVED_EXCEPT(hr) D3DDeviceRemovedException(__LINE__, __FILE__, (hr));
+#define D3D_THROW_INFO(call)
 #endif
 
