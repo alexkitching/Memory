@@ -3,6 +3,8 @@
 #include "Win.h"
 #include "Exception.h"
 #include <vector>
+#include <wrl.h>
+#include <dxgidebug.h>
 
 class DXGIInfoManager
 {
@@ -17,10 +19,10 @@ public:
 	
 private:
 	DXGIInfoManager();
-	~DXGIInfoManager();
+	~DXGIInfoManager() {}
 	DXGIInfoManager(const DXGIInfoManager&) = delete;
 	DXGIInfoManager& operator=(const DXGIInfoManager&) = delete;
 	
 	unsigned long long m_next = 0u;
-	struct IDXGIInfoQueue* m_pDXGI_InfoQueue;
+	Microsoft::WRL::ComPtr<IDXGIInfoQueue> m_pDXGI_InfoQueue;
 };

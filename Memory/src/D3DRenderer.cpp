@@ -2,6 +2,11 @@
 
 
 D3DRenderer::D3DRenderer(HWND a_hwnd)
+	:
+m_pDevice(nullptr),
+m_pSwapChain(nullptr),
+m_pContext(nullptr),
+m_pRenderTarget(nullptr)
 {
 	DXGI_SWAP_CHAIN_DESC sd = {};
 	sd.BufferDesc.Width = 0;
@@ -45,41 +50,18 @@ D3DRenderer::D3DRenderer(HWND a_hwnd)
 	));
 
 	// Gain Access to texture subresource in swap chain (backbuffer)
-	ID3D11Resource* pBackbuffer = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11Resource> pBackbuffer = nullptr;
 	D3D_THROW_FAILED(m_pSwapChain->GetBuffer(0, // Buffer Idx
 		__uuidof(ID3D11Resource),
-		reinterpret_cast<void**>(&pBackbuffer)));
+		&pBackbuffer));
 
 	D3D_THROW_FAILED(m_pDevice->CreateRenderTargetView(
-		pBackbuffer,
+		pBackbuffer.Get(),
 		nullptr,
 		&m_pRenderTarget));
 
-	pBackbuffer->Release();
 }
 
-D3DRenderer::~D3DRenderer()
-{	
-	if(m_pRenderTarget != nullptr)
-	{
-		m_pRenderTarget->Release();
-	}
-	
-	if(m_pContext != nullptr)
-	{
-		m_pContext->Release();
-	}
-	
-	if (m_pSwapChain != nullptr)
-	{
-		m_pSwapChain->Release();
-	}
-	
-	if(m_pDevice != nullptr)
-	{
-		m_pDevice->Release();
-	}
-}
 
 void D3DRenderer::EndFrame()
 {
@@ -103,5 +85,5 @@ void D3DRenderer::EndFrame()
 void D3DRenderer::Clear(float a_r, float a_g, float a_b)
 {
 	const float color[] = { a_r, a_g, a_b, 1.f };
-	m_pContext->ClearRenderTargetView(m_pRenderTarget, color);
+	m_pContext->ClearRenderTargetView(m_pRenderTarget.Get(), color);
 }

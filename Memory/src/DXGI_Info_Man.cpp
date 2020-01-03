@@ -1,8 +1,6 @@
 #include "DXGI_Info_Man.h"
 #include "Window.h"
 #include "D3D.h"
-#include <dxgidebug.h>
-
 
 #pragma comment(lib, "dxguid.lib")
 
@@ -33,14 +31,6 @@ DXGIInfoManager::DXGIInfoManager()
 	// Call the function to get the interface
 	HRESULT hr;
 	D3D_THROW_FAILED(DXGIGetDebugInterfaceFunc(__uuidof(IDXGIInfoQueue), (void**)&m_pDXGI_InfoQueue));
-}
-
-DXGIInfoManager::~DXGIInfoManager()
-{
-	if(m_pDXGI_InfoQueue != nullptr)
-	{
-		m_pDXGI_InfoQueue->Release();
-	}
 }
 
 void DXGIInfoManager::Initialise()
@@ -80,11 +70,11 @@ std::vector<std::string> DXGIInfoManager::GetMessages()
 		SIZE_T messageLen;
 
 		// Get Size of Current Message
-		D3D_THROW_FAILED(m_pDXGI_InfoQueue->GetMessage(DXGI_DEBUG_ALL, i, nullptr, &messageLen))
+		D3D_THROW_FAILED_NOINFO(m_pDXGI_InfoQueue->GetMessage(DXGI_DEBUG_ALL, i, nullptr, &messageLen))
 
 		DXGI_INFO_QUEUE_MESSAGE* pMessage = (DXGI_INFO_QUEUE_MESSAGE*)new byte[messageLen];
 
-		D3D_THROW_FAILED(m_pDXGI_InfoQueue->GetMessage(DXGI_DEBUG_ALL, i, pMessage, &messageLen));
+		D3D_THROW_FAILED_NOINFO(m_pDXGI_InfoQueue->GetMessage(DXGI_DEBUG_ALL, i, pMessage, &messageLen));
 
 		messages.emplace_back(pMessage->pDescription);
 
