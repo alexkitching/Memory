@@ -1,11 +1,15 @@
 #include "Exception.h"
 #include <sstream>
 
-Exception::Exception(int a_line, const char* a_File)
+Exception::Exception(int a_line, const char* a_File, const char* a_typeName)
 	:
 m_line(a_line),
 m_file(a_File)
 {
+	if(a_typeName != nullptr)
+	{
+		m_type = a_typeName;
+	}
 }
 
 const char* Exception::what() const

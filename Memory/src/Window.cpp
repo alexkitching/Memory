@@ -43,6 +43,11 @@ HINSTANCE Window::WindowClassDef::GetInstance()
 	return s_ClassDef.m_hInstance;
 }
 
+const char* Window::MissingRendererException::GetType() const
+{
+	return "[MissingRendererException] Window has no renderer";
+}
+
 Window::Window(int a_width, int a_height, const char* a_name)
 	:
 GetKeyboard(m_keyboard),
@@ -77,11 +82,31 @@ m_height(a_height)
 	}
 
 	ShowWindow(m_hWnd, SW_SHOWDEFAULT);
+
+	
 }
 
 Window::~Window()
 {
 	DestroyWindow(m_hWnd);
+}
+
+bool Window::Initialise()
+{
+	// Create Renderer
+	m_pRenderer = std::make_unique<D3DRenderer>(m_hWnd);
+
+	return m_pRenderer != nullptr;
+}
+
+D3DRenderer& Window::GetRenderer()
+{
+	if(m_pRenderer == nullptr)
+	{
+		throw WND_Missing_Renderer_Except();
+	}
+	
+	return *m_pRenderer;
 }
 
 void Window::SetTitle(const std::string a_titleStr) const
@@ -90,6 +115,24 @@ void Window::SetTitle(const std::string a_titleStr) const
 	{
 		throw WND_Last_Except();
 	}
+}
+
+std::optional<int> Window::ProcessMessages()
+{
+	MSG msg;
+
+	while(PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+	{
+		if(msg.message == WM_QUIT) // Quit Check
+		{
+			return (int)msg.wParam; // Return Optional int
+		}
+
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+	// Return empty optional
+	return {};
 }
 
 LRESULT CALLBACK Window::HandleMessageSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
