@@ -65,6 +65,8 @@ public:
 	void DisableAutoRepeat() { m_bAutoRepeatEnabled = false; }
 	bool AutoRepeatEnabled() const { return m_bAutoRepeatEnabled; }
 
+	static const unsigned int s_kNumKeys = 256u;
+
 private:
 	void OnKeyPressed(unsigned char a_keyCode);
 	void OnKeyReleased(unsigned char a_keyCode);
@@ -73,7 +75,6 @@ private:
 	template<typename T>
 	static void TrimBuffer(std::queue<T>& buffer);
 
-	static const unsigned int s_kNumKeys = 256u;
 	static const unsigned int s_kBufSize = 16u;
 	bool m_bAutoRepeatEnabled;
 	std::bitset<s_kNumKeys> m_keyStates;

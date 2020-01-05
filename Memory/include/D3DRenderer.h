@@ -3,6 +3,7 @@
 
 #include "D3D.h"
 #include <wrl.h>
+#include <complex>
 
 class D3DRenderer : public IRenderer
 {
@@ -16,7 +17,7 @@ public:
 	virtual void EndFrame() override;
 	virtual void Clear(float a_r, float a_g, float a_b) override;
 
-	void DrawTestTriangle()
+	void DrawTestTriangle(float a_angle)
 	{
 		struct Vertex
 		{
@@ -43,7 +44,7 @@ public:
 			{-0.5f, -0.5f, 0, 0, 255, 0},
 			{-0.3f, 0.3f, 0, 255, 0, 0},
 			{0.3f, 0.3f, 0, 0, 255, 0},
-			{0.f, -1.8f, 255, 0, 0, 0}
+			{0.f, -0.8f, 255, 0, 0, 0}
 		};
 
 
@@ -103,10 +104,56 @@ public:
 			0u
 		};
 
-		D3D_THROW_INFO(m_pDevice->CreateBuffer(&idb, &isd, &pIndexBuffer));
+		D3D_THROW_FAILED(m_pDevice->CreateBuffer(&idb, &isd, &pIndexBuffer));
 
 		// Bind Index Buffer to Pipeline
 		D3D_THROW_INFO(m_pContext->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0u));
+
+
+		// Constant Buffer for Transformation Matrix
+		struct ConstantBuffer
+		{
+			struct
+			{
+				float Values[4][4];
+			} TransformMatrix;
+		};
+		// Buffer Data Instance
+		const ConstantBuffer cb =
+		{
+			{
+				(3.f / 4.f) * std::cos(a_angle), std::sin(a_angle), 0.f, 0.f,
+				(3.f / 4.f) * -std::sin(a_angle), std::cos(a_angle), 0.f, 0.f,
+				0.f, 0.f, 1.f, 0.f,
+				0.f, 0.f, 0.f, 1.f
+			}
+		};
+
+		// Create Buffer
+
+		Microsoft::WRL::ComPtr<ID3D11Buffer> pConstantBuffer;
+		D3D11_BUFFER_DESC cbd =
+		{
+			sizeof(cb),
+			D3D11_USAGE_DYNAMIC, // Dynamic Allows use of Lock Function
+			D3D11_BIND_CONSTANT_BUFFER,
+			D3D11_CPU_ACCESS_WRITE,
+			0u,
+			0u // Not an array
+		};
+
+		D3D11_SUBRESOURCE_DATA csd =
+		{
+			&cb,
+			0u,
+			0u
+		};
+
+		D3D_THROW_FAILED(m_pDevice->CreateBuffer(&cbd, &csd, &pConstantBuffer));
+
+		// Bind Buffer to Vertex Shader
+		D3D_THROW_INFO(m_pContext->VSSetConstantBuffers(0u, 1u, pConstantBuffer.GetAddressOf()));
+		
 		
 		// Create Pixel Shader
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShader;
@@ -159,10 +206,10 @@ public:
 		// Config Viewport
 		D3D11_VIEWPORT vp =
 		{
-			100,
-			100,
-			400,
-			300,
+			0,
+			0,
+			800,
+			600,
 			0,
 			1
 		};
@@ -172,6 +219,11 @@ public:
 		
 		D3D_THROW_INFO(m_pContext->DrawIndexed((UINT)std::size(indices), 0u, 0u));
 	}
+
+	ID3D11Device* GetDevice() const { return m_pDevice.Get(); }
+	IDXGISwapChain* GetSwapChain() const { return m_pSwapChain.Get(); }
+	ID3D11DeviceContext* GetContext() const { return m_pContext.Get(); }
+	
 private:
 
 	Microsoft::WRL::ComPtr<ID3D11Device> m_pDevice;

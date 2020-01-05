@@ -58,6 +58,18 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{951174a7-fffa-45d9-8f63-eea38aee9f9d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\IMGUI">
+      <UniqueIdentifier>{af9158fe-13d4-4137-b2ad-95f6df414cfd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\IMGUI">
+      <UniqueIdentifier>{4b0d661b-1fdf-4a92-ad7b-764160a447b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="IMGUI">
+      <UniqueIdentifier>{08ec75db-7ffa-4285-8c21-98248b6c0cbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="IMGUI\examples">
+      <UniqueIdentifier>{d615fd08-eae9-4456-bb86-15ac00204dce}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -98,6 +110,27 @@
     </ClCompile>
     <ClCompile Include="src\DXGI_Info_Man.cpp">
       <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IMGUIInterface.cpp">
+      <Filter>Source Files\IMGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Debug.cpp">
+      <Filter>Source Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui-master\imgui.cpp">
+      <Filter>IMGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui-master\imgui_draw.cpp">
+      <Filter>IMGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui-master\imgui_widgets.cpp">
+      <Filter>IMGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui-master\examples\imgui_impl_dx11.cpp">
+      <Filter>IMGUI\examples</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui-master\examples\imgui_impl_win32.cpp">
+      <Filter>IMGUI\examples</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -151,6 +184,36 @@
     </ClInclude>
     <ClInclude Include="include\DXGI_Info_Man.h">
       <Filter>Header Files\Graphics\D3D</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IMGUIInterface.h">
+      <Filter>Header Files\IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Debug.h">
+      <Filter>Header Files\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui-master\imconfig.h">
+      <Filter>IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui-master\imgui.h">
+      <Filter>IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui-master\imgui_internal.h">
+      <Filter>IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui-master\imstb_rectpack.h">
+      <Filter>IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui-master\imstb_textedit.h">
+      <Filter>IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui-master\imstb_truetype.h">
+      <Filter>IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui-master\examples\imgui_impl_dx11.h">
+      <Filter>IMGUI\examples</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui-master\examples\imgui_impl_win32.h">
+      <Filter>IMGUI\examples</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

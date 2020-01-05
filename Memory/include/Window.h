@@ -6,6 +6,7 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "D3DRenderer.h"
+#include "IMGUIInterface.h"
 #include <memory>
 #include <optional>
 
@@ -65,6 +66,7 @@ public:
 	Keyboard& GetKeyboard;
 	Mouse& GetMouse;
 	D3DRenderer& GetRenderer();
+	IMGUIInterface& GetIMGUI();
 	std::string GetName() const { return m_name; }
 	HWND GetHandle() const {return m_hWnd;}
 
@@ -84,6 +86,7 @@ private:
 	Keyboard m_keyboard;
 	Mouse m_mouse;
 	std::unique_ptr<D3DRenderer> m_pRenderer;
+	IMGUIInterface m_IMGUIInterface;
 };
 
 #define WND_Except(hr) Window::WindowException(__LINE__, __FILE__, hr)

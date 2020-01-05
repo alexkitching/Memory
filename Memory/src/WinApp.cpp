@@ -63,8 +63,9 @@ void WinApp::OnPreFrame()
 		// Optional Has Value
 		SetShouldClose(*errorCode);
 	}
-	float c = sin(m_Timer.GetTime()) / 2.f + 0.5f;
+	const float c = sin(m_Timer.GetTime()) / 2.f + 0.5f;
 	m_pWindow->GetRenderer().Clear(c, c, 1.0f);
+	m_pWindow->GetIMGUI().OnBeginFrame();
 }
 
 void WinApp::OnFrame()
@@ -74,12 +75,13 @@ void WinApp::OnFrame()
 	oss << "Time elapsed: " << std::setprecision(1) << std::fixed << t << "s";
 	m_pWindow->SetTitle(oss.str());
 
-	m_pWindow->GetRenderer().DrawTestTriangle();
+	m_pWindow->GetRenderer().DrawTestTriangle(m_Timer.GetTime());
+	m_pWindow->GetIMGUI().Test();
 }
 
 void WinApp::OnPostFrame()
 {
-	
+	m_pWindow->GetIMGUI().OnPostFrame();
 	m_pWindow->GetRenderer().EndFrame();
 }
 

@@ -1,6 +1,9 @@
 #include "Window.h"
 #include <sstream>
 #include "resource.h"
+#include "Debug.h"
+
+#define LOG_MESSAGES 0
 
 Window::WindowClassDef Window::WindowClassDef::s_ClassDef;
 WindowsMessageMap Window::s_MessageMap;
@@ -96,6 +99,8 @@ bool Window::Initialise()
 	// Create Renderer
 	m_pRenderer = std::make_unique<D3DRenderer>(m_hWnd);
 
+	m_IMGUIInterface.Initialise(this);
+
 	return m_pRenderer != nullptr;
 }
 
@@ -107,6 +112,11 @@ D3DRenderer& Window::GetRenderer()
 	}
 	
 	return *m_pRenderer;
+}
+
+IMGUIInterface& Window::GetIMGUI()
+{
+	return m_IMGUIInterface;
 }
 
 void Window::SetTitle(const std::string a_titleStr) const
@@ -137,7 +147,9 @@ std::optional<int> Window::ProcessMessages()
 
 LRESULT CALLBACK Window::HandleMessageSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+#if LOG_MESSAGES
 	OutputDebugString(s_MessageMap(msg, lParam, wParam).c_str());
+#endif
 
 	if(msg == WM_NCCREATE) // Create Message
 	{
@@ -162,8 +174,9 @@ LRESULT CALLBACK Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 
 LRESULT Window::HandleMessageInternal(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+#if LOG_MESSAGES
 	OutputDebugString(s_MessageMap(msg, lParam, wParam).c_str());
-
+#endif
 	switch (msg)
 	{
 	case WM_CLOSE:
