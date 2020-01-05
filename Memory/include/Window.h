@@ -70,6 +70,9 @@ public:
 	std::string GetName() const { return m_name; }
 	HWND GetHandle() const {return m_hWnd;}
 
+	int GetWidth() const { return m_width; }
+	int GetHeight() const { return m_height; }
+
 	void SetTitle(const std::string a_titleStr) const;
 	static std::optional<int> ProcessMessages();
 private:

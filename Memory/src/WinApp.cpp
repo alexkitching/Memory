@@ -63,9 +63,8 @@ void WinApp::OnPreFrame()
 		// Optional Has Value
 		SetShouldClose(*errorCode);
 	}
-	const float c = sin(m_Timer.GetTime()) / 2.f + 0.5f;
-	m_pWindow->GetRenderer().Clear(c, c, 1.0f);
-	m_pWindow->GetIMGUI().OnBeginFrame();
+	
+	
 }
 
 void WinApp::OnFrame()
@@ -75,14 +74,32 @@ void WinApp::OnFrame()
 	oss << "Time elapsed: " << std::setprecision(1) << std::fixed << t << "s";
 	m_pWindow->SetTitle(oss.str());
 
-	m_pWindow->GetRenderer().DrawTestTriangle(m_Timer.GetTime());
+	const float c = sin(m_Timer.GetTime()) / 2.f + 0.5f;
+	m_pWindow->GetRenderer().Clear(c, c, 1.0f);
+	// Draw Stuff
+	const float X = 1.f - (float)m_pWindow->GetMouse.GetXPos() / ((float)m_pWindow->GetWidth() * 0.5f);
+	const float Y = 1.f - (float)m_pWindow->GetMouse.GetYPos() / ((float)m_pWindow->GetHeight() * 0.5f);
+	
+	m_pWindow->GetRenderer().DrawTestTriangle(m_Timer.GetTime(), -X, Y);
+	m_pWindow->GetRenderer().DrawTestTriangle(-m_Timer.GetTime(), 0, 0);
+
+	// Draw IMGUI Frame
+	m_pWindow->GetIMGUI().BeginGUIFrame();
 	m_pWindow->GetIMGUI().Test();
+	m_pWindow->GetIMGUI().RenderGUIFrame();
+	
+	// Present
+	m_pWindow->GetRenderer().EndFrame();
+
+	// IMGUI
+	
 }
 
 void WinApp::OnPostFrame()
 {
-	m_pWindow->GetIMGUI().OnPostFrame();
-	m_pWindow->GetRenderer().EndFrame();
+	
+	
+	
 }
 
 void WinApp::OnExit()

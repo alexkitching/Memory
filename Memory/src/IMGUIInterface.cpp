@@ -52,7 +52,7 @@ void IMGUIInterface::Initialise(Window* a_pWindow)
 	m_bInitialised = true;
 }
 
-void IMGUIInterface::OnBeginFrame()
+void IMGUIInterface::BeginGUIFrame()
 {
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
@@ -98,10 +98,15 @@ void IMGUIInterface::Test()
 	ImGui::End();
 }
 
-void IMGUIInterface::OnPostFrame()
+void IMGUIInterface::RenderGUIFrame()
 {
 	ImGui::Render();
+	ID3D11RenderTargetView* pOldRT;
+	ID3D11DepthStencilView* pOldDS;
+	m_pWindow->GetRenderer().GetContext()->OMGetRenderTargets(1, &pOldRT, &pOldDS);
 	m_pWindow->GetRenderer().GetContext()->OMSetRenderTargets(1, m_pDXRenderTarget.GetAddressOf(), NULL);
 
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+	m_pWindow->GetRenderer().GetContext()->OMSetRenderTargets(1, &pOldRT, pOldDS);
 }

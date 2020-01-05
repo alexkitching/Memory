@@ -14,9 +14,11 @@ public:
 	~IMGUIInterface();
 	void Initialise(Window* a_pWindow);
 
-	void OnBeginFrame();
+	
+
+	void BeginGUIFrame();
 	void Test();
-	void OnPostFrame();
+	void RenderGUIFrame();
 private:
 	bool m_bInitialised;
 	
