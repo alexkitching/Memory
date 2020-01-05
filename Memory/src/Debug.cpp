@@ -12,7 +12,8 @@ const char* AssertFailException::what() const
 {
 	std::ostringstream oss;
 	oss << GetType() << std::endl
-		<< "[Failed Expression] " << GetFailedExpressionString() << std::endl;
+		<< "[Failed Expression] " << std::endl 
+	<< GetFailedExpressionString() << std::endl;
 
 	oss << GetOriginalString();
 

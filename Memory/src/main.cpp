@@ -1,7 +1,7 @@
-#include "WinApp.h"
+#include "MemoryApp.h"
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPreviousInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	WinApp App;
+	MemoryApp App;
 	return App.Run();
 }

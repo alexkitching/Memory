@@ -82,6 +82,18 @@
     <Filter Include="Header Files\Scenario">
       <UniqueIdentifier>{fd2e8d49-2394-4cae-a619-fb2f037ad423}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Memory">
+      <UniqueIdentifier>{9c16fbd3-4d34-4cea-8868-865a89871e95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Memory">
+      <UniqueIdentifier>{73bb53b8-23ae-472b-b2e6-5c34e7b0a988}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Memory\Allocators">
+      <UniqueIdentifier>{9afd4978-05eb-4019-a524-bb638e7f1387}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Memory\Allocators">
+      <UniqueIdentifier>{cbff3239-5af9-4e94-b40a-ded79a90074a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -143,6 +155,9 @@
     </ClCompile>
     <ClCompile Include="src\MemoryApp.cpp">
       <Filter>Source Files\Application\App</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AllocatorBase.cpp">
+      <Filter>Source Files\Memory\Allocators</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -229,6 +244,15 @@
     </ClInclude>
     <ClInclude Include="include\MemoryApp.h">
       <Filter>Header Files\Application\App</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scenario.h">
+      <Filter>Header Files\Scenario</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AllocatorBase.h">
+      <Filter>Header Files\Memory\Allocators</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Types.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

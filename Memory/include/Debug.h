@@ -4,7 +4,7 @@
 
 #define BREAK { __asm int 3}
 
-class AssertFailException : Exception
+class AssertFailException : public Exception
 {
 public:
 	AssertFailException(int a_line, const char* a_fileName, const char* a_expression);

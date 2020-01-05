@@ -156,6 +156,7 @@
     <ClCompile Include="imgui-master\imgui.cpp" />
     <ClCompile Include="imgui-master\imgui_draw.cpp" />
     <ClCompile Include="imgui-master\imgui_widgets.cpp" />
+    <ClCompile Include="src\AllocatorBase.cpp" />
     <ClCompile Include="src\D3D.cpp" />
     <ClCompile Include="src\D3DRenderer.cpp" />
     <ClCompile Include="src\Debug.cpp" />
@@ -181,6 +182,7 @@
     <ClInclude Include="imgui-master\imstb_rectpack.h" />
     <ClInclude Include="imgui-master\imstb_textedit.h" />
     <ClInclude Include="imgui-master\imstb_truetype.h" />
+    <ClInclude Include="include\AllocatorBase.h" />
     <ClInclude Include="include\App.h" />
     <ClInclude Include="include\Common.h" />
     <ClInclude Include="include\D3D.h" />
@@ -194,7 +196,9 @@
     <ClInclude Include="include\MemoryApp.h" />
     <ClInclude Include="include\Mouse.h" />
     <ClInclude Include="include\Renderer.h" />
+    <ClInclude Include="include\Scenario.h" />
     <ClInclude Include="include\Timer.h" />
+    <ClInclude Include="include\Types.h" />
     <ClInclude Include="include\Win.h" />
     <ClInclude Include="include\WinApp.h" />
     <ClInclude Include="include\Window.h" />

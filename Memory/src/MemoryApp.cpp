@@ -21,7 +21,6 @@ bool MemoryApp::Initialise()
 void MemoryApp::OnPreFrame()
 {
 	WinApp::OnPreFrame();
-	
 }
 
 void MemoryApp::OnFrame()
