@@ -1,6 +1,7 @@
 #include "WinApp.h"
 #include <sstream>
 #include <iomanip>
+#include "Debug.h"
 
 #if DEBUG
 #include "DXGI_Info_Man.h"
@@ -20,10 +21,18 @@ Window& WinApp::GetWindow() const
 
 int WinApp::Run()
 {
-	int result = 0;
 	try
 	{
-		result = AppBase::Run();
+		ASSERT(Initialise() && "Initialisation Failed");
+
+		while (m_bShouldClose == false)
+		{
+			CycleFrame();
+		}
+
+		OnExit();
+
+		return m_ExitCode;
 	}
 	catch (const Exception& e)
 	{
@@ -38,7 +47,7 @@ int WinApp::Run()
 		MessageBox(m_pWindow->GetHandle(), "No Details Available", "Unknown Exception", MB_OK | MB_ICONEXCLAMATION);
 	}
 
-	return result;
+	return 0;
 }
 
 bool WinApp::Initialise()
@@ -63,19 +72,13 @@ void WinApp::OnPreFrame()
 		// Optional Has Value
 		SetShouldClose(*errorCode);
 	}
-	
-	
 }
 
 void WinApp::OnFrame()
 {
-	const float t = m_Timer.GetTime();
-	std::ostringstream oss;
-	oss << "Time elapsed: " << std::setprecision(1) << std::fixed << t << "s";
-	m_pWindow->SetTitle(oss.str());
-
-	const float c = sin(m_Timer.GetTime()) / 2.f + 0.5f;
-	m_pWindow->GetRenderer().Clear(c, c, 1.0f);
+	// <---- Clear Render ---->
+	m_pWindow->GetRenderer().Clear(0.7f, 0.7f, 0.7f);
+	
 	// Draw Stuff
 	const float X = 1.f - (float)m_pWindow->GetMouse.GetXPos() / ((float)m_pWindow->GetWidth() * 0.5f);
 	const float Y = 1.f - (float)m_pWindow->GetMouse.GetYPos() / ((float)m_pWindow->GetHeight() * 0.5f);
@@ -83,22 +86,18 @@ void WinApp::OnFrame()
 	m_pWindow->GetRenderer().DrawTestTriangle(m_Timer.GetTime(), -X, Y);
 	m_pWindow->GetRenderer().DrawTestTriangle(-m_Timer.GetTime(), 0, 0);
 
-	// Draw IMGUI Frame
+	// <---- IMGUI ---->
 	m_pWindow->GetIMGUI().BeginGUIFrame();
+	OnGUI(m_pWindow->GetIMGUI());
 	m_pWindow->GetIMGUI().Test();
 	m_pWindow->GetIMGUI().RenderGUIFrame();
 	
-	// Present
+	// <---- Present ---->
 	m_pWindow->GetRenderer().EndFrame();
-
-	// IMGUI
-	
 }
 
 void WinApp::OnPostFrame()
 {
-	
-	
 	
 }
 
@@ -107,4 +106,25 @@ void WinApp::OnExit()
 #if DEBUG
 	DXGIInfoManager::Shutdown();
 #endif
+}
+
+void WinApp::CycleFrame()
+{
+	switch (m_FrameStage)
+	{
+	case FrameStage::PreFrame:
+		OnPreFrame();
+		m_FrameStage = FrameStage::OnFrame;
+		break;
+	case FrameStage::OnFrame:
+		OnFrame();
+		m_FrameStage = FrameStage::PostFrame;
+		break;
+	case FrameStage::PostFrame:
+		OnPostFrame();
+		m_FrameStage = FrameStage::PreFrame;
+		break;
+	default:
+		break;
+	}
 }

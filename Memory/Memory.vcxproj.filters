@@ -70,6 +70,18 @@
     <Filter Include="IMGUI\examples">
       <UniqueIdentifier>{d615fd08-eae9-4456-bb86-15ac00204dce}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Application\App">
+      <UniqueIdentifier>{f212fff0-8f01-4a7e-b3ca-36828a0f6038}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Application\App">
+      <UniqueIdentifier>{971a61e0-13d2-465c-8fa8-1ac28eecf0f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scenario">
+      <UniqueIdentifier>{07229560-96f3-47e1-b206-912d66ecf908}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scenario">
+      <UniqueIdentifier>{fd2e8d49-2394-4cae-a619-fb2f037ad423}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -86,12 +98,6 @@
     </ClCompile>
     <ClCompile Include="src\Mouse.cpp">
       <Filter>Source Files\Windows\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="src\App.cpp">
-      <Filter>Source Files\Application</Filter>
-    </ClCompile>
-    <ClCompile Include="src\WinApp.cpp">
-      <Filter>Source Files\Windows</Filter>
     </ClCompile>
     <ClCompile Include="src\Exception.cpp">
       <Filter>Source Files\Debug</Filter>
@@ -132,6 +138,12 @@
     <ClCompile Include="imgui-master\examples\imgui_impl_win32.cpp">
       <Filter>IMGUI\examples</Filter>
     </ClCompile>
+    <ClCompile Include="src\WinApp.cpp">
+      <Filter>Source Files\Application\App</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MemoryApp.cpp">
+      <Filter>Source Files\Application\App</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\WindowsMessageMap.h">
@@ -157,12 +169,6 @@
     </ClInclude>
     <ClInclude Include="include\Mouse.h">
       <Filter>Header Files\Windows\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="include\App.h">
-      <Filter>Header Files\Application</Filter>
-    </ClInclude>
-    <ClInclude Include="include\WinApp.h">
-      <Filter>Header Files\Windows</Filter>
     </ClInclude>
     <ClInclude Include="include\Exception.h">
       <Filter>Header Files\Debug</Filter>
@@ -214,6 +220,15 @@
     </ClInclude>
     <ClInclude Include="imgui-master\examples\imgui_impl_win32.h">
       <Filter>IMGUI\examples</Filter>
+    </ClInclude>
+    <ClInclude Include="include\App.h">
+      <Filter>Header Files\Application\App</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WinApp.h">
+      <Filter>Header Files\Application\App</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MemoryApp.h">
+      <Filter>Header Files\Application\App</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

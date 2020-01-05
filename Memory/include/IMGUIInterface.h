@@ -14,8 +14,6 @@ public:
 	~IMGUIInterface();
 	void Initialise(Window* a_pWindow);
 
-	
-
 	void BeginGUIFrame();
 	void Test();
 	void RenderGUIFrame();

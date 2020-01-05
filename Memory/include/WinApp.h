@@ -5,7 +5,7 @@
 #include "Timer.h"
 
 
-class WinApp : public AppBase
+class WinApp : public IApp
 {
 public:
 	WinApp();
@@ -13,15 +13,35 @@ public:
 
 	Window& GetWindow() const;
 
-	virtual int Run() override;
+	virtual int Run() override final;
 protected:
 	virtual bool Initialise() override;
-	virtual void OnPreFrame() override;
-	virtual void OnFrame() override;
-	virtual void OnPostFrame() override;
+	virtual void OnPreFrame();
+	virtual void OnFrame();
+	virtual void OnGUI(IMGUIInterface& a_imGUIInterface) {}
+	virtual void OnPostFrame();
 	virtual void OnExit() override;
+
+	void SetShouldClose(int a_exitCode) { m_bShouldClose = true; m_ExitCode = a_exitCode; }
+
+	
 private:
+	enum class FrameStage
+	{
+		PreFrame = 0,
+		OnFrame,
+		PostFrame,
+		MAX
+	};
+
+	void CycleFrame();
+
+	
 	Window* m_pWindow;
 	BOOL m_Result;
 	Timer m_Timer;
+
+	FrameStage m_FrameStage;
+	bool m_bShouldClose;
+	int m_ExitCode;
 };

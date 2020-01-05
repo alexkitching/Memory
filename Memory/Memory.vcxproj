@@ -156,7 +156,6 @@
     <ClCompile Include="imgui-master\imgui.cpp" />
     <ClCompile Include="imgui-master\imgui_draw.cpp" />
     <ClCompile Include="imgui-master\imgui_widgets.cpp" />
-    <ClCompile Include="src\App.cpp" />
     <ClCompile Include="src\D3D.cpp" />
     <ClCompile Include="src\D3DRenderer.cpp" />
     <ClCompile Include="src\Debug.cpp" />
@@ -166,6 +165,7 @@
     <ClCompile Include="src\IMGUIInterface.cpp" />
     <ClCompile Include="src\Keyboard.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\MemoryApp.cpp" />
     <ClCompile Include="src\Mouse.cpp" />
     <ClCompile Include="src\Timer.cpp" />
     <ClCompile Include="src\WinApp.cpp" />
@@ -191,6 +191,7 @@
     <ClInclude Include="include\Exception.h" />
     <ClInclude Include="include\IMGUIInterface.h" />
     <ClInclude Include="include\Keyboard.h" />
+    <ClInclude Include="include\MemoryApp.h" />
     <ClInclude Include="include\Mouse.h" />
     <ClInclude Include="include\Renderer.h" />
     <ClInclude Include="include\Timer.h" />
