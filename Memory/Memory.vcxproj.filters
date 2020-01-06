@@ -109,6 +109,12 @@
     <Filter Include="Source Files\IMGUI\Windows">
       <UniqueIdentifier>{f59a6e2f-0aaa-4760-8300-8727d2971798}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Time">
+      <UniqueIdentifier>{99a24a00-95ba-4e04-9f01-2579339168da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Time">
+      <UniqueIdentifier>{1a8a1a94-9c06-413c-b2a3-d7a155e355af}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -180,11 +186,14 @@
     <ClCompile Include="src\LogWindow.cpp">
       <Filter>Source Files\IMGUI\Windows</Filter>
     </ClCompile>
-    <ClCompile Include="src\Timer.cpp">
-      <Filter>Source Files\Application</Filter>
-    </ClCompile>
     <ClCompile Include="src\PerformanceCounterWindow.cpp">
       <Filter>Source Files\IMGUI\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Timer.cpp">
+      <Filter>Source Files\Time</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GlobalTime.cpp">
+      <Filter>Source Files\Time</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -214,9 +223,6 @@
     </ClInclude>
     <ClInclude Include="include\Exception.h">
       <Filter>Header Files\Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Timer.h">
-      <Filter>Header Files\Application</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer.h">
       <Filter>Header Files\Application</Filter>
@@ -298,6 +304,12 @@
     </ClInclude>
     <ClInclude Include="include\PerformanceCounterWindow.h">
       <Filter>Header Files\IMGUI\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Timer.h">
+      <Filter>Header Files\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GlobalTime.h">
+      <Filter>Header Files\Time</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

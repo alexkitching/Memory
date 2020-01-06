@@ -11,7 +11,7 @@ public:
 
 	bool IsStarted() const { return m_bStarted; }
 
-	float GetTime();
+	float GetTime() const;
 private:
 	std::chrono::steady_clock::time_point m_startTime;
 	std::chrono::steady_clock::time_point m_stopTime;

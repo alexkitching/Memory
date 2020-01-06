@@ -1,7 +1,7 @@
 #include "WinApp.h"
-#include <sstream>
-#include <iomanip>
 #include "Debug.h"
+#include "GlobalTime.h"
+#include <iomanip>
 
 #if DEBUG
 #include "DXGI_Info_Man.h"
@@ -9,8 +9,7 @@
 
 WinApp::WinApp()
 	:
-m_pWindow(nullptr),
-m_Timer(false)
+m_pWindow(nullptr)
 {
 }
 
@@ -60,7 +59,6 @@ bool WinApp::Initialise()
 	
 	m_pWindow->Initialise();
 
-	m_Timer.Start();
 	return m_pWindow != nullptr;
 }
 
@@ -83,8 +81,8 @@ void WinApp::OnFrame()
 	const float X = 1.f - (float)m_pWindow->GetMouse.GetXPos() / ((float)m_pWindow->GetWidth() * 0.5f);
 	const float Y = 1.f - (float)m_pWindow->GetMouse.GetYPos() / ((float)m_pWindow->GetHeight() * 0.5f);
 	
-	m_pWindow->GetRenderer().DrawTestTriangle(m_Timer.GetTime(), -X, Y);
-	m_pWindow->GetRenderer().DrawTestTriangle(-m_Timer.GetTime(), 0, 0);
+	m_pWindow->GetRenderer().DrawTestTriangle(Time::TimeSinceStartup(), -X, Y);
+	m_pWindow->GetRenderer().DrawTestTriangle(-Time::TimeSinceStartup(), 0, 0);
 
 	// <---- IMGUI ---->
 	m_pWindow->GetIMGUI().BeginGUIFrame();
@@ -113,6 +111,7 @@ void WinApp::CycleFrame()
 	switch (m_FrameStage)
 	{
 	case FrameStage::PreFrame:
+		m_Time.Update();
 		OnPreFrame();
 		m_FrameStage = FrameStage::OnFrame;
 		break;

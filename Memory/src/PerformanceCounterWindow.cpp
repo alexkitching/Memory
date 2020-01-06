@@ -3,9 +3,15 @@
 #include "psapi.h"
 
 #include <imgui.h>
+#include "GlobalTime.h"
+
 PerformanceCounterWindow::PerformanceCounterWindow()
 	:
-IMGUIWindow("Performance Counter")
+IMGUIWindow("Performance Counter"),
+m_fDeltaTime(0.f),
+m_fAccumFPS(0.f),
+m_FrameCount(0),
+m_fFPS(0.f)
 {
 }
 
@@ -15,21 +21,32 @@ PerformanceCounterWindow::~PerformanceCounterWindow()
 
 void PerformanceCounterWindow::OnGUIWindow(const IMGUIInterface& a_interface)
 {
-
+	m_fDeltaTime = Time::DeltaTime();
+	m_fAccumFPS += m_fDeltaTime;
+	m_FrameCount++;
+	
+	// Update FPS
+	if (m_fAccumFPS > 1.0 / m_fFPSUpdateRate)
+	{
+		m_fFPS = m_FrameCount / m_fAccumFPS;
+		m_FrameCount = 0;
+		m_fAccumFPS -= 1.0f / m_fFPSUpdateRate;
+	}
+	
 	MEMORYSTATUSEX memInfo;
 	memInfo.dwLength = sizeof(MEMORYSTATUSEX);
 	GlobalMemoryStatusEx(&memInfo);
-	DWORDLONG totalVirtualMem = memInfo.ullTotalPageFile;
-	DWORDLONG totalPhysMem = memInfo.ullTotalPhys;
+	const DWORDLONG totalVirtualMem = memInfo.ullTotalPageFile;
+	const DWORDLONG totalPhysMem = memInfo.ullTotalPhys;
 	
 	PROCESS_MEMORY_COUNTERS_EX pmc;
 	GetProcessMemoryInfo(GetCurrentProcess(), (PPROCESS_MEMORY_COUNTERS)&pmc, sizeof(pmc));
-	SIZE_T virtualMemUsedByMe = pmc.PrivateUsage;
-	SIZE_T physMemUsedByMe = pmc.WorkingSetSize;
+	const SIZE_T virtualMemUsedByMe = pmc.PrivateUsage;
+	const SIZE_T physMemUsedByMe = pmc.WorkingSetSize;
 	
 
-	ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
-	ImGui::Text("CPU Time: %.3f ms", 1000.f / ImGui::GetIO().Framerate);
+	ImGui::Text("FPS: %.1f", m_fFPS);
+	ImGui::Text("CPU Time: %.3f ms", 1000.f / m_fFPS);
 
 	ImGui::Separator();
 	ImGui::Text("Physical Memory Usage: %.1f Mbs", (float)((float)physMemUsedByMe / MB));

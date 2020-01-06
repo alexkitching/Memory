@@ -172,6 +172,7 @@
     <ClCompile Include="src\Mouse.cpp" />
     <ClCompile Include="src\PerformanceCounterWindow.cpp" />
     <ClCompile Include="src\ScenarioManager.cpp" />
+    <ClCompile Include="src\GlobalTime.cpp" />
     <ClCompile Include="src\Timer.cpp" />
     <ClCompile Include="src\WinApp.cpp" />
     <ClCompile Include="src\Window.cpp" />
@@ -207,6 +208,7 @@
     <ClInclude Include="include\ResourceLoadingScenario.h" />
     <ClInclude Include="include\Scenario.h" />
     <ClInclude Include="include\ScenarioManager.h" />
+    <ClInclude Include="include\GlobalTime.h" />
     <ClInclude Include="include\Timer.h" />
     <ClInclude Include="include\Types.h" />
     <ClInclude Include="include\Win.h" />

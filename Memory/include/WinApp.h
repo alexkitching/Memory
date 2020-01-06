@@ -2,9 +2,9 @@
 
 #include "Window.h"
 #include "App.h"
-#include "Timer.h"
+#include "GlobalTime.h"
 
-
+class Time;
 class WinApp : public IApp
 {
 public:
@@ -39,7 +39,7 @@ private:
 	
 	Window* m_pWindow;
 	BOOL m_Result;
-	Timer m_Timer;
+	Time m_Time;
 
 	FrameStage m_FrameStage;
 	bool m_bShouldClose;

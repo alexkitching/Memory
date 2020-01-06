@@ -27,7 +27,7 @@ void Timer::Stop()
 	m_stopTime = std::chrono::steady_clock::now();;
 }
 
-float Timer::GetTime()
+float Timer::GetTime() const
 {
 	if(m_bStarted)
 	{

@@ -13,4 +13,9 @@ protected:
 
 
 private:
+	float m_fDeltaTime;
+	float m_fAccumFPS;
+	int m_FrameCount;
+	const float m_fFPSUpdateRate = 2.f;
+	float m_fFPS;
 };

@@ -22,7 +22,11 @@ static void AssertFail(int a_line, const char* a_fileName, const char* a_express
 	throw AssertFailException(a_line, a_fileName, a_expression);
 }
 
+#if DEBUG
 #define ASSERT(x) (void)((x) || (AssertFail(__LINE__, __FILE__, #x), 0))
+#else
+#define ASSERT(x)
+#endif
 
 class ILogHandler
 {
