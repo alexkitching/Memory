@@ -94,6 +94,18 @@
     <Filter Include="Source Files\Memory\Allocators">
       <UniqueIdentifier>{cbff3239-5af9-4e94-b40a-ded79a90074a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Scenario\Resource Loading">
+      <UniqueIdentifier>{06bca229-dd6d-4cdc-abb5-a22dc947523e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scenario\Particle System">
+      <UniqueIdentifier>{8bf33618-f26a-4016-8d49-9525801ffc92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scenario\Vertex Data Processing">
+      <UniqueIdentifier>{615702be-6e4c-4d0e-b2a0-6931d7e23eba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\IMGUI\Windows">
+      <UniqueIdentifier>{569a82a4-7d0d-4ee5-9a83-0adda5da47d1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -158,6 +170,9 @@
     </ClCompile>
     <ClCompile Include="src\AllocatorBase.cpp">
       <Filter>Source Files\Memory\Allocators</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ScenarioManager.cpp">
+      <Filter>Source Files\Scenario</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -253,6 +268,18 @@
     </ClInclude>
     <ClInclude Include="include\Types.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResourceLoadingScenario.h">
+      <Filter>Header Files\Scenario\Resource Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RandomUtility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ScenarioManager.h">
+      <Filter>Header Files\Scenario</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LogWindow.h">
+      <Filter>Header Files\IMGUI\Windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -14,6 +14,7 @@ bool MemoryApp::Initialise()
 	// Init Window
 	ASSERT(WinApp::Initialise() && "WinApp Init Failed!");
 
+	m_ScenarioManager.StartScenario(ScenarioManager::ScenarioType::ResourceLoadingBootup);
 
 	return true;
 }
@@ -26,6 +27,7 @@ void MemoryApp::OnPreFrame()
 void MemoryApp::OnFrame()
 {
 	WinApp::OnFrame();
+	m_ScenarioManager.Update();
 }
 
 void MemoryApp::OnGUI(IMGUIInterface& a_GUIInterface)

@@ -9,6 +9,8 @@ public:
 	void Start();
 	void Stop();
 
+	bool IsStarted() const { return m_bStarted; }
+
 	float GetTime();
 private:
 	std::chrono::steady_clock::time_point m_startTime;

@@ -168,6 +168,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MemoryApp.cpp" />
     <ClCompile Include="src\Mouse.cpp" />
+    <ClCompile Include="src\ScenarioManager.cpp" />
     <ClCompile Include="src\Timer.cpp" />
     <ClCompile Include="src\WinApp.cpp" />
     <ClCompile Include="src\Window.cpp" />
@@ -193,10 +194,14 @@
     <ClInclude Include="include\Exception.h" />
     <ClInclude Include="include\IMGUIInterface.h" />
     <ClInclude Include="include\Keyboard.h" />
+    <ClInclude Include="include\LogWindow.h" />
     <ClInclude Include="include\MemoryApp.h" />
     <ClInclude Include="include\Mouse.h" />
+    <ClInclude Include="include\RandomUtility.h" />
     <ClInclude Include="include\Renderer.h" />
+    <ClInclude Include="include\ResourceLoadingScenario.h" />
     <ClInclude Include="include\Scenario.h" />
+    <ClInclude Include="include\ScenarioManager.h" />
     <ClInclude Include="include\Timer.h" />
     <ClInclude Include="include\Types.h" />
     <ClInclude Include="include\Win.h" />

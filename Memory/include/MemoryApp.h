@@ -1,6 +1,7 @@
 #pragma once
 
 #include "WinApp.h"
+#include "ScenarioManager.h"
 
 class MemoryApp : public WinApp
 {
@@ -16,5 +17,6 @@ protected:
 	virtual void OnPostFrame() override;
 	virtual void OnExit() override;
 private:
-	
+	ScenarioManager m_ScenarioManager;
+
 };
