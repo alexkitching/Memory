@@ -106,6 +106,9 @@
     <Filter Include="Header Files\IMGUI\Windows">
       <UniqueIdentifier>{569a82a4-7d0d-4ee5-9a83-0adda5da47d1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\IMGUI\Windows">
+      <UniqueIdentifier>{f59a6e2f-0aaa-4760-8300-8727d2971798}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -173,6 +176,12 @@
     </ClCompile>
     <ClCompile Include="src\ScenarioManager.cpp">
       <Filter>Source Files\Scenario</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IMGUIWindow.cpp">
+      <Filter>Source Files\IMGUI\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LogWindow.cpp">
+      <Filter>Source Files\IMGUI\Windows</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -279,6 +288,9 @@
       <Filter>Header Files\Scenario</Filter>
     </ClInclude>
     <ClInclude Include="include\LogWindow.h">
+      <Filter>Header Files\IMGUI\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IMGUIWindow.h">
       <Filter>Header Files\IMGUI\Windows</Filter>
     </ClInclude>
   </ItemGroup>

@@ -164,7 +164,9 @@
     <ClCompile Include="src\DXGI_Info_Man.cpp" />
     <ClCompile Include="src\Exception.cpp" />
     <ClCompile Include="src\IMGUIInterface.cpp" />
+    <ClCompile Include="src\IMGUIWindow.cpp" />
     <ClCompile Include="src\Keyboard.cpp" />
+    <ClCompile Include="src\LogWindow.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MemoryApp.cpp" />
     <ClCompile Include="src\Mouse.cpp" />
@@ -193,6 +195,7 @@
     <ClInclude Include="include\DXGI_Info_Man.h" />
     <ClInclude Include="include\Exception.h" />
     <ClInclude Include="include\IMGUIInterface.h" />
+    <ClInclude Include="include\IMGUIWindow.h" />
     <ClInclude Include="include\Keyboard.h" />
     <ClInclude Include="include\LogWindow.h" />
     <ClInclude Include="include\MemoryApp.h" />

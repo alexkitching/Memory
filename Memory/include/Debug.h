@@ -1,5 +1,6 @@
 #pragma once
 #include "Exception.h"
+#include <cstdarg>
 
 
 #define BREAK { __asm int 3}
@@ -22,3 +23,29 @@ static void AssertFail(int a_line, const char* a_fileName, const char* a_express
 }
 
 #define ASSERT(x) (void)((x) || (AssertFail(__LINE__, __FILE__, #x), 0))
+
+class ILogHandler
+{
+public:
+	virtual ~ILogHandler() {}
+
+	virtual void OnLog(const char* fmt, ...) = 0;
+};
+
+class Debug
+{
+public:
+	static void SetLogHandler(ILogHandler* a_pHandler) { s_pLogHandler = a_pHandler; }
+	static void Log(const char* fmt, ...)
+	{
+		if (s_pLogHandler != nullptr)
+		{
+			va_list va;
+			va_start(va, fmt);
+			s_pLogHandler->OnLog(fmt, va);
+			va_end(va);
+		}
+	};
+private:
+	static ILogHandler* s_pLogHandler;
+};

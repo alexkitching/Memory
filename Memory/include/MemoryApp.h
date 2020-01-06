@@ -2,6 +2,7 @@
 
 #include "WinApp.h"
 #include "ScenarioManager.h"
+#include "LogWindow.h"
 
 class MemoryApp : public WinApp
 {
@@ -18,5 +19,5 @@ protected:
 	virtual void OnExit() override;
 private:
 	ScenarioManager m_ScenarioManager;
-
+	LogWindow m_LogWindow;
 };
