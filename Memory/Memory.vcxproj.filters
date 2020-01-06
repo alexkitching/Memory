@@ -129,9 +129,6 @@
     <ClCompile Include="src\Exception.cpp">
       <Filter>Source Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="src\Timer.cpp">
-      <Filter>Source Files\Application</Filter>
-    </ClCompile>
     <ClCompile Include="src\D3DRenderer.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
@@ -181,6 +178,12 @@
       <Filter>Source Files\IMGUI\Windows</Filter>
     </ClCompile>
     <ClCompile Include="src\LogWindow.cpp">
+      <Filter>Source Files\IMGUI\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Timer.cpp">
+      <Filter>Source Files\Application</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PerformanceCounterWindow.cpp">
       <Filter>Source Files\IMGUI\Windows</Filter>
     </ClCompile>
   </ItemGroup>
@@ -291,6 +294,9 @@
       <Filter>Header Files\IMGUI\Windows</Filter>
     </ClInclude>
     <ClInclude Include="include\IMGUIWindow.h">
+      <Filter>Header Files\IMGUI\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PerformanceCounterWindow.h">
       <Filter>Header Files\IMGUI\Windows</Filter>
     </ClInclude>
   </ItemGroup>

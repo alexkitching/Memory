@@ -29,8 +29,15 @@ class ILogHandler
 public:
 	virtual ~ILogHandler() {}
 
-	virtual void OnLog(const char* fmt, ...) = 0;
+	virtual void Log(const char* fmt, ...) = 0;
+	virtual void OnLog(const char* fmt, va_list a_va) = 0;
 };
+
+#if DEBUG
+#define LOG(x, ...) Debug::Log(x, __VA_ARGS__);
+#else
+#define LOG(x)
+#endif
 
 class Debug
 {
@@ -42,6 +49,7 @@ public:
 		{
 			va_list va;
 			va_start(va, fmt);
+
 			s_pLogHandler->OnLog(fmt, va);
 			va_end(va);
 		}

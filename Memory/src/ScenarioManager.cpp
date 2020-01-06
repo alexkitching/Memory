@@ -1,4 +1,7 @@
 #include "ScenarioManager.h"
+#include "Debug.h"
+
+#define SMLOG(x, ...) LOG("ScenarioManager::" x, __VA_ARGS__)
 
 ScenarioManager::ScenarioManager()
 {
@@ -22,7 +25,7 @@ void ScenarioManager::StartScenario(ScenarioType a_type)
 
 	for(const auto& active : m_ActiveScenarios ) // If Already Started, Ignore
 	{
-		if(active == pScenarioToStart)
+		if(active.pScenario == pScenarioToStart)
 		{
 			return;
 		}
@@ -41,7 +44,11 @@ void ScenarioManager::StartScenario(ScenarioType a_type)
 		break;
 	}
 
-	m_ActiveScenarios.push_back(pScenarioToStart);
+
+	const char* pName = ScenarioTypeNames[(int)a_type].c_str();
+	SMLOG("Starting Memory Scenario - %s \n", pName);
+	
+	m_ActiveScenarios.emplace_back(pScenarioToStart, a_type);
 }
 
 void ScenarioManager::StopScenario(ScenarioType a_type)
@@ -50,11 +57,12 @@ void ScenarioManager::StopScenario(ScenarioType a_type)
 
 	for (size_t i = 0; i < m_ActiveScenarios.size(); ++i) // If Already Started, Ignore
 	{
-		IScenario* pActive = m_ActiveScenarios[i];
-		if (pActive == pScenarioToStart)
+		ActiveScenario& active = m_ActiveScenarios[i];
+		if (active.pScenario == pScenarioToStart)
 		{
+			active.pScenario->Reset();
+			SMLOG("Scenario Stopped - %s \n", ScenarioTypeNames[(int)a_type].c_str());
 			m_ActiveScenarios.erase(m_ActiveScenarios.begin() + i);
-			pActive->Reset();
 			return;
 		}
 	}
@@ -62,19 +70,21 @@ void ScenarioManager::StopScenario(ScenarioType a_type)
 
 void ScenarioManager::Update()
 {
-	for(size_t i = m_ActiveScenarios.size() - 1; i > 0; --i)
+	for(int i = (int)m_ActiveScenarios.size() - 1; i >= 0; --i)
 	{
-		IScenario* pActive = m_ActiveScenarios[i];
+		ActiveScenario& active = m_ActiveScenarios[i];
 
 		// TODO Time Scenario
-		if(pActive->IsComplete() == false)
+		if(active.pScenario->IsComplete() == false)
 		{
-			pActive->Run();
+			active.pScenario->Run();
 		}
 		else
 		{
+			active.pScenario->Reset();
+			float fTimeTaken = active.Timer.GetTime();
+			SMLOG("Scenario Completed - %s - Time Taken - %f s \n", ScenarioTypeNames[(int)active.Type].c_str(), fTimeTaken);
 			m_ActiveScenarios.erase(m_ActiveScenarios.begin() + i);
-			pActive->Reset();
 		}
 	}
 }

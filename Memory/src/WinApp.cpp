@@ -89,7 +89,7 @@ void WinApp::OnFrame()
 	// <---- IMGUI ---->
 	m_pWindow->GetIMGUI().BeginGUIFrame();
 	OnGUI(m_pWindow->GetIMGUI());
-	m_pWindow->GetIMGUI().Test();
+	//m_pWindow->GetIMGUI().Test();
 	m_pWindow->GetIMGUI().RenderGUIFrame();
 	
 	// <---- Present ---->

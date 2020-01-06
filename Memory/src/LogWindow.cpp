@@ -1,7 +1,16 @@
 #include "LogWindow.h"
 
 
-void LogWindow::OnLog(const char* fmt, ...)
+void LogWindow::OnLog(const char* fmt, va_list a_va)
+{
+	int old_size = m_Buffer.size();
+	m_Buffer.appendfv(fmt, a_va);
+	for (const int new_size = m_Buffer.size(); old_size < new_size; old_size++)
+		if (m_Buffer[old_size] == '\n')
+			m_LineOffsets.push_back(old_size + 1);
+}
+
+void LogWindow::Log(const char* fmt, ...)
 {
 	int old_size = m_Buffer.size();
 	va_list args;

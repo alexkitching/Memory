@@ -25,7 +25,8 @@ public:
 		m_LineOffsets.push_back(0);
 	}
 
-	virtual void OnLog(const char* fmt, ...) IM_FMTARGS(2) override;
+	virtual void Log(const char* fmt, ...) override;
+	virtual void OnLog(const char* fmt, va_list a_va) IM_FMTARGS(2) override;
 
 protected:
 	void OnGUIWindow(const IMGUIInterface& a_interface) override;

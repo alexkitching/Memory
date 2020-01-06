@@ -35,6 +35,7 @@ void MemoryApp::OnGUI(IMGUIInterface& a_GUIInterface)
 {
 	// Draw IMGUI Stuff Here
 	m_LogWindow.OnGUI(a_GUIInterface);
+	m_PerformanceCounterWindow.OnGUI(a_GUIInterface);
 }
 
 void MemoryApp::OnPostFrame()

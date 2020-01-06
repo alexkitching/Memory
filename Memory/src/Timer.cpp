@@ -3,9 +3,12 @@
 
 Timer::Timer(bool a_bStartImme)
 	:
-m_bStarted(a_bStartImme)
+m_bStarted(false)
 {
-	
+	if(a_bStartImme)
+	{
+		Start();
+	}
 }
 
 void Timer::Start()
