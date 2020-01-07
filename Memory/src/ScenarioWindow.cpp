@@ -20,40 +20,29 @@ ScenarioWindow::~ScenarioWindow()
 }
 
 
-void ScenarioWindow::OnGUIWindow(const IMGUIInterface& a_interface)
+void ScenarioWindow::OnGUIWindow(const IMGUIInterface& a_gui)
 {
 	ImGui::Text("Scenarios");
 	ImGui::Separator();
 
-	const bool bScenarioActive = m_bScenarioActive[(int)ScenarioType::ResourceLoadingBootup];
-	if(bScenarioActive)
-	{
-		 ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-		 ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-	}
-
-	if(ImGui::Button("Bootup Resource Loading" ))
+	// Bootup Resource Loading Scenario 
+	if(a_gui.Button("Bootup Resource Loading", m_bScenarioActive[(int)ScenarioType::ResourceLoadingBootup] == false))
 	{
 		m_pScenarioManager->StartScenario(ScenarioType::ResourceLoadingBootup);
 	}
 
-	if (bScenarioActive)
+	if (a_gui.Button("Gameplay Resource Loading", m_bScenarioActive[(int)ScenarioType::ResourceLoadingBootup] == false))
 	{
-		ImGui::PopStyleVar();
-		ImGui::PopItemFlag();
+		m_pScenarioManager->StartScenario(ScenarioType::ResourceLoadingGameplay);
 	}
+	
 
-	if(ImGui::Button("Gameplay Resource Loading"))
-	{
-		
-	}
-
-	if(ImGui::Button("Particle System"))
+	if(a_gui.Button("Particle System"))
 	{
 		
 	}
 
-	if(ImGui::Button("Vertex Data Processing"))
+	if(a_gui.Button("Vertex Data Processing"))
 	{
 		
 	}
@@ -68,3 +57,4 @@ void ScenarioWindow::OnScenarioFinished(ScenarioType a_type)
 {
 	m_bScenarioActive[(int)a_type] = false;
 }
+

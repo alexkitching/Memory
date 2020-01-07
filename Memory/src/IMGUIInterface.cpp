@@ -7,6 +7,7 @@
 #include "../imgui-master/examples/imgui_impl_dx11.h"
 
 #include <d3d11.h>
+#include "imgui_internal.h"
 
 IMGUIInterface::IMGUIInterface()
 	:
@@ -109,4 +110,23 @@ void IMGUIInterface::RenderGUIFrame()
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
 	m_pWindow->GetRenderer().GetContext()->OMSetRenderTargets(1, &pOldRT, pOldDS);
+}
+
+bool IMGUIInterface::Button(const char* a_pName, bool a_bEnabled) const
+{
+	if(a_bEnabled == false)
+	{
+		ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+	}
+
+	const bool bPressed = ImGui::Button(a_pName);
+
+	if(a_bEnabled == false)
+	{
+		ImGui::PopStyleVar();
+		ImGui::PopItemFlag();
+	}
+
+	return bPressed;
 }

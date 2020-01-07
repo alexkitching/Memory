@@ -16,9 +16,6 @@ bool MemoryApp::Initialise()
 {
 	// Init Window
 	ASSERT(WinApp::Initialise() && "WinApp Init Failed!");
-
-	m_ScenarioManager.StartScenario(ScenarioType::ResourceLoadingBootup);
-
 	return true;
 }
 

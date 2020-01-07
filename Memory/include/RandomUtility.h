@@ -26,5 +26,15 @@ public:
 		std::uniform_int_distribution<T> distr(a_min, a_max); // define the range
 		return distr(eng);
 	}
+
+	static bool Bool()
+	{
+		return IntRange(0, 1);
+	}
+	
+	static bool BoolWithSeed(unsigned a_seed)
+	{
+		return IntRangeWithSeed(0, 1, a_seed);
+	}
 	
 };

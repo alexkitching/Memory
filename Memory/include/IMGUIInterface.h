@@ -17,6 +17,8 @@ public:
 	void BeginGUIFrame();
 	void Test();
 	void RenderGUIFrame();
+
+	bool Button(const char* a_pName, bool a_bEnabled = true) const;
 private:
 	bool m_bInitialised;
 	

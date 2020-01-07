@@ -12,6 +12,12 @@ ScenarioManager::ScenarioManager()
 	config.Bootup.MinResourceSize = 20 * MB;
 	config.Bootup.m_NumResourcesToLoad = 20;
 
+	config.Gameplay.LoadInterval = 0.5f;
+	config.Gameplay.MaxResourceSize = 60 * MB;
+	config.Gameplay.MinResourceSize = MB;
+	config.Gameplay.MaxAllocatedResourceSize = 400 * MB;
+	config.Gameplay.RunLength = 20.f;
+
 	Scenarios.ResourceLoading = ResourceLoadingScenario(config);
 }
 
