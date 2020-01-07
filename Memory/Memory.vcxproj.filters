@@ -94,15 +94,6 @@
     <Filter Include="Source Files\Memory\Allocators">
       <UniqueIdentifier>{cbff3239-5af9-4e94-b40a-ded79a90074a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Scenario\Resource Loading">
-      <UniqueIdentifier>{06bca229-dd6d-4cdc-abb5-a22dc947523e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Scenario\Particle System">
-      <UniqueIdentifier>{8bf33618-f26a-4016-8d49-9525801ffc92}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Scenario\Vertex Data Processing">
-      <UniqueIdentifier>{615702be-6e4c-4d0e-b2a0-6931d7e23eba}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\IMGUI\Windows">
       <UniqueIdentifier>{569a82a4-7d0d-4ee5-9a83-0adda5da47d1}</UniqueIdentifier>
     </Filter>
@@ -114,6 +105,12 @@
     </Filter>
     <Filter Include="Source Files\Time">
       <UniqueIdentifier>{1a8a1a94-9c06-413c-b2a3-d7a155e355af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scenario\Scenarios">
+      <UniqueIdentifier>{d3735ddb-42ee-4780-91f0-7a6039922029}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scenario\Scenarios">
+      <UniqueIdentifier>{78f560f4-e3f4-4f3f-b1c3-932b97ff789f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -197,6 +194,9 @@
     </ClCompile>
     <ClCompile Include="src\ScenarioWindow.cpp">
       <Filter>Source Files\IMGUI\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResourceLoadingScenario.cpp">
+      <Filter>Source Files\Scenario\Scenarios</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -290,9 +290,6 @@
     <ClInclude Include="include\Types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ResourceLoadingScenario.h">
-      <Filter>Header Files\Scenario\Resource Loading</Filter>
-    </ClInclude>
     <ClInclude Include="include\RandomUtility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -322,6 +319,9 @@
     </ClInclude>
     <ClInclude Include="include\Event.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResourceLoadingScenario.h">
+      <Filter>Header Files\Scenario\Scenarios</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

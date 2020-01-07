@@ -171,6 +171,7 @@
     <ClCompile Include="src\MemoryApp.cpp" />
     <ClCompile Include="src\Mouse.cpp" />
     <ClCompile Include="src\PerformanceCounterWindow.cpp" />
+    <ClCompile Include="src\ResourceLoadingScenario.cpp" />
     <ClCompile Include="src\ScenarioManager.cpp" />
     <ClCompile Include="src\GlobalTime.cpp" />
     <ClCompile Include="src\ScenarioWindow.cpp" />
