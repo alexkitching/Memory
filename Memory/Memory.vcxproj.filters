@@ -198,6 +198,9 @@
     <ClCompile Include="src\ResourceLoadingScenario.cpp">
       <Filter>Source Files\Scenario\Scenarios</Filter>
     </ClCompile>
+    <ClCompile Include="src\ParticleSystemScenario.cpp">
+      <Filter>Source Files\Scenario\Scenarios</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\WindowsMessageMap.h">
