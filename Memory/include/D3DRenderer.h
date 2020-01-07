@@ -17,7 +17,7 @@ public:
 	virtual void EndFrame() override;
 	virtual void Clear(float a_r, float a_g, float a_b) override;
 
-	void DrawTestTriangle(float a_angle, float a_x, float a_z);
+	void DrawCube(float a_x, float a_y, float a_z, float a_scale, float a_angle) override;
 
 	ID3D11Device* GetDevice() const { return m_pDevice.Get(); }
 	IDXGISwapChain* GetSwapChain() const { return m_pSwapChain.Get(); }

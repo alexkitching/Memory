@@ -1,4 +1,7 @@
 #include "ParticleSystemScenario.h"
+#include "Debug.h"
+#include "GlobalTime.h"
+#include "Renderer.h"
 
 void ParticleSystemScenario::Run()
 {
@@ -23,6 +26,14 @@ void ParticleSystemScenario::Run()
 	if (m_RunTimeTimer.GetTime() >= m_Config.RunLength)
 	{
 		m_bComplete = true;
+	}
+}
+
+void ParticleSystemScenario::OnRender(IRenderer* a_pRenderer)
+{
+	for(auto& ps : m_ParticleSystems)
+	{
+		ps.OnRender(a_pRenderer);
 	}
 }
 
@@ -78,6 +89,15 @@ void ParticleSystemScenario::ParticleSystem::Update()
 		}
 	}
 
+}
+
+void ParticleSystemScenario::ParticleSystem::OnRender(IRenderer* a_pRenderer)
+{
+	for(auto& p : m_Particles)
+	{
+		// TODO Optimise Renderer KILLS FPS probs due to Constant/create/destroy of buffers
+		//a_pRenderer->DrawCube(p.Position[0], p.Position[1], p.Position[2], 0.1f, Time::DeltaTime());
+	}
 }
 
 void ParticleSystemScenario::ParticleSystem::SpawnParticle()

@@ -17,6 +17,7 @@ enum class ScenarioType
 DECLARE_EVENT_ONE_PARAM(ScenarioEvent, void, ScenarioType);
 DECLARE_DELEGATE_ONE_PARAM(ScenarioEventDelegate, void, ScenarioType);
 
+class IRenderer;
 class ScenarioManager
 {
 public:
@@ -27,6 +28,7 @@ public:
 	void StopScenario(ScenarioType a_type);
 
 	void Update();
+	void OnRender(IRenderer* a_pRenderer);
 
 	ScenarioEvent OnScenarioStarted;
 	ScenarioEvent OnScenarioStopped;

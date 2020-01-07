@@ -31,6 +31,12 @@ void MemoryApp::OnFrame()
 	
 }
 
+void MemoryApp::OnRenderFrame(IRenderer* a_pRenderer)
+{
+	WinApp::OnRenderFrame(a_pRenderer);
+	m_ScenarioManager.OnRender(a_pRenderer);
+}
+
 void MemoryApp::OnGUI(IMGUIInterface& a_GUIInterface)
 {
 	// Draw IMGUI Stuff Here

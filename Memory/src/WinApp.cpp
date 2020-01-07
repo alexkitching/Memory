@@ -9,7 +9,9 @@
 
 WinApp::WinApp()
 	:
-m_pWindow(nullptr)
+m_pWindow(nullptr),
+m_FrameStage(FrameStage::PreFrame),
+m_bShouldClose(false)
 {
 }
 
@@ -74,22 +76,38 @@ void WinApp::OnPreFrame()
 
 void WinApp::OnFrame()
 {
+
+	
+
+}
+
+void WinApp::OnPreRenderFrame()
+{
 	// <---- Clear Render ---->
 	m_pWindow->GetRenderer().Clear(0.7f, 0.7f, 0.7f);
-	
-	// Draw Stuff
-	const float X = 1.f - (float)m_pWindow->GetMouse.GetXPos() / ((float)m_pWindow->GetWidth() * 0.5f);
-	const float Y = 1.f - (float)m_pWindow->GetMouse.GetYPos() / ((float)m_pWindow->GetHeight() * 0.5f);
-	
-	m_pWindow->GetRenderer().DrawTestTriangle(Time::TimeSinceStartup(), -X, Y);
-	m_pWindow->GetRenderer().DrawTestTriangle(-Time::TimeSinceStartup(), 0, 0);
+}
 
+void WinApp::OnRenderFrame(IRenderer* a_pRenderer)
+{
+	// Draw Stuff
+	const float MouseX = 1.f - (float)m_pWindow->GetMouse.GetXPos() / ((float)m_pWindow->GetWidth() * 0.5f);
+	const float MouseY = 1.f - (float)m_pWindow->GetMouse.GetYPos() / ((float)m_pWindow->GetHeight() * 0.5f);
+
+	const float zOffs = 0.f;
+	//m_pWindow->GetRenderer().DrawCube(-MouseX, 0.f, zOffs + MouseY, Time::TimeSinceStartup());
+	m_pWindow->GetRenderer().DrawCube(0.f, 0.f, zOffs, 1.f, -Time::TimeSinceStartup());
+	m_pWindow->GetRenderer().DrawCube(3.f, 0.f, zOffs, 0.5f, -Time::TimeSinceStartup());
 	// <---- IMGUI ---->
 	m_pWindow->GetIMGUI().BeginGUIFrame();
 	OnGUI(m_pWindow->GetIMGUI());
 	//m_pWindow->GetIMGUI().Test();
 	m_pWindow->GetIMGUI().RenderGUIFrame();
+
 	
+}
+
+void WinApp::OnPostRenderFrame()
+{
 	// <---- Present ---->
 	m_pWindow->GetRenderer().EndFrame();
 }
@@ -117,6 +135,12 @@ void WinApp::CycleFrame()
 		break;
 	case FrameStage::OnFrame:
 		OnFrame();
+		m_FrameStage = FrameStage::OnRenderFrame;
+		break;
+	case FrameStage::OnRenderFrame:
+		OnPreRenderFrame();
+		OnRenderFrame(&m_pWindow->GetRenderer());
+		OnPostRenderFrame();
 		m_FrameStage = FrameStage::PostFrame;
 		break;
 	case FrameStage::PostFrame:

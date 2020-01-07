@@ -126,7 +126,7 @@ void D3DRenderer::Clear(float a_r, float a_g, float a_b)
 	m_pContext->ClearDepthStencilView(m_pDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.f, 0u);
 }
 
-void D3DRenderer::DrawTestTriangle(float a_angle, float a_x, float a_z)
+void D3DRenderer::DrawCube(float a_x, float a_y, float a_z, float a_scale, float a_angle)
 {
 	struct Vertex
 	{
@@ -221,16 +221,18 @@ void D3DRenderer::DrawTestTriangle(float a_angle, float a_x, float a_z)
 	{
 		DX::XMMATRIX transform;
 	};
+
+	const float fCamZOffs = 10;
 	// Buffer Data Instance
 	const VSConstantBuffer vscb =
 	{
 		{
 				DX::XMMatrixTranspose(
-					//DX::XMMatrixScaling(1.0f, 1.f, 1.f) *
+					DX::XMMatrixScaling(a_scale, a_scale, a_scale) *
 					DX::XMMatrixRotationZ(a_angle) *
 					DX::XMMatrixRotationX(a_angle) *
-					DX::XMMatrixTranslation(a_x, 0.f, a_z + 4.f) *
-					DX::XMMatrixPerspectiveLH(1.f, 3.f / 4.f, 0.5f, 10.f)
+					DX::XMMatrixTranslation(a_x, a_y, a_z  + fCamZOffs) *
+					DX::XMMatrixPerspectiveLH(1.f, 3.f / 4.f, 0.5f, 500.f)
 				)
 		}
 	};

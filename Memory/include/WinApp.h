@@ -18,6 +18,9 @@ protected:
 	virtual bool Initialise() override;
 	virtual void OnPreFrame();
 	virtual void OnFrame();
+	virtual void OnPreRenderFrame();
+	virtual void OnRenderFrame(IRenderer* a_pRenderer);
+	virtual void OnPostRenderFrame();
 	virtual void OnGUI(IMGUIInterface& a_imGUIInterface) {}
 	virtual void OnPostFrame();
 	virtual void OnExit() override;
@@ -30,6 +33,7 @@ private:
 	{
 		PreFrame = 0,
 		OnFrame,
+		OnRenderFrame,
 		PostFrame,
 		MAX
 	};

@@ -1,10 +1,8 @@
 #pragma once
 #include "Scenario.h"
 #include "Timer.h"
-#include <vector>
-#include "GlobalTime.h"
 #include "RandomUtility.h"
-#include "Debug.h"
+#include <vector>
 
 class ParticleSystemScenario : public IScenario
 {
@@ -33,6 +31,7 @@ public:
 	virtual ~ParticleSystemScenario() {}
 
 	void Run() override;
+	void OnRender(IRenderer* a_pRenderer) override;
 	void Reset() override;
 	bool IsComplete() override { return m_bComplete; }
 
@@ -61,6 +60,7 @@ private:
 		~ParticleSystem() {}
 
 		void Update();
+		void OnRender(IRenderer* a_pRenderer);
 
 		int GetParticleCount() const { return (int)m_Particles.size(); }
 		

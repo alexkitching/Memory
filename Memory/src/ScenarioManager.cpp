@@ -112,6 +112,14 @@ void ScenarioManager::Update()
 	}
 }
 
+void ScenarioManager::OnRender(IRenderer* a_pRenderer)
+{
+	for(auto& active : m_ActiveScenarios)
+	{
+		active.pScenario->OnRender(a_pRenderer);
+	}
+}
+
 IScenario* ScenarioManager::GetScenario(ScenarioType a_type)
 {
 	switch (a_type)

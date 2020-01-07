@@ -16,6 +16,7 @@ protected:
 	virtual bool Initialise() override;
 	virtual void OnPreFrame() override;
 	virtual void OnFrame() override;
+	virtual void OnRenderFrame(IRenderer* a_pRenderer) override;
 	virtual void OnGUI(IMGUIInterface& a_GUIInterface) override;
 	virtual void OnPostFrame() override;
 	virtual void OnExit() override;
