@@ -4,6 +4,7 @@
 #include "ScenarioManager.h"
 #include "LogWindow.h"
 #include "PerformanceCounterWindow.h"
+#include "ScenarioWindow.h"
 
 class MemoryApp : public WinApp
 {
@@ -22,4 +23,5 @@ private:
 	ScenarioManager m_ScenarioManager;
 	LogWindow m_LogWindow;
 	PerformanceCounterWindow m_PerformanceCounterWindow;
+	ScenarioWindow m_ScenarioWindow;
 };

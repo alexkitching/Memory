@@ -195,6 +195,9 @@
     <ClCompile Include="src\GlobalTime.cpp">
       <Filter>Source Files\Time</Filter>
     </ClCompile>
+    <ClCompile Include="src\ScenarioWindow.cpp">
+      <Filter>Source Files\IMGUI\Windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\WindowsMessageMap.h">
@@ -310,6 +313,15 @@
     </ClInclude>
     <ClInclude Include="include\GlobalTime.h">
       <Filter>Header Files\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ScenarioWindow.h">
+      <Filter>Header Files\IMGUI\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Delegate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Event.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

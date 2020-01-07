@@ -1,24 +1,24 @@
 #pragma once
 #include "ResourceLoadingScenario.h"
 #include "Common.h"
+#include "Event.h"
+
+enum class ScenarioType
+{
+	Invalid = -1,
+	ResourceLoadingBootup,
+	ResourceLoadingGameplay,
+	ParticleSystem,
+	VertexDataProcessing,
+	COUNT
+};
+
+DECLARE_EVENT_ONE_PARAM(ScenarioEvent, void, ScenarioType);
+DECLARE_DELEGATE_ONE_PARAM(ScenarioEventDelegate, void, ScenarioType);
 
 class ScenarioManager
 {
 public:
-
-	enum class ScenarioType
-	{
-		Invalid = -1,
-		ResourceLoadingBootup,
-		ResourceLoadingGameplay,
-		ParticleSystem,
-		VertexDataProcessing,
-		COUNT
-	};
-
-
-
-
 	ScenarioManager();
 	~ScenarioManager();
 
@@ -26,6 +26,10 @@ public:
 	void StopScenario(ScenarioType a_type);
 
 	void Update();
+
+	ScenarioEvent OnScenarioStarted;
+	ScenarioEvent OnScenarioStopped;
+	ScenarioEvent OnScenarioComplete;
 	
 private:
 
@@ -51,7 +55,7 @@ private:
 		{TEXT(VertexDataProcessing)}
 	};
 
-	IScenario* GetScenario(ScenarioType a_type);
+	inline IScenario* GetScenario(ScenarioType a_type);
 	
 	struct
 	{

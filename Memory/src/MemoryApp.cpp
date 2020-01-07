@@ -2,6 +2,9 @@
 #include "Debug.h"
 
 MemoryApp::MemoryApp()
+	:
+m_ScenarioManager(ScenarioManager()),
+m_ScenarioWindow(&m_ScenarioManager)
 {
 }
 
@@ -14,7 +17,7 @@ bool MemoryApp::Initialise()
 	// Init Window
 	ASSERT(WinApp::Initialise() && "WinApp Init Failed!");
 
-	m_ScenarioManager.StartScenario(ScenarioManager::ScenarioType::ResourceLoadingBootup);
+	m_ScenarioManager.StartScenario(ScenarioType::ResourceLoadingBootup);
 
 	return true;
 }
@@ -36,6 +39,7 @@ void MemoryApp::OnGUI(IMGUIInterface& a_GUIInterface)
 	// Draw IMGUI Stuff Here
 	m_LogWindow.OnGUI(a_GUIInterface);
 	m_PerformanceCounterWindow.OnGUI(a_GUIInterface);
+	m_ScenarioWindow.OnGUI(a_GUIInterface);
 }
 
 void MemoryApp::OnPostFrame()

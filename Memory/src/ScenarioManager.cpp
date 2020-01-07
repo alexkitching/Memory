@@ -49,6 +49,8 @@ void ScenarioManager::StartScenario(ScenarioType a_type)
 	SMLOG("Starting Memory Scenario - %s \n", pName);
 	
 	m_ActiveScenarios.emplace_back(pScenarioToStart, a_type);
+	
+	OnScenarioStarted(a_type); // Raise Event
 }
 
 void ScenarioManager::StopScenario(ScenarioType a_type)
@@ -63,6 +65,8 @@ void ScenarioManager::StopScenario(ScenarioType a_type)
 			active.pScenario->Reset();
 			SMLOG("Scenario Stopped - %s \n", ScenarioTypeNames[(int)a_type].c_str());
 			m_ActiveScenarios.erase(m_ActiveScenarios.begin() + i);
+
+			OnScenarioStopped(a_type); // Raise Event
 			return;
 		}
 	}
@@ -81,10 +85,14 @@ void ScenarioManager::Update()
 		}
 		else
 		{
+			ScenarioType type = active.Type;
 			active.pScenario->Reset();
-			float fTimeTaken = active.Timer.GetTime();
-			SMLOG("Scenario Completed - %s - Time Taken - %f s \n", ScenarioTypeNames[(int)active.Type].c_str(), fTimeTaken);
+			const float fTimeTaken = active.Timer.GetTime();
+
 			m_ActiveScenarios.erase(m_ActiveScenarios.begin() + i);
+
+			SMLOG("Scenario Completed - %s - Time Taken - %f s \n", ScenarioTypeNames[(int)type].c_str(), fTimeTaken);
+			OnScenarioComplete(type); // Raise Event
 		}
 	}
 }

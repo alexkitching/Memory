@@ -173,6 +173,7 @@
     <ClCompile Include="src\PerformanceCounterWindow.cpp" />
     <ClCompile Include="src\ScenarioManager.cpp" />
     <ClCompile Include="src\GlobalTime.cpp" />
+    <ClCompile Include="src\ScenarioWindow.cpp" />
     <ClCompile Include="src\Timer.cpp" />
     <ClCompile Include="src\WinApp.cpp" />
     <ClCompile Include="src\Window.cpp" />
@@ -193,8 +194,10 @@
     <ClInclude Include="include\D3D.h" />
     <ClInclude Include="include\D3DRenderer.h" />
     <ClInclude Include="include\Debug.h" />
+    <ClInclude Include="include\Delegate.h" />
     <ClInclude Include="include\dxerr.h" />
     <ClInclude Include="include\DXGI_Info_Man.h" />
+    <ClInclude Include="include\Event.h" />
     <ClInclude Include="include\Exception.h" />
     <ClInclude Include="include\IMGUIInterface.h" />
     <ClInclude Include="include\IMGUIWindow.h" />
@@ -209,6 +212,7 @@
     <ClInclude Include="include\Scenario.h" />
     <ClInclude Include="include\ScenarioManager.h" />
     <ClInclude Include="include\GlobalTime.h" />
+    <ClInclude Include="include\ScenarioWindow.h" />
     <ClInclude Include="include\Timer.h" />
     <ClInclude Include="include\Types.h" />
     <ClInclude Include="include\Win.h" />
