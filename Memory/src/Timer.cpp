@@ -1,7 +1,8 @@
 #include "Timer.h"
+#include "GlobalTime.h"
 
 
-Timer::Timer(bool a_bStartImme)
+TP_Timer::TP_Timer(bool a_bStartImme)
 	:
 m_bStarted(false)
 {
@@ -11,7 +12,7 @@ m_bStarted(false)
 	}
 }
 
-void Timer::Start()
+void TP_Timer::Start()
 {
 	if (m_bStarted)
 		return;
@@ -21,13 +22,13 @@ void Timer::Start()
 	m_bStarted = true;
 }
 
-void Timer::Stop()
+void TP_Timer::Stop()
 {
 	m_bStarted = false;
 	m_stopTime = std::chrono::steady_clock::now();;
 }
 
-float Timer::GetTime() const
+float TP_Timer::GetTime() const
 {
 	if(m_bStarted)
 	{
@@ -42,4 +43,36 @@ float Timer::GetTime() const
 	}
 	
 	return 0.f;
+}
+
+DT_Timer::DT_Timer(bool a_bStartImme)
+	:
+m_bStarted(false)
+{
+	if (a_bStartImme)
+	{
+		Start();
+	}
+}
+
+void DT_Timer::Start()
+{
+	if (m_bStarted)
+		return;
+
+	m_CurrentTime = 0.f;
+	m_bStarted = true;
+}
+
+void DT_Timer::Stop()
+{
+	m_bStarted = false;
+}
+
+void DT_Timer::Tick()
+{
+	if(m_bStarted)
+	{
+		m_CurrentTime += Time::DeltaTime();
+	}
 }

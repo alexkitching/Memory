@@ -1,10 +1,10 @@
 #pragma once
 #include <chrono>
 
-class Timer
+class TP_Timer
 {
 public:
-	Timer(bool a_bStartImme = true);
+	TP_Timer(bool a_bStartImme = false);
 
 	void Start();
 	void Stop();
@@ -15,5 +15,23 @@ public:
 private:
 	std::chrono::steady_clock::time_point m_startTime;
 	std::chrono::steady_clock::time_point m_stopTime;
+	bool m_bStarted;
+};
+
+class DT_Timer
+{
+public:
+	DT_Timer(bool a_bStartImme = false);
+
+	void Start();
+	void Stop();
+	void Tick();
+
+	bool IsStarted() const { return m_bStarted; }
+
+	float GetTime() const { return m_CurrentTime; }
+	void SetTime(float a_fTime) { m_CurrentTime = a_fTime; }
+private:
+	float m_CurrentTime;
 	bool m_bStarted;
 };

@@ -1,5 +1,6 @@
 #pragma once
 #include "ResourceLoadingScenario.h"
+#include "ParticleSystemScenario.h"
 #include "Common.h"
 #include "Event.h"
 
@@ -44,7 +45,7 @@ private:
 		}
 		IScenario* pScenario;
 		ScenarioType Type;
-		Timer Timer;
+		TP_Timer Timer;
 	};
 
 	std::string ScenarioTypeNames[(int)ScenarioType::COUNT] =
@@ -60,6 +61,7 @@ private:
 	struct
 	{
 		ResourceLoadingScenario ResourceLoading;
+		ParticleSystemScenario ParticleSystem;
 	}Scenarios;
 
 	std::vector<ActiveScenario> m_ActiveScenarios;

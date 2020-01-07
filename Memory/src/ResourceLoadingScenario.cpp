@@ -7,6 +7,10 @@ void ResourceLoadingScenario::Run()
 		m_RunTimeTimer.Start();
 	}
 
+	// Tick Timers
+	m_RunTimeTimer.Tick();
+	m_IntervalTimer.Tick();
+
 	switch (m_CurrentType)
 	{
 	case Type::Bootup:

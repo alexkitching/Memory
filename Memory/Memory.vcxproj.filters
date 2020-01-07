@@ -323,6 +323,9 @@
     <ClInclude Include="include\ResourceLoadingScenario.h">
       <Filter>Header Files\Scenario\Scenarios</Filter>
     </ClInclude>
+    <ClInclude Include="include\ParticleSystemScenario.h">
+      <Filter>Header Files\Scenario\Scenarios</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Memory.rc">

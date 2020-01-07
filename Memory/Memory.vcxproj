@@ -206,6 +206,7 @@
     <ClInclude Include="include\LogWindow.h" />
     <ClInclude Include="include\MemoryApp.h" />
     <ClInclude Include="include\Mouse.h" />
+    <ClInclude Include="include\ParticleSystemScenario.h" />
     <ClInclude Include="include\PerformanceCounterWindow.h" />
     <ClInclude Include="include\RandomUtility.h" />
     <ClInclude Include="include\Renderer.h" />

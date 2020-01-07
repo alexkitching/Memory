@@ -37,12 +37,12 @@ void ScenarioWindow::OnGUIWindow(const IMGUIInterface& a_gui)
 	}
 	
 
-	if(a_gui.Button("Particle System"))
+	if(a_gui.Button("Particle System", m_bScenarioActive[(int)ScenarioType::ParticleSystem] == false))
 	{
-		
+		m_pScenarioManager->StartScenario(ScenarioType::ParticleSystem);
 	}
 
-	if(a_gui.Button("Vertex Data Processing"))
+	if(a_gui.Button("Vertex Data Processing", m_bScenarioActive[(int)ScenarioType::VertexDataProcessing] == false))
 	{
 		
 	}

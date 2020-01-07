@@ -19,6 +19,16 @@ ScenarioManager::ScenarioManager()
 	config.Gameplay.RunLength = 20.f;
 
 	Scenarios.ResourceLoading = ResourceLoadingScenario(config);
+
+	ParticleSystemScenario::Config psConfig = {};
+	psConfig.ParticleSystem.MaxParticles = 2000;
+	psConfig.ParticleSystem.ParticleEmissionRate = 50.f;
+	psConfig.ParticleSystem.ParticleStartCount = 50;
+	psConfig.ParticleSystem.ParticleLifeTime = 3.f;
+	psConfig.ParticleSystemsCount = 50;
+	psConfig.RunLength = 20.f;
+
+	Scenarios.ParticleSystem = ParticleSystemScenario(psConfig);
 }
 
 ScenarioManager::~ScenarioManager()
@@ -84,7 +94,6 @@ void ScenarioManager::Update()
 	{
 		ActiveScenario& active = m_ActiveScenarios[i];
 
-		// TODO Time Scenario
 		if(active.pScenario->IsComplete() == false)
 		{
 			active.pScenario->Run();
@@ -110,8 +119,8 @@ IScenario* ScenarioManager::GetScenario(ScenarioType a_type)
 	case ScenarioType::ResourceLoadingBootup:
 	case ScenarioType::ResourceLoadingGameplay:
 		return &Scenarios.ResourceLoading;
-		break;
 	case ScenarioType::ParticleSystem:
+		return &Scenarios.ParticleSystem;
 	case ScenarioType::VertexDataProcessing:
 	default:
 		break;

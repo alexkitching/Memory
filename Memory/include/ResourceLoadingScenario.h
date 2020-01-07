@@ -96,8 +96,8 @@ private:
 	Type m_CurrentType;
 	Config m_Config;
 
-	Timer m_IntervalTimer;
-	Timer m_RunTimeTimer;
+	DT_Timer m_IntervalTimer;
+	DT_Timer m_RunTimeTimer;
 	
 
 	int m_NextSeed;
