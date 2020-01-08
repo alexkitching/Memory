@@ -8,11 +8,13 @@
 class WindowsMessageMap
 {
 public:
+	static std::string Read(DWORD msg, LPARAM lp, WPARAM wp);
+private:
 	WindowsMessageMap();
 	~WindowsMessageMap() {}
 
-	std::string operator()( DWORD msg,LPARAM lp,WPARAM wp ) const noexcept;
+	std::string operator()(DWORD msg, LPARAM lp, WPARAM wp) const noexcept;
 
-private:
+	static WindowsMessageMap* s_pMessageMap;
 	std::map<DWORD, std::string> m_MessageMap;
 };

@@ -31,7 +31,7 @@ void ScenarioWindow::OnGUIWindow(const IMGUIInterface& a_gui)
 		m_pScenarioManager->StartScenario(ScenarioType::ResourceLoadingBootup);
 	}
 
-	if (a_gui.Button("Gameplay Resource Loading", m_bScenarioActive[(int)ScenarioType::ResourceLoadingBootup] == false))
+	if (a_gui.Button("Gameplay Resource Loading", m_bScenarioActive[(int)ScenarioType::ResourceLoadingGameplay] == false))
 	{
 		m_pScenarioManager->StartScenario(ScenarioType::ResourceLoadingGameplay);
 	}

@@ -3,6 +3,8 @@
 #include "GlobalTime.h"
 #include "Renderer.h"
 
+ Heap* ParticleSystemScenario::ParticleSystem::Particle::s_Heap = nullptr;
+
 void ParticleSystemScenario::Run()
 {
 	if (m_RunTimeTimer.IsStarted() == false) // Begin

@@ -3,6 +3,8 @@
 #include "Timer.h"
 #include "RandomUtility.h"
 #include <vector>
+#include "Heap.h"
+#include "MemoryManager.h"
 
 class ParticleSystemScenario : public IScenario
 {
@@ -26,7 +28,9 @@ public:
 	:
 	m_Config(a_config),
 	m_bComplete(false)
-	{}
+	{
+		ParticleSystem::Particle::s_Heap = MemoryManager::CreateHeapFromGlobal("ParticleHeap");
+	}
 	
 	virtual ~ParticleSystemScenario() {}
 
@@ -38,6 +42,7 @@ public:
 private:
 	class ParticleSystem
 	{
+		friend class ParticleSystemScenario;
 	public:
 		struct Config
 		{
@@ -84,6 +89,18 @@ private:
 			float Position[3];
 			float Velocity[3];
 			float LiveTime;
+
+			static Heap* s_Heap;
+
+			void* operator new(size_t a_size)
+			{
+				return ::operator new(a_size, s_Heap);
+			}
+
+			void operator delete(void* a_pPtr, size_t a_size)
+			{
+				return ::operator delete(a_pPtr);
+			}
 		};
 
 		void SpawnParticle();

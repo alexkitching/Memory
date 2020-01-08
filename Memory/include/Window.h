@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Win.h"
-#include "WindowsMessageMap.h"
+
 #include "Exception.h"
 #include "Keyboard.h"
 #include "Mouse.h"
@@ -79,8 +79,6 @@ private:
 	static LRESULT CALLBACK HandleMessageSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT HandleMessageInternal(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
-	static WindowsMessageMap s_MessageMap;
 
 	std::string m_name;
 	int m_width;

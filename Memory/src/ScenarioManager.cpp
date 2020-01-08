@@ -1,9 +1,14 @@
 #include "ScenarioManager.h"
+#include "ResourceLoadingScenario.h"
+#include "ParticleSystemScenario.h"
 #include "Debug.h"
+#include "MemoryManager.h"
 
 #define SMLOG(x, ...) LOG("ScenarioManager::" x, __VA_ARGS__)
 
 ScenarioManager::ScenarioManager()
+	:
+Scenarios({nullptr, nullptr})
 {
 	// Setup Scenarios
 	ResourceLoadingScenario::Config config = {};
@@ -18,8 +23,9 @@ ScenarioManager::ScenarioManager()
 	config.Gameplay.MaxAllocatedResourceSize = 400 * MB;
 	config.Gameplay.RunLength = 20.f;
 
-	Scenarios.ResourceLoading = ResourceLoadingScenario(config);
+	Scenarios.pResourceLoading = new ResourceLoadingScenario(config);
 
+	
 	ParticleSystemScenario::Config psConfig = {};
 	psConfig.ParticleSystem.MaxParticles = 2000;
 	psConfig.ParticleSystem.ParticleEmissionRate = 50.f;
@@ -28,11 +34,14 @@ ScenarioManager::ScenarioManager()
 	psConfig.ParticleSystemsCount = 50;
 	psConfig.RunLength = 20.f;
 
-	Scenarios.ParticleSystem = ParticleSystemScenario(psConfig);
+	Scenarios.pParticleSystem = new ParticleSystemScenario(psConfig);
+
+
 }
 
 ScenarioManager::~ScenarioManager()
 {
+	delete Scenarios.pResourceLoading;
 }
 
 void ScenarioManager::StartScenario(ScenarioType a_type)
@@ -51,10 +60,10 @@ void ScenarioManager::StartScenario(ScenarioType a_type)
 	switch (a_type)
 	{
 	case ScenarioType::ResourceLoadingBootup:
-		Scenarios.ResourceLoading.SetType(ResourceLoadingScenario::Type::Bootup);
+		Scenarios.pResourceLoading->SetType(ResourceLoadingScenario::Type::Bootup);
 		break;
 	case ScenarioType::ResourceLoadingGameplay:
-		Scenarios.ResourceLoading.SetType(ResourceLoadingScenario::Type::Gameplay);
+		Scenarios.pResourceLoading->SetType(ResourceLoadingScenario::Type::Gameplay);
 		break;
 	default:
 		break;
@@ -126,9 +135,9 @@ IScenario* ScenarioManager::GetScenario(ScenarioType a_type)
 	{
 	case ScenarioType::ResourceLoadingBootup:
 	case ScenarioType::ResourceLoadingGameplay:
-		return &Scenarios.ResourceLoading;
+		return Scenarios.pResourceLoading;
 	case ScenarioType::ParticleSystem:
-		return &Scenarios.ParticleSystem;
+		return Scenarios.pParticleSystem;
 	case ScenarioType::VertexDataProcessing:
 	default:
 		break;

@@ -1,8 +1,7 @@
 #pragma once
-#include "ResourceLoadingScenario.h"
-#include "ParticleSystemScenario.h"
 #include "Common.h"
 #include "Event.h"
+#include "Timer.h"
 
 enum class ScenarioType
 {
@@ -17,7 +16,11 @@ enum class ScenarioType
 DECLARE_EVENT_ONE_PARAM(ScenarioEvent, void, ScenarioType);
 DECLARE_DELEGATE_ONE_PARAM(ScenarioEventDelegate, void, ScenarioType);
 
+class IScenario;
+class ResourceLoadingScenario;
+class ParticleSystemScenario;
 class IRenderer;
+
 class ScenarioManager
 {
 public:
@@ -62,8 +65,8 @@ private:
 	
 	struct
 	{
-		ResourceLoadingScenario ResourceLoading;
-		ParticleSystemScenario ParticleSystem;
+		ResourceLoadingScenario* pResourceLoading;
+		ParticleSystemScenario* pParticleSystem;
 	}Scenarios;
 
 	std::vector<ActiveScenario> m_ActiveScenarios;

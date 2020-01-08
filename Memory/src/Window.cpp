@@ -1,12 +1,16 @@
 #include "Window.h"
-#include <sstream>
 #include "resource.h"
 #include "Debug.h"
 
+#include <sstream>
+
 #define LOG_MESSAGES 0
 
+#if LOG_MESSAGES
+#include "WindowsMessageMap.h"
+#endif
+
 Window::WindowClassDef Window::WindowClassDef::s_ClassDef;
-WindowsMessageMap Window::s_MessageMap;
 
 Window::WindowClassDef::WindowClassDef()
 	:
@@ -148,7 +152,7 @@ std::optional<int> Window::ProcessMessages()
 LRESULT CALLBACK Window::HandleMessageSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 #if LOG_MESSAGES
-	OutputDebugString(s_MessageMap(msg, lParam, wParam).c_str());
+	OutputDebugString(WindowsMessageMap::Read(msg, lParam, wParam).c_str());
 #endif
 
 	if(msg == WM_NCCREATE) // Create Message
@@ -175,7 +179,7 @@ LRESULT CALLBACK Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 LRESULT Window::HandleMessageInternal(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 #if LOG_MESSAGES
-	OutputDebugString(s_MessageMap(msg, lParam, wParam).c_str());
+	OutputDebugString(WindowsMessageMap::Read(msg, lParam, wParam).c_str());
 #endif
 	switch (msg)
 	{

@@ -201,6 +201,12 @@
     <ClCompile Include="src\ParticleSystemScenario.cpp">
       <Filter>Source Files\Scenario\Scenarios</Filter>
     </ClCompile>
+    <ClCompile Include="src\MemoryManager.cpp">
+      <Filter>Source Files\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Heap.cpp">
+      <Filter>Source Files\Memory</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\WindowsMessageMap.h">
@@ -328,6 +334,12 @@
     </ClInclude>
     <ClInclude Include="include\ParticleSystemScenario.h">
       <Filter>Header Files\Scenario\Scenarios</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Heap.h">
+      <Filter>Header Files\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MemoryManager.h">
+      <Filter>Header Files\Memory</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
