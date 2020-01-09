@@ -1,40 +1,35 @@
 #pragma once
 
-#include <new>
+#include "Heap.h"
 #define MAX_HEAPS 10
-class Heap;
 
 class MemoryManager
 {
 public:
-	static void Initialise();
+	struct GlobalAllocationHeader
+	{
+		uint32 AllocTypeSig;
+	};
+	
+	static void Initialise(size_t a_maxGlobalMem);
 	
 	static void Shutdown();
 
 
 	static Heap* GetDefaultHeap();
 
-	static Heap* CreateHeapFromGlobal(const char* a_pName);
+	static Heap* CreateHeapFromGlobal(Heap::Config& a_config);
 private:
 
-	static Heap* ActivateEmptyHeap(const char* a_pName);
+	static Heap* ActivateEmptyHeap(const Heap::Config& a_config);
 	
-	static Heap* CreateHeap(const char* a_pName, const char* a_pParentName);
-	static Heap* CreateHeap(const char* a_pName, Heap* a_pParent);
+	static Heap* CreateHeap(Heap::Config& a_config, const char* a_pParentName);
+	static Heap* CreateHeap(Heap::Config& a_config, Heap* a_pParent);
 	static Heap* FindActiveHeap(const char* a_pName);
 	
 	static bool s_bInitialised;
 	static Heap* s_pGlobalHeap;
 	static Heap* s_pDefaultHeap;
+	static Heap s_Heaps[MAX_HEAPS];
 };
 
-void* operator new(std::size_t a_size, const char* a_pFile, int a_Line, const char* a_pFunc);
-
-void* operator new(std::size_t a_size, Heap* a_pHeap);
-
-void* operator new(std::size_t a_size);
-
-void operator delete(void* ptr) noexcept;
-
-
-#define MM_NEW new(__FILE__, __LINE__, __FUNCTION__)

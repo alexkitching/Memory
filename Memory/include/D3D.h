@@ -70,12 +70,12 @@ if(DXGIInfoManager::Instance() != nullptr)									\
 	DXGIInfoManager::Instance()->Set();										\
 	(call);																	\
 	{																		\
-		auto dxgimsg = DXGIInfoManager::Instance()->GetMessages();			\
+		std::vector<std::string>& dxgimsg = DXGIInfoManager::Instance()->GetMessages();			\
 		if(dxgimsg.empty() == false)										\
 		{																	\
 			throw D3DInfoException(__LINE__,__FILE__, dxgimsg);				\
 		}																	\
-		}																	\
+	}																	\
 }																		    \
 
 #else

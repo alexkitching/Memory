@@ -2,8 +2,18 @@
 #include "Debug.h"
 #include "GlobalTime.h"
 #include "Renderer.h"
+#include "Heap.h"
+#include "MemoryManager.h"
 
  Heap* ParticleSystemScenario::ParticleSystem::Particle::s_Heap = nullptr;
+
+ParticleSystemScenario::ParticleSystemScenario(const Config& a_config)
+	:
+	m_Config(a_config),
+	m_bComplete(false)
+{
+	//ParticleSystem::Particle::s_Heap = MemoryManager::CreateHeapFromGlobal("ParticleHeap");
+}
 
 void ParticleSystemScenario::Run()
 {
@@ -44,6 +54,16 @@ void ParticleSystemScenario::Reset()
 	m_bComplete = false;
 	m_RunTimeTimer.Stop();
 	m_ParticleSystems.clear();
+}
+
+ParticleSystemScenario::ParticleSystem::ParticleSystem(const Config& a_config)
+	:
+	m_Config(a_config)
+{
+	while ((int)m_Particles.size() != m_Config.StartParticles)
+	{
+		SpawnParticle();
+	}
 }
 
 void ParticleSystemScenario::ParticleSystem::Update()
@@ -100,6 +120,21 @@ void ParticleSystemScenario::ParticleSystem::OnRender(IRenderer* a_pRenderer)
 		// TODO Optimise Renderer KILLS FPS probs due to Constant/create/destroy of buffers
 		//a_pRenderer->DrawCube(p.Position[0], p.Position[1], p.Position[2], 0.1f, Time::DeltaTime());
 	}
+}
+
+ParticleSystemScenario::ParticleSystem::Particle::Particle(float a_fX, float a_fY, float a_fZ)
+	:
+	Position{ a_fX, a_fY, a_fZ },
+	Velocity{ Random::FloatRange(-1.f, 1.f), // Random Dirs
+			 Random::FloatRange(-1.f, 1.f) ,
+			 Random::FloatRange(-1.f, 1.f) },
+	LiveTime(0.f)
+{
+	// Normalise Dir
+	const float len = Velocity[0] + Velocity[1] + Velocity[2];
+	Velocity[0] /= len;
+	Velocity[1] /= len;
+	Velocity[2] /= len;
 }
 
 void ParticleSystemScenario::ParticleSystem::SpawnParticle()

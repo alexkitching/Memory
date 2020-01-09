@@ -3,8 +3,8 @@
 #include "Timer.h"
 #include "RandomUtility.h"
 #include <vector>
-#include "Heap.h"
-#include "MemoryManager.h"
+
+class Heap;
 
 class ParticleSystemScenario : public IScenario
 {
@@ -24,13 +24,7 @@ public:
 	};
 
 	ParticleSystemScenario() = default;
-	ParticleSystemScenario(const Config& a_config)
-	:
-	m_Config(a_config),
-	m_bComplete(false)
-	{
-		ParticleSystem::Particle::s_Heap = MemoryManager::CreateHeapFromGlobal("ParticleHeap");
-	}
+	ParticleSystemScenario(const Config& a_config);
 	
 	virtual ~ParticleSystemScenario() {}
 
@@ -53,15 +47,7 @@ private:
 			float OriginPosition[3];
 		};
 		
-		ParticleSystem(const Config& a_config)
-			:
-		m_Config(a_config)
-		{
-			while((int)m_Particles.size() != m_Config.StartParticles)
-			{
-				SpawnParticle();
-			}
-		}
+		ParticleSystem(const Config& a_config);
 		~ParticleSystem() {}
 
 		void Update();
@@ -72,20 +58,8 @@ private:
 	private:
 		struct Particle
 		{
-			Particle(float a_fX, float a_fY, float a_fZ)
-				:
-			Position{a_fX, a_fY, a_fZ},
-			Velocity{Random::FloatRange(-1.f, 1.f), // Random Dirs
-					 Random::FloatRange(-1.f, 1.f) ,
-					 Random::FloatRange(-1.f, 1.f) },
-			LiveTime(0.f)
-			{
-				// Normalise Dir
-				const float len = Velocity[0] + Velocity[1] + Velocity[2];
-				Velocity[0] /= len;
-				Velocity[1] /= len;
-				Velocity[2] /= len;
-			}
+			Particle(float a_fX, float a_fY, float a_fZ);
+				
 			float Position[3];
 			float Velocity[3];
 			float LiveTime;
@@ -97,7 +71,7 @@ private:
 				return ::operator new(a_size, s_Heap);
 			}
 
-			void operator delete(void* a_pPtr, size_t a_size)
+			void operator delete(void* a_pPtr)
 			{
 				return ::operator delete(a_pPtr);
 			}

@@ -1,9 +1,7 @@
 #include "MemoryManager.h"
-#include "Heap.h"
 #include "Debug.h"
+#include "Common.h"
 
-
-#define OVERRIDE_NEW 1
 
 bool MemoryManager::s_bInitialised = false;
 Heap* MemoryManager::s_pGlobalHeap = nullptr;
@@ -12,90 +10,43 @@ Heap* MemoryManager::s_pDefaultHeap = nullptr;
 #define MM_ASSERT_INIT() ASSERT(s_bInitialised && "Memory Manager not Initialised!")
 
 constexpr const char* GLOBAL_HEAP_NAME = "Global";
+
 constexpr const char* DEFAULT_HEAP_NAME = "Default";
+constexpr size_t DEFAULT_HEAP_SIZE = 512 * MB;
 
-static Heap s_Heaps[MAX_HEAPS];
+Heap MemoryManager::s_Heaps[MAX_HEAPS] = { };
 
-#if OVERRIDE_NEW // Overloaded Operators
-void* operator new(std::size_t a_size, const char* a_pFile, int a_Line, const char* a_pFunc)
-{
-	void* pPtr = operator new(a_size, MemoryManager::GetDefaultHeap());
-	if(pPtr != nullptr)
-	{
-		return pPtr;
-	}
-	throw std::bad_alloc();
-}
-
-void* operator new(size_t a_size, Heap* a_pHeap)
-{
-	const size_t ReqBytes = sizeof(Heap::AllocationHeader) + a_size;
-	char* pMem = (char*)malloc(ReqBytes);
-
-	Heap::AllocationHeader* pHeader = (Heap::AllocationHeader*)pMem;
-
-	if(pHeader != nullptr)
-	{
-		pHeader->pHeap = a_pHeap;
-		pHeader->Size = a_size;
-	}
-	
-
-	a_pHeap->AddAllocation(a_size);
-
-	void* pStartBlock = pMem + sizeof(Heap::AllocationHeader);
-	return pStartBlock;
-}
-
-// Default Globals
-void* operator new(std::size_t a_size)
-{
-	void* pPtr = operator new(a_size, MemoryManager::GetDefaultHeap());
-
-	if (pPtr)
-		return pPtr;
-
-	throw std::bad_alloc();
-}
-
-void operator delete(void* a_pPtr)
-{
-	char* pPtr = (char*)a_pPtr;
-	pPtr -= sizeof(Heap::AllocationHeader);
-
-	Heap::AllocationHeader* pHeader = (Heap::AllocationHeader*)(pPtr);
-
-	pHeader->pHeap->RemoveAllocation(pHeader->Size);
-	
-	std::free(pPtr);
-}
-
-
-#else // STANDARD OPERATORS
-void* operator new(size_t a_size)
-{
-
-	void* pPtr = malloc(a_size);
-	if(pPtr)
-	{
-		return pPtr;
-	}
-
-	throw std::bad_alloc();
-}
-
-void operator delete(void* a_pPtr)
-{
-	std::free(a_pPtr);
-}
-#endif
-
-void MemoryManager::Initialise()
+void MemoryManager::Initialise(size_t a_maxGlobalMem)
 {
 	ASSERT(s_bInitialised == false && "Trying to Init Twice!");
 
-	s_pGlobalHeap = ActivateEmptyHeap(GLOBAL_HEAP_NAME);
-	s_pDefaultHeap = CreateHeapFromGlobal(DEFAULT_HEAP_NAME);
+	void* pGlobalMem = malloc(a_maxGlobalMem);
+	if(pGlobalMem == nullptr)
+	{
+		UNREACHABLE("Failed to Allocate Global Memory");
+		return;
+	}
+
+	// Set All Memory to 0
+	memset(pGlobalMem, 0, a_maxGlobalMem);
+	
+	const Heap::Config GlobalConfig
+	{
+		GLOBAL_HEAP_NAME,
+		pGlobalMem,
+		a_maxGlobalMem
+	};
+	
+	s_pGlobalHeap = ActivateEmptyHeap(GlobalConfig);
+
+	Heap::Config DefaultConfig
+	{
+		DEFAULT_HEAP_NAME,
+		nullptr, // To be Allocated from Global
+		a_maxGlobalMem - sizeof(Heap::AllocationHeader) + sizeof(unsigned int)
+	};
+	
+	s_pDefaultHeap = CreateHeapFromGlobal(DefaultConfig);
 
 	s_bInitialised = true;
 }
@@ -111,14 +62,14 @@ Heap* MemoryManager::GetDefaultHeap()
 	return s_pDefaultHeap;
 }
 
-Heap* MemoryManager::ActivateEmptyHeap(const char* a_pName)
+Heap* MemoryManager::ActivateEmptyHeap(const Heap::Config& a_config)
 {
 	for(int i = 0; i < MAX_HEAPS; ++i)
 	{
 		Heap* pHeap = &s_Heaps[i];
 		if(pHeap->IsActive() == false)
 		{
-			pHeap->Activate(a_pName);
+			pHeap->Activate(a_config);
 			return pHeap;
 		}
 	}
@@ -126,29 +77,36 @@ Heap* MemoryManager::ActivateEmptyHeap(const char* a_pName)
 	return nullptr;
 }
 
-Heap* MemoryManager::CreateHeapFromGlobal(const char* a_pName)
+Heap* MemoryManager::CreateHeapFromGlobal(Heap::Config& a_config)
 {
-	return CreateHeap(a_pName, s_pGlobalHeap);
+	return CreateHeap(a_config, s_pGlobalHeap);
 }
 
-Heap* MemoryManager::CreateHeap(const char* a_pName, const char* a_pParentName)
+Heap* MemoryManager::CreateHeap(Heap::Config& a_config, const char* a_pParentName)
 {
 	Heap* pParent = FindActiveHeap(a_pParentName);
 	ASSERT(pParent != nullptr && "No Parent Heap Found!");
-	ASSERT(FindActiveHeap(a_pName) == nullptr && "Heap with identical name already exists!");
+	ASSERT(FindActiveHeap(a_config.Name) == nullptr && "Heap with identical name already exists!");
 
-	Heap* pChildHeap = CreateHeap(a_pName, pParent);
+	Heap* pChildHeap = CreateHeap(a_config, pParent);
 	pChildHeap->SetParent(pParent);
 
 	return pChildHeap;
 }
 
-Heap* MemoryManager::CreateHeap(const char* a_pName, Heap* a_pParent)
+Heap* MemoryManager::CreateHeap(Heap::Config& a_config, Heap* a_pParent)
 {
 	ASSERT(a_pParent != nullptr && "Parent Heap is null!");
-	ASSERT(FindActiveHeap(a_pName) == nullptr && "Heap with identical name already exists!");
+	ASSERT(FindActiveHeap(a_config.Name) == nullptr && "Heap with identical name already exists!");
 
-	Heap* pHeap = ActivateEmptyHeap(a_pName);
+	void* pHeapStart = a_pParent->Allocate(a_config.Capacity);
+
+	if (pHeapStart == nullptr) // Failed to Allocate
+		return nullptr;
+
+	a_config.pStartPtr = pHeapStart;
+	
+	Heap* pHeap = ActivateEmptyHeap(a_config);
 	pHeap->SetParent(a_pParent);
 	return pHeap;
 }

@@ -16,8 +16,8 @@ void TP_Timer::Start()
 {
 	if (m_bStarted)
 		return;
-	
-	m_startTime = std::chrono::steady_clock::now();
+
+	m_startTime = std::chrono::high_resolution_clock::now();
 
 	m_bStarted = true;
 }
@@ -25,7 +25,7 @@ void TP_Timer::Start()
 void TP_Timer::Stop()
 {
 	m_bStarted = false;
-	m_stopTime = std::chrono::steady_clock::now();;
+	m_stopTime = std::chrono::high_resolution_clock::now();;
 }
 
 float TP_Timer::GetTime() const

@@ -50,7 +50,7 @@ private:
 		}
 		IScenario* pScenario;
 		ScenarioType Type;
-		TP_Timer Timer;
+		DT_Timer Timer;
 	};
 
 	std::string ScenarioTypeNames[(int)ScenarioType::COUNT] =

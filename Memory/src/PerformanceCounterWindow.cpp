@@ -6,6 +6,7 @@
 #include "GlobalTime.h"
 #include "MemoryManager.h"
 #include "Heap.h"
+#include "MemSys.h"
 
 PerformanceCounterWindow::PerformanceCounterWindow()
 	:
@@ -57,5 +58,7 @@ void PerformanceCounterWindow::OnGUIWindow(const IMGUIInterface& a_interface)
 	ImGui::Text("Virtual Memory Usage: %.1f Mbs", (float)((float)virtualMemUsedByMe / MB));
 	ImGui::Text("Virtual Memory Capacity: %.1f Mbs", (float)((float)totalVirtualMem / MB));
 	ImGui::Separator();
+#if USE_MEM_SYS
 	ImGui::Text("Default Heap Usage: %.1f Mbs", (float)((float)MemoryManager::GetDefaultHeap()->GetTotalAllocationSize()/ MB));
+#endif
 }

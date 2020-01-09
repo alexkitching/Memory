@@ -171,6 +171,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MemoryApp.cpp" />
     <ClCompile Include="src\MemoryManager.cpp" />
+    <ClCompile Include="src\MemSys.cpp" />
     <ClCompile Include="src\Mouse.cpp" />
     <ClCompile Include="src\ParticleSystemScenario.cpp" />
     <ClCompile Include="src\PerformanceCounterWindow.cpp" />
@@ -210,6 +211,7 @@
     <ClInclude Include="include\LogWindow.h" />
     <ClInclude Include="include\MemoryApp.h" />
     <ClInclude Include="include\MemoryManager.h" />
+    <ClInclude Include="include\MemSys.h" />
     <ClInclude Include="include\Mouse.h" />
     <ClInclude Include="include\ParticleSystemScenario.h" />
     <ClInclude Include="include\PerformanceCounterWindow.h" />

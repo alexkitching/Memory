@@ -15,7 +15,7 @@ public:
 	static void Shutdown();
 	
 	void Set();
-	std::vector<std::string> GetMessages();
+	std::vector<std::string>& GetMessages();
 	
 private:
 	DXGIInfoManager();
@@ -25,4 +25,5 @@ private:
 	
 	unsigned long long m_next = 0u;
 	Microsoft::WRL::ComPtr<IDXGIInfoQueue> m_pDXGI_InfoQueue;
+	std::vector<std::string> m_msgs;
 };

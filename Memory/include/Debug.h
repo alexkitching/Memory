@@ -24,8 +24,10 @@ static void AssertFail(int a_line, const char* a_fileName, const char* a_express
 
 #if DEBUG
 #define ASSERT(x) (void)((x) || (AssertFail(__LINE__, __FILE__, #x), 0))
+#define UNREACHABLE(x) ASSERT(false && ("UNREACHABLE::" x))
 #else
 #define ASSERT(x)
+#define UNREACHABLE(x)
 #endif
 
 class ILogHandler

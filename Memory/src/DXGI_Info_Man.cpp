@@ -58,11 +58,11 @@ void DXGIInfoManager::Set()
 {
 	// Set the index of next index
 	m_next = m_pDXGI_InfoQueue->GetNumStoredMessages(DXGI_DEBUG_ALL);
+	m_msgs.clear();
 }
 
-std::vector<std::string> DXGIInfoManager::GetMessages()
+std::vector<std::string>& DXGIInfoManager::GetMessages()
 {
-	std::vector<std::string> messages;
 	const auto end = m_pDXGI_InfoQueue->GetNumStoredMessages(DXGI_DEBUG_ALL);
 	for(unsigned long long i = m_next; i < end; ++i)
 	{
@@ -76,10 +76,10 @@ std::vector<std::string> DXGIInfoManager::GetMessages()
 
 		D3D_THROW_FAILED_NOINFO(m_pDXGI_InfoQueue->GetMessage(DXGI_DEBUG_ALL, i, pMessage, &messageLen));
 
-		messages.emplace_back(pMessage->pDescription);
+		m_msgs.emplace_back(pMessage->pDescription);
 
 		delete[] pMessage;
 	}
 
-	return messages;
+	return m_msgs;
 }

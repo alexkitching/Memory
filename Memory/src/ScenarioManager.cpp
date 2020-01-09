@@ -102,7 +102,7 @@ void ScenarioManager::Update()
 	for(int i = (int)m_ActiveScenarios.size() - 1; i >= 0; --i)
 	{
 		ActiveScenario& active = m_ActiveScenarios[i];
-
+		active.Timer.Tick();
 		if(active.pScenario->IsComplete() == false)
 		{
 			active.pScenario->Run();
