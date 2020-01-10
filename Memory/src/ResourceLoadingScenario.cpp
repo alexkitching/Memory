@@ -53,8 +53,6 @@ void ResourceLoadingScenario::RunBootType()
 		return;
 	}
 
-	
-
 	// Load Resource
 	const size_t ResourceSize = Random::IntRangeWithSeed(m_Config.Bootup.MinResourceSize, m_Config.Bootup.MaxResourceSize, m_NextSeed++);
 	IDummyResource* pResource = new DummyResource(ResourceSize);

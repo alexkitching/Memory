@@ -44,7 +44,7 @@ void ScenarioWindow::OnGUIWindow(const IMGUIInterface& a_gui)
 
 	if(a_gui.Button("Vertex Data Processing", m_bScenarioActive[(int)ScenarioType::VertexDataProcessing] == false))
 	{
-		
+		m_pScenarioManager->StartScenario(ScenarioType::VertexDataProcessing);
 	}
 }
 

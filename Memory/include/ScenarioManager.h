@@ -19,6 +19,7 @@ DECLARE_DELEGATE_ONE_PARAM(ScenarioEventDelegate, void, ScenarioType);
 class IScenario;
 class ResourceLoadingScenario;
 class ParticleSystemScenario;
+class VertexDataProcessingScenario;
 class IRenderer;
 
 class ScenarioManager
@@ -71,6 +72,7 @@ private:
 	{
 		ResourceLoadingScenario* pResourceLoading;
 		ParticleSystemScenario* pParticleSystem;
+		VertexDataProcessingScenario* pVertexProcessing;
 	}Scenarios;
 
 	std::vector<ActiveScenario> m_ActiveScenarios;

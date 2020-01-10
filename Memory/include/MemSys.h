@@ -3,7 +3,7 @@
 
 class Heap;
 
-#define USE_MEM_SYS 1
+#define USE_MEM_SYS 0
 
 #define MEM_END 0xFFC00FED
 

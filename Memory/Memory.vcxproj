@@ -182,6 +182,7 @@
     <ClCompile Include="src\GlobalTime.cpp" />
     <ClCompile Include="src\ScenarioWindow.cpp" />
     <ClCompile Include="src\Timer.cpp" />
+    <ClCompile Include="src\VertexDataProcessingScenario.cpp" />
     <ClCompile Include="src\WinApp.cpp" />
     <ClCompile Include="src\Window.cpp" />
     <ClCompile Include="src\WindowsMessageMap.cpp" />
@@ -230,6 +231,7 @@
     <ClInclude Include="include\ScenarioWindow.h" />
     <ClInclude Include="include\Timer.h" />
     <ClInclude Include="include\Types.h" />
+    <ClInclude Include="include\VertexDataProcessingScenario.h" />
     <ClInclude Include="include\Win.h" />
     <ClInclude Include="include\WinApp.h" />
     <ClInclude Include="include\Window.h" />

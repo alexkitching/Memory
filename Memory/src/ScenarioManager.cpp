@@ -1,6 +1,7 @@
 #include "ScenarioManager.h"
 #include "ResourceLoadingScenario.h"
 #include "ParticleSystemScenario.h"
+#include "VertexDataProcessingScenario.h"
 #include "Debug.h"
 #include "MemoryManager.h"
 #include "PerformanceCounter.h"
@@ -39,7 +40,13 @@ Scenarios({nullptr, nullptr})
 
 	Scenarios.pParticleSystem = new ParticleSystemScenario(psConfig);
 
+	VertexDataProcessingScenario::Config vpConfig = {};
+	vpConfig.MinVertsPerSub = 3;
+	vpConfig.MaxVertsPerSub = 300;
+	vpConfig.PerFrameTotalData = 20 * MB;
+	vpConfig.RunLength = 20.f;
 
+	Scenarios.pVertexProcessing = new VertexDataProcessingScenario(vpConfig);
 }
 
 ScenarioManager::~ScenarioManager()
@@ -147,6 +154,7 @@ IScenario* ScenarioManager::GetScenario(ScenarioType a_type)
 	case ScenarioType::ParticleSystem:
 		return Scenarios.pParticleSystem;
 	case ScenarioType::VertexDataProcessing:
+		return Scenarios.pVertexProcessing;
 	default:
 		break;
 	}

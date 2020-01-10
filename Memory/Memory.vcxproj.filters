@@ -222,6 +222,9 @@
     <ClCompile Include="src\PerformanceCounter.cpp">
       <Filter>Source Files\Performance</Filter>
     </ClCompile>
+    <ClCompile Include="src\VertexDataProcessingScenario.cpp">
+      <Filter>Source Files\Scenario\Scenarios</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\WindowsMessageMap.h">
@@ -370,6 +373,9 @@
     </ClInclude>
     <ClInclude Include="include\PerformanceCounter.h">
       <Filter>Header Files\Performance</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VertexDataProcessingScenario.h">
+      <Filter>Header Files\Scenario\Scenarios</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
