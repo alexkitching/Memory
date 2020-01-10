@@ -225,6 +225,9 @@
     <ClCompile Include="src\VertexDataProcessingScenario.cpp">
       <Filter>Source Files\Scenario\Scenarios</Filter>
     </ClCompile>
+    <ClCompile Include="src\StackAllocator.cpp">
+      <Filter>Source Files\Memory\Allocators</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\WindowsMessageMap.h">
@@ -376,6 +379,9 @@
     </ClInclude>
     <ClInclude Include="include\VertexDataProcessingScenario.h">
       <Filter>Header Files\Scenario\Scenarios</Filter>
+    </ClInclude>
+    <ClInclude Include="include\StackAllocator.h">
+      <Filter>Header Files\Memory\Allocators</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

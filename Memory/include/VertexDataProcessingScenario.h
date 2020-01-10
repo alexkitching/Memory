@@ -1,6 +1,7 @@
 #pragma once
 #include "Scenario.h"
 #include "Timer.h"
+#include "StackAllocator.h"
 #include <vector>
 
 class VertexDataProcessingScenario : public IScenario
@@ -52,5 +53,8 @@ private:
 
 	size_t m_fCurrentFrameDataSize;
 
+#if USE_MEM_SYS
+	StackAllocator m_VertexStack;
+#endif
 	std::vector<VertexSub> m_Subs;
 };

@@ -181,6 +181,7 @@
     <ClCompile Include="src\ScenarioManager.cpp" />
     <ClCompile Include="src\GlobalTime.cpp" />
     <ClCompile Include="src\ScenarioWindow.cpp" />
+    <ClCompile Include="src\StackAllocator.cpp" />
     <ClCompile Include="src\Timer.cpp" />
     <ClCompile Include="src\VertexDataProcessingScenario.cpp" />
     <ClCompile Include="src\WinApp.cpp" />
@@ -229,6 +230,7 @@
     <ClInclude Include="include\ScenarioManager.h" />
     <ClInclude Include="include\GlobalTime.h" />
     <ClInclude Include="include\ScenarioWindow.h" />
+    <ClInclude Include="include\StackAllocator.h" />
     <ClInclude Include="include\Timer.h" />
     <ClInclude Include="include\Types.h" />
     <ClInclude Include="include\VertexDataProcessingScenario.h" />

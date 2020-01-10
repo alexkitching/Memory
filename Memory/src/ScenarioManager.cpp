@@ -43,7 +43,7 @@ Scenarios({nullptr, nullptr})
 	VertexDataProcessingScenario::Config vpConfig = {};
 	vpConfig.MinVertsPerSub = 3;
 	vpConfig.MaxVertsPerSub = 300;
-	vpConfig.PerFrameTotalData = 20 * MB;
+	vpConfig.PerFrameTotalData = 5 * MB;
 	vpConfig.RunLength = 20.f;
 
 	Scenarios.pVertexProcessing = new VertexDataProcessingScenario(vpConfig);

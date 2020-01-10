@@ -20,9 +20,8 @@ public:
 	Pool& operator=(const Pool&) = delete;
 
 	virtual void* allocate(size_t a_size, uint8 a_alignment) override;
-	void deallocate(void* a_pBlock) override;
+	virtual void deallocate(void* a_pBlock) override;
 
-	typedef ObjectT value_type;
 private:
 	void Initialise();
 	
