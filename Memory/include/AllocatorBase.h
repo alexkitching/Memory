@@ -5,21 +5,19 @@
 class AllocatorBase
 {
 public:
-	AllocatorBase(size_t a_size, void* a_pStart);
+	AllocatorBase();
+	AllocatorBase(size_t a_capacity, void* a_pStart);
 	virtual ~AllocatorBase();
-
-	// Throws Exceptions in Debug 
-	void PreDispose();
 
 	// Prevent Copies
 	AllocatorBase(const AllocatorBase&) = delete;
 	AllocatorBase& operator=(const AllocatorBase&) = delete;
 
 	virtual void* allocate(size_t a_size, uint8 a_alignment = 4u) = 0;
-	virtual void deallocate(void* a_p) = 0;
+	virtual void deallocate(void* a_pBlock) = 0;
 
 	void* GetStartAddress() const { return m_pStart;  }
-	size_t GetMaxSize() const { return m_maxSize;  }
+	size_t GetCapacity() const { return m_capacity;  }
 	
 #if DEBUG
 	size_t GetUsedMemory() const { return m_usedSize; }
@@ -27,7 +25,7 @@ public:
 #endif
 protected:
 	void* m_pStart;
-	size_t m_maxSize;
+	size_t m_capacity;
 	
 #if DEBUG
 	size_t m_allocationCount;

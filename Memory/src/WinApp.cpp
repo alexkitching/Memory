@@ -2,6 +2,7 @@
 #include "Debug.h"
 #include "GlobalTime.h"
 #include <iomanip>
+#include "PerformanceCounter.h"
 
 #if DEBUG
 #include "DXGI_Info_Man.h"
@@ -72,6 +73,8 @@ void WinApp::OnPreFrame()
 		// Optional Has Value
 		SetShouldClose(*errorCode);
 	}
+
+	PerformanceCounter::Tick();
 }
 
 void WinApp::OnFrame()

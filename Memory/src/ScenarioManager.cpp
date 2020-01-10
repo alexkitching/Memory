@@ -3,6 +3,7 @@
 #include "ParticleSystemScenario.h"
 #include "Debug.h"
 #include "MemoryManager.h"
+#include "PerformanceCounter.h"
 
 #define SMLOG(x, ...) LOG("ScenarioManager::" x, __VA_ARGS__)
 
@@ -28,9 +29,11 @@ Scenarios({nullptr, nullptr})
 	
 	ParticleSystemScenario::Config psConfig = {};
 	psConfig.ParticleSystem.MaxParticles = 2000;
-	psConfig.ParticleSystem.ParticleEmissionRate = 50.f;
+	psConfig.ParticleSystem.FixedParticleSpawnInterval = 0.0001f;
+	psConfig.ParticleSystem.ParticlesPerInterval = 10;
 	psConfig.ParticleSystem.ParticleStartCount = 50;
-	psConfig.ParticleSystem.ParticleLifeTime = 3.f;
+	psConfig.ParticleSystem.ParticleLifeTimeMax = 5.f;
+	psConfig.ParticleSystem.ParticleLifeTimeMin = 1.5f;
 	psConfig.ParticleSystemsCount = 50;
 	psConfig.RunLength = 20.f;
 
@@ -103,6 +106,9 @@ void ScenarioManager::Update()
 	{
 		ActiveScenario& active = m_ActiveScenarios[i];
 		active.Timer.Tick();
+		active.Ticks++;
+		active.AverageFPS += (PerformanceCounter::FPS() - active.AverageFPS) / active.Ticks;
+		
 		if(active.pScenario->IsComplete() == false)
 		{
 			active.pScenario->Run();
@@ -110,12 +116,14 @@ void ScenarioManager::Update()
 		else
 		{
 			ScenarioType type = active.Type;
+			const float averageFPS = active.AverageFPS;
 			active.pScenario->Reset();
 			const float fTimeTaken = active.Timer.GetTime();
 
 			m_ActiveScenarios.erase(m_ActiveScenarios.begin() + i);
 
-			SMLOG("Scenario Completed - %s - Time Taken - %f s \n", ScenarioTypeNames[(int)type].c_str(), fTimeTaken);
+			SMLOG("Scenario Completed - %s - Time Taken - %f.1 s AverageFPS - %f.1 \n", ScenarioTypeNames[(int)type].c_str(), fTimeTaken, averageFPS);
+			
 			OnScenarioComplete(type); // Raise Event
 		}
 	}

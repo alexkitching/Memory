@@ -112,6 +112,12 @@
     <Filter Include="Header Files\Scenario\Scenarios">
       <UniqueIdentifier>{78f560f4-e3f4-4f3f-b1c3-932b97ff789f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Performance">
+      <UniqueIdentifier>{05a4f06b-d228-4ef7-a85d-c1da65000e09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Performance">
+      <UniqueIdentifier>{e68abf57-39ad-49bd-bc70-1796c06262ab}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -204,11 +210,17 @@
     <ClCompile Include="src\MemoryManager.cpp">
       <Filter>Source Files\Memory</Filter>
     </ClCompile>
-    <ClCompile Include="src\Heap.cpp">
-      <Filter>Source Files\Memory</Filter>
-    </ClCompile>
     <ClCompile Include="src\MemSys.cpp">
       <Filter>Source Files\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Heap.cpp">
+      <Filter>Source Files\Memory\Allocators</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Pool.cpp">
+      <Filter>Source Files\Memory\Allocators</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PerformanceCounter.cpp">
+      <Filter>Source Files\Performance</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -338,14 +350,26 @@
     <ClInclude Include="include\ParticleSystemScenario.h">
       <Filter>Header Files\Scenario\Scenarios</Filter>
     </ClInclude>
-    <ClInclude Include="include\Heap.h">
-      <Filter>Header Files\Memory</Filter>
-    </ClInclude>
     <ClInclude Include="include\MemoryManager.h">
       <Filter>Header Files\Memory</Filter>
     </ClInclude>
     <ClInclude Include="include\MemSys.h">
       <Filter>Header Files\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Platform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Heap.h">
+      <Filter>Header Files\Memory\Allocators</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Pool.h">
+      <Filter>Header Files\Memory\Allocators</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PointerMath.h">
+      <Filter>Header Files\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PerformanceCounter.h">
+      <Filter>Header Files\Performance</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

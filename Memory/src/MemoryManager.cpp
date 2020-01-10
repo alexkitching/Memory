@@ -99,7 +99,7 @@ Heap* MemoryManager::CreateHeap(Heap::Config& a_config, Heap* a_pParent)
 	ASSERT(a_pParent != nullptr && "Parent Heap is null!");
 	ASSERT(FindActiveHeap(a_config.Name) == nullptr && "Heap with identical name already exists!");
 
-	void* pHeapStart = a_pParent->Allocate(a_config.Capacity);
+	void* pHeapStart = a_pParent->allocate(a_config.Capacity);
 
 	if (pHeapStart == nullptr) // Failed to Allocate
 		return nullptr;

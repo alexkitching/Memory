@@ -2,6 +2,7 @@
 #include "Scenario.h"
 #include "Timer.h"
 #include "RandomUtility.h"
+#include "Pool.h"
 #include <vector>
 
 class Heap;
@@ -15,9 +16,11 @@ public:
 		struct
 		{
 			int MaxParticles;
-			float ParticleEmissionRate;
+			float FixedParticleSpawnInterval;
+			int ParticlesPerInterval;
 			int ParticleStartCount;
-			float ParticleLifeTime;
+			float ParticleLifeTimeMax;
+			float ParticleLifeTimeMin;
 		}ParticleSystem;
 
 		float RunLength;
@@ -33,7 +36,10 @@ public:
 	void Reset() override;
 	bool IsComplete() override { return m_bComplete; }
 
+	static int TotalAllocatedParticles;
 private:
+	
+	
 	class ParticleSystem
 	{
 		friend class ParticleSystemScenario;
@@ -42,13 +48,14 @@ private:
 		{
 			int MaxParticles;
 			int StartParticles;
-			float ParticleEmissionRatePerSecond;
+			float FixedParticleSpawnInterval;
+			int ParticlesPerInterval;
 			float LifeTime;
 			float OriginPosition[3];
 		};
 		
 		ParticleSystem(const Config& a_config);
-		~ParticleSystem() {}
+		~ParticleSystem();
 
 		void Update();
 		void OnRender(IRenderer* a_pRenderer);
@@ -62,19 +69,7 @@ private:
 				
 			float Position[3];
 			float Velocity[3];
-			float LiveTime;
-
-			static Heap* s_Heap;
-
-			void* operator new(size_t a_size)
-			{
-				return ::operator new(a_size, s_Heap);
-			}
-
-			void operator delete(void* a_pPtr)
-			{
-				return ::operator delete(a_pPtr);
-			}
+			float LiveTime; // 56 Bytes
 		};
 
 		void SpawnParticle();
@@ -82,7 +77,10 @@ private:
 
 		Config m_Config;
 		DT_Timer m_NextParticleTimer;
-		std::vector<Particle> m_Particles;
+#if USE_MEM_SYS
+		Pool<Particle, 8> m_ParticlePool;
+#endif
+		std::vector<Particle*> m_Particles;
 	};
 
 	void Initialise();

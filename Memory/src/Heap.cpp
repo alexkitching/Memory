@@ -9,6 +9,7 @@
 
 Heap::Heap()
 	:
+AllocatorBase(),
 m_Name{"INVALID"},
 m_bActive(false),
 m_bFavourBestFit(true),
@@ -16,11 +17,12 @@ m_pParent(nullptr),
 m_pChild(nullptr),
 m_pNextSibling(nullptr),
 m_pPreviousSibling(nullptr),
-m_pStartPtr(nullptr),
-m_Capacity(0u),
-m_TotalAllocatedSize(0u),
 m_pHeadAlloc(nullptr),
 m_pTailAlloc(nullptr)
+{
+}
+
+Heap::~Heap()
 {
 }
 
@@ -31,12 +33,12 @@ void Heap::Activate(const Config& a_config)
 	ASSERT(a_config.Capacity >= MIN_HEAP_ALLOC_SIZE && "Capacity must be greater than min heap alloc size!");
 	// Reset Vars Here
 	m_bActive = true;
-	m_pStartPtr = a_config.pStartPtr;
-	m_Capacity = a_config.Capacity;
+	m_pStart = a_config.pStartPtr;
+	m_capacity = a_config.Capacity;
 	strcpy_s(m_Name, MAX_HEAP_NAME_LEN, a_config.Name);
 }
 
-void* Heap::Allocate(size_t a_size)
+void* Heap::allocate(size_t a_size, uint8 a_alignment)
 {
 	AllocationHeader* pHeader = TryAllocate(a_size);
 
@@ -50,46 +52,52 @@ void* Heap::Allocate(size_t a_size)
 	*pEndMark = MEM_END;
 
 	// Increase Total Allocation Size
-	m_TotalAllocatedSize += HEAP_ALLOC_HEADER_FOOTER_SIZE + pHeader->Size;
-
+#if DEBUG
+	m_usedSize += HEAP_ALLOC_HEADER_FOOTER_SIZE + pHeader->Size;
+	m_allocationCount++;
+#endif
+	
 	return pBlockStart;
 }
 
-void Heap::Deallocate(void* a_pMem)
+void Heap::Deallocate(void* a_pBlock)
 {
-	auto pHeader = (AllocationHeader*)((char*)a_pMem - sizeof(AllocationHeader));
+	auto pHeader = (AllocationHeader*)((char*)a_pBlock - sizeof(AllocationHeader));
 	ASSERT(pHeader->Sig == MEM_HEAP_SIG && "Expected Heap Signature?");
-	pHeader->pHeap->Deallocate(pHeader); // Perform Deallocation
+	pHeader->pHeap->deallocate(a_pBlock); // Perform Deallocation
 }
 
-void Heap::Deallocate(AllocationHeader* a_pHeader)
+void Heap::deallocate(void* a_pBlock)
 {
-	uint32* pEndMark = (uint32*)((char*)a_pHeader + sizeof(AllocationHeader) + a_pHeader->Size);
+	auto pHeader = (AllocationHeader*)((char*)a_pBlock - sizeof(AllocationHeader));
+	uint32* pEndMark = (uint32*)((char*)a_pBlock + pHeader->Size);
 	ASSERT(*pEndMark == MEM_END && "Missing End Mark, Corrupt Allocation?");
 
 	// Head------->Tail
-	if (a_pHeader->pPrev == nullptr) // Must be Head 
+	if (pHeader->pPrev == nullptr) // Must be Head 
 	{
-		ASSERT(a_pHeader == m_pHeadAlloc && "Expected Header to be Head Allocation");
-		m_pHeadAlloc = a_pHeader->pNext; // Update New Head
+		ASSERT(pHeader == m_pHeadAlloc && "Expected Header to be Head Allocation");
+		m_pHeadAlloc = pHeader->pNext; // Update New Head
 		m_pHeadAlloc->pPrev = nullptr;
 	}
-	else if (a_pHeader->pNext == nullptr)
+	else if (pHeader->pNext == nullptr)
 	{
-		ASSERT(a_pHeader == m_pTailAlloc && "Expected Header to be Head Allocation");
-		m_pTailAlloc = a_pHeader->pPrev;
+		ASSERT(pHeader == m_pTailAlloc && "Expected Header to be Head Allocation");
+		m_pTailAlloc = pHeader->pPrev;
 		m_pTailAlloc->pNext = nullptr;
 	}
 	else // Not Head
 	{
-		a_pHeader->pPrev->pNext = a_pHeader->pNext;
-		a_pHeader->pNext->pPrev = a_pHeader->pPrev;
+		pHeader->pPrev->pNext = pHeader->pNext;
+		pHeader->pNext->pPrev = pHeader->pPrev;
 	}
 
-	m_TotalAllocatedSize -= HEAP_ALLOC_HEADER_FOOTER_SIZE + a_pHeader->Size;
-
+#if DEBUG
+	m_usedSize -= HEAP_ALLOC_HEADER_FOOTER_SIZE + pHeader->Size;
+	--m_allocationCount;
+#endif
 	// Free
-	memset(a_pHeader, 0, HEAP_ALLOC_HEADER_FOOTER_SIZE + a_pHeader->Size);
+	memset(pHeader, 0, HEAP_ALLOC_HEADER_FOOTER_SIZE + pHeader->Size);
 }
 
 void Heap::SetParent(Heap* a_pParent)
@@ -129,15 +137,17 @@ void Heap::SetParent(Heap* a_pParent)
 
 Heap::AllocationHeader* Heap::TryAllocate(size_t a_size)
 {
-	if(m_TotalAllocatedSize + a_size > m_Capacity)
+#if DEBUG
+	if(m_usedSize + a_size > m_capacity)
 	{
 		LOG("Heap: %s Failed Attempted Allocation of Size %u REASON - Exceeds Capacity")
 		return nullptr;
 	}
+#endif
 
 	if(m_pHeadAlloc == nullptr)
 	{
-		AllocationHeader* pHeader = (AllocationHeader*)m_pStartPtr;
+		AllocationHeader* pHeader = (AllocationHeader*)m_pStart;
 		pHeader->Sig = MEM_HEAP_SIG;
 		pHeader->pHeap = this;
 		pHeader->Size = a_size;
@@ -227,15 +237,15 @@ void* Heap::TryAllocateBestFit(size_t a_size, AllocationHeader*& a_pPrevClosestA
 	char* pStart = nullptr;
 	char* pEnd = nullptr;
 
-	if(m_pStartPtr != m_pHeadAlloc) // Gap Between Start - Head Check First
+	if(m_pStart != m_pHeadAlloc) // Gap Between Start - Head Check First
 	{
-		pStart = (char*)m_pStartPtr;
+		pStart = (char*)m_pStart;
 		pEnd = (char*)m_pHeadAlloc;
 		GapSize = pEnd - pStart;
 
 		if (GapSize >= a_size + HEAP_ALLOC_HEADER_FOOTER_SIZE) // Tail - Capacity Can fit, Set as Best for now
 		{
-			pBestFit = m_pStartPtr;
+			pBestFit = m_pStart;
 			bestSize = GapSize;
 		}
 	}
@@ -263,7 +273,7 @@ void* Heap::TryAllocateBestFit(size_t a_size, AllocationHeader*& a_pPrevClosestA
 
 	// Check for Gap between final alloc and capacity
 	pStart = (char*)m_pTailAlloc + HEAP_ALLOC_HEADER_FOOTER_SIZE + m_pTailAlloc->Size; // Tail Alloc End
-	pEnd = (char*)m_pStartPtr + m_Capacity;
+	pEnd = (char*)m_pStart + m_capacity;
 	if(pStart != pEnd) // End Point
 	{
 		GapSize = pEnd - pStart;

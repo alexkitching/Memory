@@ -174,7 +174,9 @@
     <ClCompile Include="src\MemSys.cpp" />
     <ClCompile Include="src\Mouse.cpp" />
     <ClCompile Include="src\ParticleSystemScenario.cpp" />
+    <ClCompile Include="src\PerformanceCounter.cpp" />
     <ClCompile Include="src\PerformanceCounterWindow.cpp" />
+    <ClCompile Include="src\Pool.cpp" />
     <ClCompile Include="src\ResourceLoadingScenario.cpp" />
     <ClCompile Include="src\ScenarioManager.cpp" />
     <ClCompile Include="src\GlobalTime.cpp" />
@@ -214,7 +216,11 @@
     <ClInclude Include="include\MemSys.h" />
     <ClInclude Include="include\Mouse.h" />
     <ClInclude Include="include\ParticleSystemScenario.h" />
+    <ClInclude Include="include\PerformanceCounter.h" />
     <ClInclude Include="include\PerformanceCounterWindow.h" />
+    <ClInclude Include="include\Platform.h" />
+    <ClInclude Include="include\PointerMath.h" />
+    <ClInclude Include="include\Pool.h" />
     <ClInclude Include="include\RandomUtility.h" />
     <ClInclude Include="include\Renderer.h" />
     <ClInclude Include="include\ResourceLoadingScenario.h" />

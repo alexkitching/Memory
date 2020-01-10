@@ -2,17 +2,16 @@
 #include "Debug.h"
 #include "GlobalTime.h"
 #include "Renderer.h"
-#include "Heap.h"
+#include "MemSys.h"
 #include "MemoryManager.h"
 
- Heap* ParticleSystemScenario::ParticleSystem::Particle::s_Heap = nullptr;
+int ParticleSystemScenario::TotalAllocatedParticles = 0;
 
 ParticleSystemScenario::ParticleSystemScenario(const Config& a_config)
 	:
 	m_Config(a_config),
 	m_bComplete(false)
 {
-	//ParticleSystem::Particle::s_Heap = MemoryManager::CreateHeapFromGlobal("ParticleHeap");
 }
 
 void ParticleSystemScenario::Run()
@@ -34,10 +33,13 @@ void ParticleSystemScenario::Run()
 	}
 
 	LOG("Total Particle Count: %i \n", iTotalParticles);
+	
 
 	if (m_RunTimeTimer.GetTime() >= m_Config.RunLength)
 	{
 		m_bComplete = true;
+		LOG("COMPLETE :: Total Allocated Particles: %i \n", TotalAllocatedParticles);
+		TotalAllocatedParticles = 0;
 	}
 }
 
@@ -59,10 +61,24 @@ void ParticleSystemScenario::Reset()
 ParticleSystemScenario::ParticleSystem::ParticleSystem(const Config& a_config)
 	:
 	m_Config(a_config)
-{
+#if USE_MEM_SYS
+	,
+m_ParticlePool(m_Config.MaxParticles * sizeof(Particle),
+				MemoryManager::GetDefaultHeap()->allocate(m_Config.MaxParticles * sizeof(Particle), 64u))
+#endif
+{ 
+
 	while ((int)m_Particles.size() != m_Config.StartParticles)
 	{
 		SpawnParticle();
+	}
+}
+
+ParticleSystemScenario::ParticleSystem::~ParticleSystem()
+{
+	while(m_Particles.empty() == false)
+	{
+		DestroyParticle(0);
 	}
 }
 
@@ -79,32 +95,28 @@ void ParticleSystemScenario::ParticleSystem::Update()
 		}
 
 		const float fNextTime = m_NextParticleTimer.GetTime();
-		const float fInterval = 1.f / m_Config.ParticleEmissionRatePerSecond;
-		if (fNextTime >= fInterval) // Timer Elapsed
+		if (fNextTime >= m_Config.FixedParticleSpawnInterval) // Timer Elapsed
 		{
-			const float fIntervals = fNextTime / fInterval;
-			const int SpawnCount = (int)fIntervals;
-			for (int i = 0; i < SpawnCount; ++i)
+			for (int i = 0; i < m_Config.ParticlesPerInterval; ++i)
 			{
 				SpawnParticle();
 			}
-
-
-			m_NextParticleTimer.SetTime(fIntervals - (float)SpawnCount);
+			
+			m_NextParticleTimer.SetTime(0.f);
 		}
 	}
 
 	for (auto& p : m_Particles)
 	{
-		p.LiveTime += Time::DeltaTime();
-		p.Position[0] += p.Velocity[0] += Time::DeltaTime();
-		p.Position[1] += p.Velocity[1] += Time::DeltaTime();
-		p.Position[2] += p.Velocity[2] += Time::DeltaTime();
+		p->LiveTime += Time::DeltaTime();
+		p->Position[0] += p->Velocity[0] += Time::DeltaTime();
+		p->Position[1] += p->Velocity[1] += Time::DeltaTime();
+		p->Position[2] += p->Velocity[2] += Time::DeltaTime();
 	}
 
 	for (int i = (int)m_Particles.size() - 1; i >= 0; --i)
 	{
-		Particle* p = &m_Particles[i];
+		Particle* p = m_Particles[i];
 		if (p->LiveTime >= m_Config.LifeTime)
 		{
 			DestroyParticle(i);
@@ -140,7 +152,15 @@ ParticleSystemScenario::ParticleSystem::Particle::Particle(float a_fX, float a_f
 void ParticleSystemScenario::ParticleSystem::SpawnParticle()
 {
 	// Push new Particle
-	m_Particles.emplace_back(m_Config.OriginPosition[0], m_Config.OriginPosition[1], m_Config.OriginPosition[2]);
+#if USE_MEM_SYS
+	Particle* pParticle = (Particle*)m_ParticlePool.allocate(sizeof(Particle), 8);
+	*pParticle = Particle(m_Config.OriginPosition[0], m_Config.OriginPosition[1], m_Config.OriginPosition[2]);
+	m_Particles.push_back(pParticle);
+#else
+	m_Particles.push_back(new Particle(m_Config.OriginPosition[0], m_Config.OriginPosition[1], m_Config.OriginPosition[2]));
+#endif
+
+	TotalAllocatedParticles++;
 
 	// Stop Timer
 	m_NextParticleTimer.Stop();
@@ -152,19 +172,27 @@ void ParticleSystemScenario::ParticleSystem::SpawnParticle()
 
 void ParticleSystemScenario::ParticleSystem::DestroyParticle(int a_pIdx)
 {
+	Particle* pParticle = m_Particles[a_pIdx];
 	m_Particles.erase(m_Particles.begin() + a_pIdx);
+#if USE_MEM_SYS
+	m_ParticlePool.deallocate(pParticle);
+#else
+	delete pParticle;
+#endif
 }
 
 void ParticleSystemScenario::Initialise()
 {
+	m_ParticleSystems.reserve(m_Config.ParticleSystemsCount);
 	while ((int)m_ParticleSystems.size() != m_Config.ParticleSystemsCount)
 	{
 		ParticleSystem::Config config =
 		{
 			m_Config.ParticleSystem.MaxParticles,
 			m_Config.ParticleSystem.ParticleStartCount,
-			m_Config.ParticleSystem.ParticleEmissionRate,
-			m_Config.ParticleSystem.ParticleLifeTime,
+			m_Config.ParticleSystem.FixedParticleSpawnInterval,
+			m_Config.ParticleSystem.ParticlesPerInterval,
+			Random::FloatRange(m_Config.ParticleSystem.ParticleLifeTimeMin, m_Config.ParticleSystem.ParticleLifeTimeMax),
 		{0.f} // Zero Vector
 		};
 		m_ParticleSystems.emplace_back(config);

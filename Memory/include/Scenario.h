@@ -1,5 +1,6 @@
 #pragma once
 
+#include "MemSys.h"
 
 class IRenderer;
 class IScenario

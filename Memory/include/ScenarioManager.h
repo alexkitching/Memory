@@ -44,13 +44,17 @@ private:
 		ActiveScenario(IScenario* a_pScenario, ScenarioType a_type)
 			:
 		pScenario(a_pScenario),
-		Type( a_type)
+		Type( a_type),
+		AverageFPS(0.f),
+		Ticks(0)
 		{
 			Timer.Start();
 		}
 		IScenario* pScenario;
 		ScenarioType Type;
 		DT_Timer Timer;
+		float AverageFPS;
+		int Ticks;
 	};
 
 	std::string ScenarioTypeNames[(int)ScenarioType::COUNT] =
