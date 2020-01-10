@@ -5,19 +5,19 @@
 #include "Debug.h"
 
 template<typename ObjectT, uint8 Alignment>
-class Pool : public AllocatorBase
+class PoolAllocator : public AllocatorBase
 {
 public:
-	Pool(size_t a_capacity,
+	PoolAllocator(size_t a_capacity,
 		void* a_pStart);
-	virtual~Pool()
+	virtual~PoolAllocator()
 	{
 		m_pListHead = nullptr;
 	}
 
 	
-	Pool(const Pool&);
-	Pool& operator=(const Pool&) = delete;
+	PoolAllocator(const PoolAllocator&);
+	PoolAllocator& operator=(const PoolAllocator&) = delete;
 
 	virtual void* allocate(size_t a_size, uint8 a_alignment) override;
 	virtual void deallocate(void* a_pBlock) override;
@@ -34,7 +34,7 @@ private:
 };
 
 template <typename ObjectT, uint8 Alignment>
-Pool<ObjectT, Alignment>::Pool(size_t a_capacity, void* a_pStart)
+PoolAllocator<ObjectT, Alignment>::PoolAllocator(size_t a_capacity, void* a_pStart)
 	:
 AllocatorBase(a_capacity, a_pStart),
 m_pListHead(nullptr)
@@ -43,7 +43,7 @@ m_pListHead(nullptr)
 }
 
 template <typename ObjectT, uint8 Alignment>
-Pool<ObjectT, Alignment>::Pool(const Pool& a_other)
+PoolAllocator<ObjectT, Alignment>::PoolAllocator(const PoolAllocator& a_other)
 	:
 AllocatorBase(a_other.m_capacity, a_other.m_pStart),
 m_pListHead(nullptr)
@@ -52,7 +52,7 @@ m_pListHead(nullptr)
 }
 
 template <typename ObjectT, uint8 Alignment>
-void* Pool<ObjectT, Alignment>::allocate(size_t a_size, uint8 a_alignment)
+void* PoolAllocator<ObjectT, Alignment>::allocate(size_t a_size, uint8 a_alignment)
 {
 	ASSERT(a_size == sizeof(ObjectT) && a_alignment == Alignment && "Incorrect Allocation Params for Pool");
 
@@ -71,7 +71,7 @@ void* Pool<ObjectT, Alignment>::allocate(size_t a_size, uint8 a_alignment)
 }
 
 template <typename ObjectT, uint8 Alignment>
-void Pool<ObjectT, Alignment>::deallocate(void* a_pBlock)
+void PoolAllocator<ObjectT, Alignment>::deallocate(void* a_pBlock)
 {
 	FreeList* pNewHead = (FreeList*)a_pBlock;
 	pNewHead->m_pNext = m_pListHead;
@@ -82,7 +82,7 @@ void Pool<ObjectT, Alignment>::deallocate(void* a_pBlock)
 }
 
 template <typename ObjectT, uint8 Alignment>
-void Pool<ObjectT, Alignment>::Initialise()
+void PoolAllocator<ObjectT, Alignment>::Initialise()
 {
 	const uint8 adjustment = PointerMath::AlignForwardAdjustment(m_pStart, Alignment);
 

@@ -2,7 +2,7 @@
 #include "Scenario.h"
 #include "Timer.h"
 #include "RandomUtility.h"
-#include "Pool.h"
+#include "PoolAllocator.h"
 #include <vector>
 
 class Heap;

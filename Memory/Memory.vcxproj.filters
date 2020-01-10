@@ -216,9 +216,6 @@
     <ClCompile Include="src\Heap.cpp">
       <Filter>Source Files\Memory\Allocators</Filter>
     </ClCompile>
-    <ClCompile Include="src\Pool.cpp">
-      <Filter>Source Files\Memory\Allocators</Filter>
-    </ClCompile>
     <ClCompile Include="src\PerformanceCounter.cpp">
       <Filter>Source Files\Performance</Filter>
     </ClCompile>
@@ -368,9 +365,6 @@
     <ClInclude Include="include\Heap.h">
       <Filter>Header Files\Memory\Allocators</Filter>
     </ClInclude>
-    <ClInclude Include="include\Pool.h">
-      <Filter>Header Files\Memory\Allocators</Filter>
-    </ClInclude>
     <ClInclude Include="include\PointerMath.h">
       <Filter>Header Files\Memory</Filter>
     </ClInclude>
@@ -381,6 +375,9 @@
       <Filter>Header Files\Scenario\Scenarios</Filter>
     </ClInclude>
     <ClInclude Include="include\StackAllocator.h">
+      <Filter>Header Files\Memory\Allocators</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PoolAllocator.h">
       <Filter>Header Files\Memory\Allocators</Filter>
     </ClInclude>
   </ItemGroup>
