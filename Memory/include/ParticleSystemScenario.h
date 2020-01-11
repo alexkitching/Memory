@@ -78,7 +78,7 @@ private:
 		Config m_Config;
 		DT_Timer m_NextParticleTimer;
 #if USE_MEM_SYS
-		Pool<Particle, 8> m_ParticlePool;
+		PoolAllocator<Particle, 8> m_ParticlePool;
 #endif
 		std::vector<Particle*> m_Particles;
 	};

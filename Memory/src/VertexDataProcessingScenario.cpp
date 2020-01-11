@@ -1,6 +1,8 @@
 #include "VertexDataProcessingScenario.h"
 #include "RandomUtility.h"
 #include "MemoryManager.h"
+#include "MemSys.h"
+#include "Common.h"
 
 VertexDataProcessingScenario::VertexDataProcessingScenario(const Config& a_config)
 	:
@@ -8,7 +10,7 @@ m_Config(a_config),
 m_bComplete(false)
 #if USE_MEM_SYS
 ,
-m_VertexStack(a_config.PerFrameTotalData + (size_t)(0.5 * MB),
+m_VertexAllocator(a_config.PerFrameTotalData + (size_t)(0.5 * MB),
 		MemoryManager::GetDefaultHeap()->allocate(a_config.PerFrameTotalData + (size_t)(0.5 * MB)))
 #endif
 {
@@ -46,7 +48,7 @@ void VertexDataProcessingScenario::AddRandomSub()
 	const int VertCount = Random::IntRange(m_Config.MinVertsPerSub, m_Config.MaxVertsPerSub);
 
 #if USE_MEM_SYS
-	Vertex* pVerts = (Vertex*)m_VertexStack.allocate(sizeof(Vertex) * VertCount, 4u);
+	Vertex* pVerts = (Vertex*)m_VertexAllocator.allocate(sizeof(Vertex) * VertCount, 4u);
 #else
 	Vertex* pVerts = new Vertex[VertCount];
 #endif
@@ -68,13 +70,15 @@ void VertexDataProcessingScenario::ClearFrameSubs()
 	while(m_Subs.empty() == false)
 	{
 		VertexSub sub = m_Subs[m_Subs.size() - 1];
-#if USE_MEM_SYS
-		m_VertexStack.deallocate(sub.pVerts);
-#else
+#if !USE_MEM_SYS
 		delete[] sub.pVerts;
 #endif
 		m_Subs.pop_back();
 	}
+
+#if USE_MEM_SYS
+	m_VertexAllocator.Clear();
+#endif
 	
 	m_fCurrentFrameDataSize = 0u;
 }

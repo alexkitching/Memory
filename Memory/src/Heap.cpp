@@ -52,8 +52,8 @@ void* Heap::allocate(size_t a_size, uint8 a_alignment)
 	*pEndMark = MEM_END;
 
 	// Increase Total Allocation Size
-#if DEBUG
 	m_usedSize += HEAP_ALLOC_HEADER_FOOTER_SIZE + pHeader->Size;
+#if DEBUG
 	m_allocationCount++;
 #endif
 	
@@ -92,8 +92,8 @@ void Heap::deallocate(void* a_pBlock)
 		pHeader->pNext->pPrev = pHeader->pPrev;
 	}
 
-#if DEBUG
 	m_usedSize -= HEAP_ALLOC_HEADER_FOOTER_SIZE + pHeader->Size;
+#if DEBUG
 	--m_allocationCount;
 #endif
 	// Free

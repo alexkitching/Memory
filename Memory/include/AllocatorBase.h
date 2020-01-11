@@ -18,9 +18,9 @@ public:
 
 	void* GetStartAddress() const { return m_pStart;  }
 	size_t GetCapacity() const { return m_capacity;  }
-	
-#if DEBUG
+
 	size_t GetUsedMemory() const { return m_usedSize; }
+#if DEBUG
 	size_t GetAllocationCount() const { return m_allocationCount; }
 #endif
 protected:
@@ -29,6 +29,6 @@ protected:
 	
 #if DEBUG
 	size_t m_allocationCount;
-	size_t m_usedSize;
 #endif
+	size_t m_usedSize;
 };

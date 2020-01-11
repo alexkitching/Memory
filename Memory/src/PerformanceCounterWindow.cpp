@@ -32,7 +32,7 @@ void PerformanceCounterWindow::OnGUIWindow(const IMGUIInterface& a_interface)
 	ImGui::Text("Virtual Memory Capacity: %.1f Mbs", PerformanceCounter::VirtualMemoryTotal());
 	ImGui::Separator();
 	
-#if USE_MEM_SYS && DEBUG
+#if USE_MEM_SYS 
 	ImGui::Text("Default Heap Usage: %.1f Mbs", (float)((float)MemoryManager::GetDefaultHeap()->GetUsedMemory()/ MB));
 #endif
 }

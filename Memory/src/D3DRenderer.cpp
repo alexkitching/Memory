@@ -24,8 +24,9 @@ m_pRenderTarget(nullptr)
 	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	sd.Flags = 0;
 
+#if DEBUG
 	HRESULT hr;
-
+#endif
 
 	UINT flags = 0;
 #if DEBUG
@@ -99,7 +100,6 @@ m_pRenderTarget(nullptr)
 	
 }
 
-
 void D3DRenderer::EndFrame()
 {
 	HRESULT hr = m_pSwapChain->Present(1u, 0u); // 1u - 60fps 2u - 30fps
@@ -172,7 +172,9 @@ void D3DRenderer::DrawCube(float a_x, float a_y, float a_z, float a_scale, float
 	};
 
 	// Create Buffer
+#if DEBUG
 	HRESULT hr;
+#endif
 	D3D_THROW_FAILED(m_pDevice->CreateBuffer(&bd, &srd, &pVertexBuffer));
 
 

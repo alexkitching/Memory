@@ -103,6 +103,7 @@ bool Window::Initialise()
 	// Create Renderer
 	m_pRenderer = std::make_unique<D3DRenderer>(m_hWnd);
 
+
 	m_IMGUIInterface.Initialise(this);
 
 	return m_pRenderer != nullptr;

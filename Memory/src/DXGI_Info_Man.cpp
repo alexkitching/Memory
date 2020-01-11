@@ -1,6 +1,9 @@
+#if DEBUG
 #include "DXGI_Info_Man.h"
 #include "Window.h"
 #include "D3D.h"
+
+
 
 #pragma comment(lib, "dxguid.lib")
 
@@ -29,7 +32,9 @@ DXGIInfoManager::DXGIInfoManager()
 	}
 
 	// Call the function to get the interface
+#if DEBUG
 	HRESULT hr;
+#endif
 	D3D_THROW_FAILED(DXGIGetDebugInterfaceFunc(__uuidof(IDXGIInfoQueue), (void**)&m_pDXGI_InfoQueue));
 }
 
@@ -83,3 +88,5 @@ std::vector<std::string>& DXGIInfoManager::GetMessages()
 
 	return m_msgs;
 }
+
+#endif

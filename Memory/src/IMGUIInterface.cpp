@@ -42,8 +42,8 @@ void IMGUIInterface::Initialise(Window* a_pWindow)
 	ImGui::StyleColorsDark();
 
 	// Setup Renderer Binding
-	ASSERT(ImGui_ImplWin32_Init(m_pWindow->GetHandle()) == true);
-	ASSERT(ImGui_ImplDX11_Init(m_pWindow->GetRenderer().GetDevice(), m_pWindow->GetRenderer().GetContext()) == true);
+	ASSERT(ImGui_ImplWin32_Init(m_pWindow->GetHandle()));
+	ASSERT(ImGui_ImplDX11_Init(m_pWindow->GetRenderer().GetDevice(), m_pWindow->GetRenderer().GetContext()));
 
 	// Create IMGUI Render Target
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> pBackBuffer;

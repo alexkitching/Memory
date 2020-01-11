@@ -1,5 +1,7 @@
 #pragma once
 
+#if DEBUG
+
 #include "Win.h"
 #include "Exception.h"
 #include <vector>
@@ -27,3 +29,5 @@ private:
 	Microsoft::WRL::ComPtr<IDXGIInfoQueue> m_pDXGI_InfoQueue;
 	std::vector<std::string> m_msgs;
 };
+
+#endif

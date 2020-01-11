@@ -225,6 +225,9 @@
     <ClCompile Include="src\StackAllocator.cpp">
       <Filter>Source Files\Memory\Allocators</Filter>
     </ClCompile>
+    <ClCompile Include="src\LinearAllocator.cpp">
+      <Filter>Source Files\Memory</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\WindowsMessageMap.h">
@@ -378,6 +381,9 @@
       <Filter>Header Files\Memory\Allocators</Filter>
     </ClInclude>
     <ClInclude Include="include\PoolAllocator.h">
+      <Filter>Header Files\Memory\Allocators</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LinearAllocator.h">
       <Filter>Header Files\Memory\Allocators</Filter>
     </ClInclude>
   </ItemGroup>

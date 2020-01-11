@@ -129,7 +129,7 @@ void ScenarioManager::Update()
 
 			m_ActiveScenarios.erase(m_ActiveScenarios.begin() + i);
 
-			SMLOG("Scenario Completed - %s - Time Taken - %f.1 s AverageFPS - %f.1 \n", ScenarioTypeNames[(int)type].c_str(), fTimeTaken, averageFPS);
+			SMLOG("Scenario Completed - %s \n - Time Taken - %f.1 s \n AverageFPS - %f.1 \n", ScenarioTypeNames[(int)type].c_str(), fTimeTaken, averageFPS);
 			
 			OnScenarioComplete(type); // Raise Event
 		}

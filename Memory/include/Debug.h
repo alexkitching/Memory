@@ -26,7 +26,7 @@ static void AssertFail(int a_line, const char* a_fileName, const char* a_express
 #define ASSERT(x) (void)((x) || (AssertFail(__LINE__, __FILE__, #x), 0))
 #define UNREACHABLE(x) ASSERT(false && ("UNREACHABLE::" x))
 #else
-#define ASSERT(x)
+#define ASSERT(x) (x)
 #define UNREACHABLE(x)
 #endif
 
@@ -42,7 +42,7 @@ public:
 #if DEBUG
 #define LOG(x, ...) Debug::Log(x, __VA_ARGS__);
 #else
-#define LOG(x)
+#define LOG(x, ...)
 #endif
 
 class Debug

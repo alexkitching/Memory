@@ -65,7 +65,9 @@ void* PoolAllocator<ObjectT, Alignment>::allocate(size_t a_size, uint8 a_alignme
 	m_pListHead = m_pListHead->m_pNext; // Move Head
 
 	m_usedSize += a_size;
+#if DEBUG
 	m_allocationCount++;
+#endif
 
 	return p;
 }
@@ -78,7 +80,9 @@ void PoolAllocator<ObjectT, Alignment>::deallocate(void* a_pBlock)
 	m_pListHead = pNewHead;
 
 	m_usedSize -= sizeof(ObjectT);
+#if DEBUG
 	m_allocationCount--;
+#endif
 }
 
 template <typename ObjectT, uint8 Alignment>

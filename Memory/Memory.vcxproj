@@ -167,6 +167,7 @@
     <ClCompile Include="src\IMGUIInterface.cpp" />
     <ClCompile Include="src\IMGUIWindow.cpp" />
     <ClCompile Include="src\Keyboard.cpp" />
+    <ClCompile Include="src\LinearAllocator.cpp" />
     <ClCompile Include="src\LogWindow.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MemoryApp.cpp" />
@@ -211,6 +212,7 @@
     <ClInclude Include="include\IMGUIInterface.h" />
     <ClInclude Include="include\IMGUIWindow.h" />
     <ClInclude Include="include\Keyboard.h" />
+    <ClInclude Include="include\LinearAllocator.h" />
     <ClInclude Include="include\LogWindow.h" />
     <ClInclude Include="include\MemoryApp.h" />
     <ClInclude Include="include\MemoryManager.h" />
