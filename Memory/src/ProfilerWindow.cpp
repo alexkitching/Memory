@@ -135,7 +135,7 @@ void ProfilerWindow::DrawCurrentSampleData()
 	ImGui::Columns(4);
 	ImGui::Text("Sample Name");
 	ImGui::NextColumn();
-	ImGui::Text("Total %");
+	ImGui::Text("Total %s", "%");
 	ImGui::NextColumn();
 	ImGui::Text("Time Taken ms");
 	ImGui::NextColumn();
@@ -146,6 +146,9 @@ void ProfilerWindow::DrawCurrentSampleData()
 	{
 		DrawSampleItem(m_Root.Children[i]);
 	}
+	ImGui::Columns();
+	ImGui::Separator();
+	ImGui::Text("Total Frame Time: %0.2f ms", m_CurrentData.TotalTimeTaken);
 }
 
 void ProfilerWindow::DrawSampleItem(SampleItem& a_item)
@@ -154,9 +157,9 @@ void ProfilerWindow::DrawSampleItem(SampleItem& a_item)
 	{
 		ImGui::Text(a_item.Data.Name.c_str());
 		ImGui::NextColumn();
-		ImGui::Text("%f %", a_item.TotalPercent);
+		ImGui::Text("%0.2f %", a_item.TotalPercent);
 		ImGui::NextColumn();
-		ImGui::Text("%f ms", a_item.Data.TimeTaken);
+		ImGui::Text("%0.3f ms", a_item.Data.TimeTaken);
 		ImGui::NextColumn();
 		ImGui::Text("%i ", a_item.Data.Calls);
 		ImGui::NextColumn();
@@ -166,9 +169,9 @@ void ProfilerWindow::DrawSampleItem(SampleItem& a_item)
 		bool bOpen = ImGui::TreeNode(a_item.Data.Name.c_str());
 
 		ImGui::NextColumn();
-		ImGui::Text("%f %", a_item.TotalPercent);
+		ImGui::Text("%0.2f %", a_item.TotalPercent);
 		ImGui::NextColumn();
-		ImGui::Text("%f ms", a_item.Data.TimeTaken);
+		ImGui::Text("%0.3f ms", a_item.Data.TimeTaken);
 		ImGui::NextColumn();
 		ImGui::Text("%i ", a_item.Data.Calls);
 		ImGui::NextColumn();
