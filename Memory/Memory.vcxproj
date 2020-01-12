@@ -177,6 +177,8 @@
     <ClCompile Include="src\ParticleSystemScenario.cpp" />
     <ClCompile Include="src\PerformanceCounter.cpp" />
     <ClCompile Include="src\PerformanceCounterWindow.cpp" />
+    <ClCompile Include="src\Profiler.cpp" />
+    <ClCompile Include="src\ProfilerWindow.cpp" />
     <ClCompile Include="src\ResourceLoadingScenario.cpp" />
     <ClCompile Include="src\ScenarioManager.cpp" />
     <ClCompile Include="src\GlobalTime.cpp" />
@@ -224,6 +226,8 @@
     <ClInclude Include="include\Platform.h" />
     <ClInclude Include="include\PointerMath.h" />
     <ClInclude Include="include\PoolAllocator.h" />
+    <ClInclude Include="include\Profiler.h" />
+    <ClInclude Include="include\ProfilerWindow.h" />
     <ClInclude Include="include\RandomUtility.h" />
     <ClInclude Include="include\Renderer.h" />
     <ClInclude Include="include\ResourceLoadingScenario.h" />

@@ -4,6 +4,7 @@
 #include "Renderer.h"
 #include "MemSys.h"
 #include "MemoryManager.h"
+#include "Profiler.h"
 
 int ParticleSystemScenario::TotalAllocatedParticles = 0;
 
@@ -16,6 +17,7 @@ ParticleSystemScenario::ParticleSystemScenario(const Config& a_config)
 
 void ParticleSystemScenario::Run()
 {
+	PROFILER_BEGIN_SAMPLE(ParticleSystemScenario::Run);
 	if (m_RunTimeTimer.IsStarted() == false) // Begin
 	{
 		Initialise();
@@ -41,6 +43,8 @@ void ParticleSystemScenario::Run()
 		LOG("COMPLETE :: Total Allocated Particles: %i \n", TotalAllocatedParticles);
 		TotalAllocatedParticles = 0;
 	}
+	
+	PROFILER_END_SAMPLE();
 }
 
 void ParticleSystemScenario::OnRender(IRenderer* a_pRenderer)
@@ -84,6 +88,7 @@ ParticleSystemScenario::ParticleSystem::~ParticleSystem()
 
 void ParticleSystemScenario::ParticleSystem::Update()
 {
+	PROFILER_BEGIN_SAMPLE(ParticleSystem::Update);
 	m_NextParticleTimer.Tick();
 
 	// Spawn Particles
@@ -123,6 +128,7 @@ void ParticleSystemScenario::ParticleSystem::Update()
 		}
 	}
 
+	PROFILER_END_SAMPLE();
 }
 
 void ParticleSystemScenario::ParticleSystem::OnRender(IRenderer* a_pRenderer)

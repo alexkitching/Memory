@@ -22,6 +22,14 @@ public:
 		return true;
 	}
 
+	template <typename T, RetVal_t(T:: * pFunc)(Args_t...)>
+	bool AddListener(T* a_pOwner)
+	{
+		Delegate< RetVal_t(Args_t...)> del = Delegate< RetVal_t(Args_t...)>::template Bind<T, pFunc>(a_pOwner);
+
+		return AddListener(del);
+	}
+
 	bool RemoveListener(Delegate<RetVal_t(Args_t...)> a_listener)
 	{
 		auto it = std::find(m_Listeners.begin(), m_Listeners.end(), a_listener);

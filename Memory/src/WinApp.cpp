@@ -3,6 +3,7 @@
 #include "GlobalTime.h"
 #include <iomanip>
 #include "PerformanceCounter.h"
+#include "Profiler.h"
 
 #if DEBUG
 #include "DXGI_Info_Man.h"
@@ -54,7 +55,7 @@ int WinApp::Run()
 
 bool WinApp::Initialise()
 {
-	m_pWindow = new Window(800, 600, "Memory");
+	m_pWindow = new Window(1280, 768, "Memory");
 
 #if DEBUG
 	DXGIInfoManager::Initialise();
@@ -73,16 +74,29 @@ void WinApp::OnPreFrame()
 		// Optional Has Value
 		SetShouldClose(*errorCode);
 	}
-
+	PROFILER_BEGIN_SAMPLE(PerformanceCounter::Tick);
 	PerformanceCounter::Tick();
+	PROFILER_END_SAMPLE();
+
+	PROFILER_BEGIN_SAMPLE(PerformanceCounter::Tick);
+	//PerformanceCounter::Tick();
+	PROFILER_END_SAMPLE();
+	
 }
+
+float MouseX;
+float MouseY;
+float Angle;
 
 void WinApp::OnFrame()
 {
+	MouseX = 1.f - (float)m_pWindow->GetMouse.GetXPos() / ((float)m_pWindow->GetWidth() * 0.5f);
+	MouseY = 1.f - (float)m_pWindow->GetMouse.GetYPos() / ((float)m_pWindow->GetHeight() * 0.5f);
 
-	
-
+	Angle -= Time::DeltaTime();
 }
+
+
 
 void WinApp::OnPreRenderFrame()
 {
@@ -93,13 +107,11 @@ void WinApp::OnPreRenderFrame()
 void WinApp::OnRenderFrame(IRenderer* a_pRenderer)
 {
 	// Draw Stuff
-	const float MouseX = 1.f - (float)m_pWindow->GetMouse.GetXPos() / ((float)m_pWindow->GetWidth() * 0.5f);
-	const float MouseY = 1.f - (float)m_pWindow->GetMouse.GetYPos() / ((float)m_pWindow->GetHeight() * 0.5f);
-
+	
 	const float zOffs = 0.f;
 	//m_pWindow->GetRenderer().DrawCube(-MouseX, 0.f, zOffs + MouseY, Time::TimeSinceStartup());
-	m_pWindow->GetRenderer().DrawCube(0.f, 0.f, zOffs, 1.f, -Time::TimeSinceStartup());
-	m_pWindow->GetRenderer().DrawCube(3.f, 0.f, zOffs, 0.5f, -Time::TimeSinceStartup());
+	m_pWindow->GetRenderer().DrawCube(0.f, 0.f, zOffs, 1.f, Angle);
+	m_pWindow->GetRenderer().DrawCube(3.f, 0.f, zOffs, 0.5f, Angle);
 	// <---- IMGUI ---->
 	m_pWindow->GetIMGUI().BeginGUIFrame();
 	OnGUI(m_pWindow->GetIMGUI());

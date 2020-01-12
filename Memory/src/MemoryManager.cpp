@@ -82,6 +82,34 @@ Heap* MemoryManager::CreateHeapFromGlobal(Heap::Config& a_config)
 	return CreateHeap(a_config, s_pGlobalHeap);
 }
 
+void* MemoryManager::New(size_t a_size)
+{
+	void* pPtr = GetDefaultHeap()->allocate(a_size);
+
+	if (pPtr)
+		return pPtr;
+
+	throw std::bad_alloc();
+}
+
+void MemoryManager::Delete(void* a_pPtr)
+{
+	if (a_pPtr != nullptr)
+	{
+		const auto pGlobalHeader = (MemoryManager::GlobalAllocationHeader*)((char*)a_pPtr -
+			sizeof(MemoryManager::GlobalAllocationHeader));
+
+		if (pGlobalHeader->AllocTypeSig == MEM_HEAP_SIG)
+		{
+			Heap::Deallocate(a_pPtr);
+		}
+		else
+		{
+			UNREACHABLE("Unknown Signature");
+		}
+	}
+}
+
 Heap* MemoryManager::CreateHeap(Heap::Config& a_config, const char* a_pParentName)
 {
 	Heap* pParent = FindActiveHeap(a_pParentName);

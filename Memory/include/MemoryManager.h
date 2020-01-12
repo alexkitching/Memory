@@ -19,6 +19,10 @@ public:
 	static Heap* GetDefaultHeap();
 
 	static Heap* CreateHeapFromGlobal(Heap::Config& a_config);
+
+	static void* New(size_t a_size);
+	static void Delete(void* a_pPtr);
+	
 private:
 
 	static Heap* ActivateEmptyHeap(const Heap::Config& a_config);
@@ -33,3 +37,5 @@ private:
 	static Heap s_Heaps[MAX_HEAPS];
 };
 
+#define MM_NEW(size) MemoryManager::New(size)
+#define MM_DELETE(ptr) MemoryManager::Delete(ptr)

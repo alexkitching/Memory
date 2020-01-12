@@ -75,8 +75,8 @@ m_pRenderTarget(nullptr)
 	// Create Depth Stencil Texture
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> pDepthStencilTex;
 	D3D11_TEXTURE2D_DESC dsTexDesc = {};
-	dsTexDesc.Width = 800u;
-	dsTexDesc.Height = 600u;
+	dsTexDesc.Width = 1280u;
+	dsTexDesc.Height = 768u;
 	dsTexDesc.MipLevels = 1u;
 	dsTexDesc.ArraySize = 1u;
 	dsTexDesc.Format = DXGI_FORMAT_D32_FLOAT;
@@ -360,8 +360,8 @@ void D3DRenderer::DrawCube(float a_x, float a_y, float a_z, float a_scale, float
 	{
 		0,
 		0,
-		800,
-		600,
+		1280,
+		768,
 		0,
 		1
 	};

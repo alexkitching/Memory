@@ -228,6 +228,12 @@
     <ClCompile Include="src\LinearAllocator.cpp">
       <Filter>Source Files\Memory</Filter>
     </ClCompile>
+    <ClCompile Include="src\Profiler.cpp">
+      <Filter>Source Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProfilerWindow.cpp">
+      <Filter>Source Files\IMGUI\Windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\WindowsMessageMap.h">
@@ -385,6 +391,12 @@
     </ClInclude>
     <ClInclude Include="include\LinearAllocator.h">
       <Filter>Header Files\Memory\Allocators</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Profiler.h">
+      <Filter>Header Files\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ProfilerWindow.h">
+      <Filter>Header Files\IMGUI\Windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

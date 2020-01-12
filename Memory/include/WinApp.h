@@ -38,7 +38,7 @@ private:
 		MAX
 	};
 
-	void CycleFrame();
+	virtual void CycleFrame();
 
 	
 	Window* m_pWindow;
