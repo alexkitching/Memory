@@ -71,103 +71,99 @@ m_CurrentFrame(1)
 
 void Profiler::BeginSampleInternal(const char* a_pName)
 {
-	m_SampleStack.push_back(Sample::Create(a_pName));
+	Sample newSample = Sample::Create(a_pName);
 
+	int CurrentScopeSize = m_CurrentScope.size();
+	int LastPeakScopeSize = m_LastPeakScope.size();
+
+	if(CurrentScopeSize != LastPeakScopeSize)
+	{
+		
+	}
+	
+	
 	// Push New Scope
 	SampleScope newScope;
-	newScope.Parent = m_SampleStack.back();
+	newScope.Sample = newSample;
 	m_CurrentScope.push_back(newScope);
+
+	
+
+
+	m_LastPeakScope.push_back(newScope);
 }
 
 void Profiler::EndSampleInternal()
 {
-	ASSERT(m_SampleStack.empty() == false && "No Samples Started!");
+	ASSERT(m_CurrentScope.empty() == false && "No Samples Started!");
 
-	int size = (int)m_SampleStack.size();
-
-	Sample* pSample = m_SampleStack[(size - 1)];
-
-	int Depth = size - 1;
+	// Get Current Scope
+	SampleScope* pCurrent = &m_CurrentScope.back();
+	
 	// Record Data
 	SampleData data;
-	data.Depth = Depth;
+	data.Depth = (int)m_CurrentScope.size() - 1;
 	data.Frame = m_CurrentFrame;
-	data.Name = pSample->Name;
+	data.Name = pCurrent->Sample.Name;
 	data.Calls = 1;
 
 	// Record Duration
-	const std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - pSample->StartTime;
+	const std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - pCurrent->Sample.StartTime;
 	data.TimeTaken = duration.count();
 
-	if(data.TimeTaken < DBL_EPSILON)
+	if (m_CurrentScope.size() > 1) // At least another Scope
 	{
-		int n = 1;
-	}
+		SampleScope* pParent = &m_CurrentScope[m_CurrentScope.size() - 2];
 
-	// Get Parent Depth
-	SampleScope* pCurrent = &m_CurrentScope.back();
-	if (pCurrent->Parent == pSample)
-	{
-		if (m_CurrentScope.size() > 1) // At least another Scope
+		SampleIdentifier id;
+		id.Name = data.Name;
+
+		auto pMatch  = pParent->ChildSet.find(id);
+		
+		if(pMatch != pParent->ChildSet.end())
 		{
-			SampleScope* pParent = &m_CurrentScope[m_CurrentScope.size() - 2];
-
-			SampleIdentifier id;
-			id.Name = data.Name;
-
-			auto pMatch  = pParent->ChildSet.find(id);
-			
-			if(pMatch != pParent->ChildSet.end())
-			{
-				int idx = pMatch->Index;
-				SampleData* pData = &pParent->ChildData[idx];
-				pData->Calls++;
-				pData->TimeTaken += data.TimeTaken;
-			}
-			else
-			{
-				pParent->ChildData.push_back(data);
-				id.Index = (int)pParent->ChildData.size() - 1;
-				pParent->ChildSet.insert(id);
-			}
-			
-			
-
-			for (int i = 0; i < pCurrent->ChildData.size(); ++i)
-			{
-				pParent->ChildData.push_back(pCurrent->ChildData[i]);
-			}
+			int idx = pMatch->Index;
+			SampleData* pData = &pParent->ChildData[idx];
+			pData->Calls++;
+			pData->TimeTaken += data.TimeTaken;
 		}
 		else
 		{
-			m_CurrentFrameData.SampleData.push_back(data);
-			
-			// Push Data to Current Frame Data
-			for (int i = 0; i < pCurrent->ChildData.size(); ++i)
-			{
-				m_CurrentFrameData.SampleData.push_back(pCurrent->ChildData[i]);
-			}
+			pParent->ChildData.push_back(data);
+			id.Index = (int)pParent->ChildData.size() - 1;
+			pParent->ChildSet.insert(id);
 		}
 		
-		m_CurrentScope.pop_back();
+		
+
+		for (int i = 0; i < pCurrent->ChildData.size(); ++i)
+		{
+			pParent->ChildData.push_back(pCurrent->ChildData[i]);
+		}
 	}
-
-	// Pop Sampler from Stack
-	delete pSample;
-	m_SampleStack.pop_back();
-
+	else
+	{
+		m_CurrentFrameData.SampleData.push_back(data);
+		
+		// Push Data to Current Frame Data
+		for (int i = 0; i < pCurrent->ChildData.size(); ++i)
+		{
+			m_CurrentFrameData.SampleData.push_back(pCurrent->ChildData[i]);
+		}
+	}
 	
+	m_CurrentScope.pop_back();
 }
 
 void Profiler::OnFrameStartInternal()
 {
-	ASSERT(m_SampleStack.empty() && "Cannot Sample Before Frame Start!");
+	ASSERT(m_CurrentScope.empty() && "Cannot Sample Before Frame Start!");
 	m_FrameStartTime = std::chrono::high_resolution_clock::now();
 }
 
 void Profiler::OnFrameEndInternal()
 {
-	ASSERT(m_SampleStack.empty() && "Mismatched Samples");
+	ASSERT(m_CurrentScope.empty() && "Mismatched Samples");
 
 	// Record Total Frame Time
 	const std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - m_FrameStartTime;

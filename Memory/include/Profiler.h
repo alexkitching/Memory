@@ -50,11 +50,11 @@ private:
 	
 	struct Sample
 	{
-		static Sample* Create(const char* a_pName)
+		static Sample Create(const char* a_pName)
 		{
-			Sample* newSample = new Sample();
-			newSample->Name = a_pName;
-			newSample->StartTime = std::chrono::high_resolution_clock::now();
+			Sample newSample;
+			newSample.Name = a_pName;
+			newSample.StartTime = std::chrono::high_resolution_clock::now();
 			return newSample;
 		}
 		std::string Name;
@@ -86,7 +86,7 @@ private:
 	
 	struct SampleScope
 	{
-		Sample* Parent;
+		Sample Sample;
 
 		std::set<SampleIdentifier> ChildSet;
 		std::vector<SampleData> ChildData;
@@ -114,8 +114,8 @@ private:
 	int m_CurrentFrame;
 	std::chrono::high_resolution_clock::time_point m_FrameStartTime;
 
-	std::vector<Sample*> m_SampleStack;
 	std::vector<SampleScope> m_CurrentScope;
+	std::vector<SampleScope> m_LastPeakScope;
 
 	// Recorded Frame Data
 	FrameData m_CurrentFrameData;
