@@ -73,24 +73,51 @@ void Profiler::BeginSampleInternal(const char* a_pName)
 {
 	Sample newSample = Sample::Create(a_pName);
 
-	int CurrentScopeSize = m_CurrentScope.size();
-	int LastPeakScopeSize = m_LastPeakScope.size();
-
-	if(CurrentScopeSize != LastPeakScopeSize)
+	if(m_OldScopeStack.size() > 0)
 	{
-		
+		SampleScope* pTop = &m_OldScopeStack[(int)m_OldScopeStack.size() - 1];
+		if(pTop != nullptr)
+		{
+			if(pTop->Sample.Name == a_pName)
+			{
+				// Reset Sample Time
+				pTop->Sample.Reset();
+				m_CurrentScope.push_back(*pTop);
+				m_OldScopeStack.pop_back();
+				return;
+			}
+			else
+			{
+				SampleData data;
+				while (m_OldScopeStack.size() > 0)
+				{
+					SampleScope* pScope = &m_OldScopeStack.back();
+					data.Name = pScope->Sample.Name;
+					data.Depth = pScope->Depth;
+					data.TimeTaken = pScope->TimeTaken;
+					data.Calls = pScope->Calls;
+					if(m_CurrentScope.size() > 0)
+					{
+						m_CurrentScope.back().ChildData.push_back(data);
+					}
+					else
+					{
+						m_CurrentFrameData.SampleData.push_back(data);
+					}
+					
+					m_OldScopeStack.pop_back();
+				}
+			}
+		}
 	}
-	
 	
 	// Push New Scope
 	SampleScope newScope;
 	newScope.Sample = newSample;
+	newScope.Depth = m_CurrentScope.size();
 	m_CurrentScope.push_back(newScope);
 
-	
-
-
-	m_LastPeakScope.push_back(newScope);
+	//m_LastPeakScope.push_back(newScope);
 }
 
 void Profiler::EndSampleInternal()
@@ -99,58 +126,52 @@ void Profiler::EndSampleInternal()
 
 	// Get Current Scope
 	SampleScope* pCurrent = &m_CurrentScope.back();
-	
-	// Record Data
-	SampleData data;
-	data.Depth = (int)m_CurrentScope.size() - 1;
-	data.Frame = m_CurrentFrame;
-	data.Name = pCurrent->Sample.Name;
-	data.Calls = 1;
+	pCurrent->Calls++;
 
 	// Record Duration
 	const std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - pCurrent->Sample.StartTime;
-	data.TimeTaken = duration.count();
+	pCurrent->TimeTaken += duration.count();
 
-	if (m_CurrentScope.size() > 1) // At least another Scope
+	if (m_CurrentScope.size() == 1) // At least another Scope
 	{
-		SampleScope* pParent = &m_CurrentScope[m_CurrentScope.size() - 2];
+		SampleData data;
+		data.Name = pCurrent->Sample.Name;
+		data.Depth = pCurrent->Depth;
+		data.TimeTaken = pCurrent->TimeTaken;
+		data.Calls = pCurrent->Calls;
 
-		SampleIdentifier id;
-		id.Name = data.Name;
+		// Push Head
+		m_CurrentFrameData.SampleData.push_back(data);
 
-		auto pMatch  = pParent->ChildSet.find(id);
-		
-		if(pMatch != pParent->ChildSet.end())
+		// Push Mid Child Data
+		for(int i = 0; i < pCurrent->ChildData.size(); ++i)
 		{
-			int idx = pMatch->Index;
-			SampleData* pData = &pParent->ChildData[idx];
-			pData->Calls++;
-			pData->TimeTaken += data.TimeTaken;
+			m_CurrentFrameData.SampleData.push_back(pCurrent->ChildData[i]);
 		}
-		else
-		{
-			pParent->ChildData.push_back(data);
-			id.Index = (int)pParent->ChildData.size() - 1;
-			pParent->ChildSet.insert(id);
-		}
-		
-		
 
-		for (int i = 0; i < pCurrent->ChildData.size(); ++i)
+		// Push Tail
+		while(m_OldScopeStack.size() > 0)
 		{
-			pParent->ChildData.push_back(pCurrent->ChildData[i]);
+			SampleScope* pScope = &m_OldScopeStack.back();
+			data.Name = pScope->Sample.Name;
+			data.Depth = pScope->Depth;
+			data.TimeTaken = pScope->TimeTaken;
+			data.Calls = pScope->Calls;
+			m_CurrentFrameData.SampleData.push_back(data);
+			
+			for (int i = 0; i < pScope->ChildData.size(); ++i)
+			{
+				m_CurrentFrameData.SampleData.push_back(pScope->ChildData[i]);
+			}
+			
+			m_OldScopeStack.pop_back();
 		}
 	}
 	else
 	{
-		m_CurrentFrameData.SampleData.push_back(data);
-		
-		// Push Data to Current Frame Data
-		for (int i = 0; i < pCurrent->ChildData.size(); ++i)
-		{
-			m_CurrentFrameData.SampleData.push_back(pCurrent->ChildData[i]);
-		}
+		m_OldScopeStack.push_back(m_CurrentScope.back());
 	}
+
 	
 	m_CurrentScope.pop_back();
 }
@@ -168,6 +189,7 @@ void Profiler::OnFrameEndInternal()
 	// Record Total Frame Time
 	const std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - m_FrameStartTime;
 	m_CurrentFrameData.TotalTimeTaken = duration.count();
+	m_CurrentFrameData.Frame = m_CurrentFrame;
 	
 	if (IsRecording())
 	{

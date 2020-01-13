@@ -1,8 +1,10 @@
 #include "ResourceLoadingScenario.h"
 #include "Debug.h"
+#include "Profiler.h"
 
 void ResourceLoadingScenario::Run()
 {
+	PROFILER_BEGIN_SAMPLE(ResourceLoadingScenario::Run);
 	if (m_RunTimeTimer.IsStarted() == false)
 	{
 		m_RunTimeTimer.Start();
@@ -24,11 +26,12 @@ void ResourceLoadingScenario::Run()
 		m_bComplete = true;
 		break;
 	}
-
+	PROFILER_END_SAMPLE();
 }
 
 void ResourceLoadingScenario::Reset()
 {
+	PROFILER_BEGIN_SAMPLE(ResourceLoadingScenario::Reset);
 	m_bComplete = false;
 	m_CurrentType = Type::Invalid;
 	m_NextSeed = 0;
@@ -43,20 +46,22 @@ void ResourceLoadingScenario::Reset()
 
 	m_LoadedResources.clear();
 	GameplayData.m_TotalLoadedResourceSize = 0u;
+	PROFILER_END_SAMPLE();
 }
 
 void ResourceLoadingScenario::RunBootType()
 {
+	PROFILER_BEGIN_SAMPLE(ResourceLoadingScenario::RunBootType);
 	if (m_IntervalTimer.IsStarted() &&
 		m_IntervalTimer.GetTime() < m_Config.Bootup.LoadInterval) // Wait Interval When Set
 	{
+		PROFILER_END_SAMPLE();
 		return;
 	}
 
 	// Load Resource
 	const size_t ResourceSize = Random::IntRangeWithSeed(m_Config.Bootup.MinResourceSize, m_Config.Bootup.MaxResourceSize, m_NextSeed++);
-	IDummyResource* pResource = new DummyResource(ResourceSize);
-	m_LoadedResources.push_back(pResource);
+	LoadResource(ResourceSize);
 
 
 	if (m_LoadedResources.size() == m_Config.Bootup.m_NumResourcesToLoad) // Loaded All our Resources
@@ -68,13 +73,16 @@ void ResourceLoadingScenario::RunBootType()
 		m_IntervalTimer.Stop();
 		m_IntervalTimer.Start();
 	}
+	PROFILER_END_SAMPLE();
 }
 
 void ResourceLoadingScenario::RunGameplayType()
 {
+	PROFILER_BEGIN_SAMPLE(ResourceLoadingScenario::RunGameplayType);
 	if (m_IntervalTimer.IsStarted() &&
 		m_IntervalTimer.GetTime() < m_Config.Gameplay.LoadInterval) // Wait Interval When Set
 	{
+		PROFILER_END_SAMPLE();
 		return;
 	}
 
@@ -91,8 +99,7 @@ void ResourceLoadingScenario::RunGameplayType()
 	{
 		// Load Resource
 		const size_t ResourceSize = Random::IntRangeWithSeed(m_Config.Bootup.MinResourceSize, m_Config.Bootup.MaxResourceSize, m_NextSeed++);
-		IDummyResource* pResource = new DummyResource(ResourceSize);
-		m_LoadedResources.push_back(pResource);
+		LoadResource(ResourceSize);
 		GameplayData.m_TotalLoadedResourceSize += ResourceSize;
 	}
 	else
@@ -105,8 +112,7 @@ void ResourceLoadingScenario::RunGameplayType()
 		}
 
 		GameplayData.m_TotalLoadedResourceSize -= m_LoadedResources[idx]->GetSize();
-		delete m_LoadedResources[idx];
-		m_LoadedResources.erase(m_LoadedResources.begin() + idx);
+		FreeResource(idx);
 	}
 
 	if (m_IntervalTimer.GetTime() >= m_Config.Gameplay.LoadInterval)
@@ -119,4 +125,22 @@ void ResourceLoadingScenario::RunGameplayType()
 	{
 		m_bComplete = true;
 	}
+
+	PROFILER_END_SAMPLE();
+}
+
+void ResourceLoadingScenario::LoadResource(size_t a_size)
+{
+	PROFILER_BEGIN_SAMPLE(ResourceLoadingScenario::LoadResource);
+	IDummyResource* pResource = new DummyResource(a_size);
+	m_LoadedResources.push_back(pResource);
+	PROFILER_END_SAMPLE();
+}
+
+void ResourceLoadingScenario::FreeResource(int a_idx)
+{
+	PROFILER_BEGIN_SAMPLE(ResourceLoadingScenario::FreeResource);
+	delete m_LoadedResources[a_idx];
+	m_LoadedResources.erase(m_LoadedResources.begin() + a_idx);
+	PROFILER_END_SAMPLE();
 }

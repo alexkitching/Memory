@@ -37,7 +37,7 @@ bool MemoryApp::Initialise()
 }
 
 void MemoryApp::OnPreFrame()
-{
+{	
 	PROFILER_BEGIN_SAMPLE(MemoryApp::OnPreFrame);
 	WinApp::OnPreFrame();
 	if (s_bPaused)

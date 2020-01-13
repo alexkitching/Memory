@@ -50,17 +50,21 @@ void ParticleSystemScenario::Run()
 
 void ParticleSystemScenario::OnRender(IRenderer* a_pRenderer)
 {
+	PROFILER_BEGIN_SAMPLE(ParticleSystemScenario::OnRender);
 	for(auto& ps : m_ParticleSystems)
 	{
 		ps.OnRender(a_pRenderer);
 	}
+	PROFILER_END_SAMPLE();
 }
 
 void ParticleSystemScenario::Reset()
 {
+	PROFILER_BEGIN_SAMPLE(ParticleSystemScenario::Reset);
 	m_bComplete = false;
 	m_RunTimeTimer.Stop();
 	m_ParticleSystems.clear();
+	PROFILER_END_SAMPLE();
 }
 
 ParticleSystemScenario::ParticleSystem::ParticleSystem(const Config& a_config)
@@ -72,11 +76,12 @@ m_ParticlePool(m_Config.MaxParticles * sizeof(Particle),
 				MemoryManager::GetDefaultHeap()->allocate(m_Config.MaxParticles * sizeof(Particle), 64u))
 #endif
 { 
-
+	PROFILER_BEGIN_SAMPLE(ParticleSystem::_ctor);
 	while ((int)m_Particles.size() != m_Config.StartParticles)
 	{
 		SpawnParticle();
 	}
+	PROFILER_END_SAMPLE();
 }
 
 ParticleSystemScenario::ParticleSystem::~ParticleSystem()
@@ -134,11 +139,13 @@ void ParticleSystemScenario::ParticleSystem::Update()
 
 void ParticleSystemScenario::ParticleSystem::OnRender(IRenderer* a_pRenderer)
 {
+	PROFILER_BEGIN_SAMPLE(ParticleSystem::OnRender);
 	for(auto& p : m_Particles)
 	{
 		// TODO Optimise Renderer KILLS FPS probs due to Constant/create/destroy of buffers
 		//a_pRenderer->DrawCube(p.Position[0], p.Position[1], p.Position[2], 0.1f, Time::DeltaTime());
 	}
+	PROFILER_END_SAMPLE();
 }
 
 ParticleSystemScenario::ParticleSystem::Particle::Particle(float a_fX, float a_fY, float a_fZ)

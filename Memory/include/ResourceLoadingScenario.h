@@ -91,6 +91,10 @@ private:
 	void RunBootType();
 
 	void RunGameplayType();
+	// Used by Both
+	void LoadResource(size_t a_size);
+	// Gameplay Only
+	void FreeResource(int a_idx);
 
 	bool m_bComplete;
 	Type m_CurrentType;

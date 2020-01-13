@@ -18,7 +18,12 @@ class Profiler
 public:
 	struct SampleData
 	{
-		int Frame;
+		SampleData()
+		{
+			Depth = 0;
+			TimeTaken = 0;
+			Calls = 0;
+		}
 		std::string Name;
 		int Depth;
 		double TimeTaken;
@@ -27,6 +32,7 @@ public:
 	
 	struct FrameData
 	{
+		int Frame;
 		double TotalTimeTaken;
 		std::vector<SampleData> SampleData;
 	};
@@ -57,6 +63,12 @@ private:
 			newSample.StartTime = std::chrono::high_resolution_clock::now();
 			return newSample;
 		}
+
+		void Reset()
+		{
+			StartTime = std::chrono::high_resolution_clock::now();
+		}
+		
 		std::string Name;
 		std::chrono::high_resolution_clock::time_point StartTime;
 	};
@@ -86,9 +98,17 @@ private:
 	
 	struct SampleScope
 	{
+		SampleScope()
+		{
+			Depth = 0;
+			TimeTaken = 0.f;
+			Calls = 0;
+		}
 		Sample Sample;
+		int Depth;
+		double TimeTaken;
+		int Calls;
 
-		std::set<SampleIdentifier> ChildSet;
 		std::vector<SampleData> ChildData;
 	};
 
@@ -115,7 +135,8 @@ private:
 	std::chrono::high_resolution_clock::time_point m_FrameStartTime;
 
 	std::vector<SampleScope> m_CurrentScope;
-	std::vector<SampleScope> m_LastPeakScope;
+	std::vector<SampleScope> m_OldScopeStack;
+	std::vector<SampleData> m_OldDataCache;
 
 	// Recorded Frame Data
 	FrameData m_CurrentFrameData;
@@ -124,10 +145,19 @@ private:
 	ProfilerSamplerEvent m_SampleRecordedEvent;
 };
 
+#define PROFILER_ONLY_CUSTOM 0
+
+#if PROFILER_ONLY_CUSTOM
+#define PROFILER_BEGIN_SAMPLE(name) 
+#define PROFILER_END_SAMPLE() 
+#define PROFILER_BEGIN_CUSTOMSAMPLE(name) Profiler::BeginSample(#name)
+#define PROFILER_END_CUSTOMSAMPLE() Profiler::EndSample()
+#else
 #define PROFILER_BEGIN_SAMPLE(name) Profiler::BeginSample(#name)
 #define PROFILER_END_SAMPLE() Profiler::EndSample()
-
-
+#define PROFILER_BEGIN_CUSTOMSAMPLE(name)
+#define PROFILER_END_CUSTOMSAMPLE() 
+#endif
 
 
 #else

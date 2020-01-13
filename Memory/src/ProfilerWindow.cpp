@@ -79,12 +79,12 @@ void ProfilerWindow::BuildItemTree()
 
 bool ProfilerWindow::BuildItemsFromDepth(SampleItem& a_pParent, int& a_idx)
 {
-	while(a_idx + 1 < m_CurrentData.SampleData.size())
+	while(a_idx != m_CurrentData.SampleData.size())
 	{
 		SampleItem& item = a_pParent.Children.emplace_back();
 		item.Data = m_CurrentData.SampleData[a_idx];
 
-		item.TotalPercent = (float) (item.Data.TimeTaken / m_CurrentData.TotalTimeTaken * 100.f);
+		item.TotalPercent = (float) ((item.Data.TimeTaken / item.Data.Calls)/ m_CurrentData.TotalTimeTaken * 100.f);
 
 		Profiler::SampleData* pNextItemData = nullptr;
 
@@ -92,6 +92,11 @@ bool ProfilerWindow::BuildItemsFromDepth(SampleItem& a_pParent, int& a_idx)
 		if (bIsLastItem == false) // Not Last Item
 		{
 			pNextItemData = &m_CurrentData.SampleData[a_idx + 1];
+		}
+		else
+		{
+			a_idx++;
+			break;
 		}
 		
 		if (pNextItemData != nullptr)

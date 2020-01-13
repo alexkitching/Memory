@@ -3,6 +3,7 @@
 #include "MemoryManager.h"
 #include "MemSys.h"
 #include "Common.h"
+#include "Profiler.h"
 
 VertexDataProcessingScenario::VertexDataProcessingScenario(const Config& a_config)
 	:
@@ -18,6 +19,7 @@ m_VertexAllocator(a_config.PerFrameTotalData + (size_t)(0.5 * MB),
 
 void VertexDataProcessingScenario::Run()
 {
+	PROFILER_BEGIN_SAMPLE(VertexDataProcessingScenario::Run);
 	if(m_runTimer.IsStarted() == false)
 	{
 		m_runTimer.Start();
@@ -35,16 +37,20 @@ void VertexDataProcessingScenario::Run()
 	{
 		m_bComplete = true;
 	}
+	PROFILER_END_SAMPLE();
 }
 
 void VertexDataProcessingScenario::Reset()
 {
+	PROFILER_BEGIN_SAMPLE(VertexDataProcessingScenario::Run);
 	m_bComplete = false;
 	ClearFrameSubs();
+	PROFILER_END_SAMPLE();
 }
 
 void VertexDataProcessingScenario::AddRandomSub()
 {
+	PROFILER_BEGIN_SAMPLE(VertexDataProcessingScenario::AddRandomSub);
 	const int VertCount = Random::IntRange(m_Config.MinVertsPerSub, m_Config.MaxVertsPerSub);
 
 #if USE_MEM_SYS
@@ -63,10 +69,12 @@ void VertexDataProcessingScenario::AddRandomSub()
 	m_fCurrentFrameDataSize += sizeof(Vertex) * VertCount;
 	
 	m_Subs.push_back(sub);
+	PROFILER_END_SAMPLE();
 }
 
 void VertexDataProcessingScenario::ClearFrameSubs()
 {
+	PROFILER_BEGIN_SAMPLE(VertexDataProcessingScenario::ClearFrameSubs);
 	while(m_Subs.empty() == false)
 	{
 		VertexSub sub = m_Subs[m_Subs.size() - 1];
@@ -81,4 +89,6 @@ void VertexDataProcessingScenario::ClearFrameSubs()
 #endif
 	
 	m_fCurrentFrameDataSize = 0u;
+
+	PROFILER_END_SAMPLE();
 }
