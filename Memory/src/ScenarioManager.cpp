@@ -5,6 +5,7 @@
 #include "Debug.h"
 #include "MemoryManager.h"
 #include "PerformanceCounter.h"
+#include "Profiler.h"
 
 #define SMLOG(x, ...) LOG("ScenarioManager::" x, __VA_ARGS__)
 
@@ -109,6 +110,7 @@ void ScenarioManager::StopScenario(ScenarioType a_type)
 
 void ScenarioManager::Update()
 {
+	PROFILER_BEGIN_SAMPLE(ScenarioManager::Update);
 	for(int i = (int)m_ActiveScenarios.size() - 1; i >= 0; --i)
 	{
 		ActiveScenario& active = m_ActiveScenarios[i];
@@ -134,14 +136,17 @@ void ScenarioManager::Update()
 			OnScenarioComplete(type); // Raise Event
 		}
 	}
+	PROFILER_END_SAMPLE();
 }
 
 void ScenarioManager::OnRender(IRenderer* a_pRenderer)
 {
+	PROFILER_BEGIN_SAMPLE(ScenarioManager::OnRender);
 	for(auto& active : m_ActiveScenarios)
 	{
 		active.pScenario->OnRender(a_pRenderer);
 	}
+	PROFILER_END_SAMPLE();
 }
 
 IScenario* ScenarioManager::GetScenario(ScenarioType a_type)

@@ -25,7 +25,7 @@ private:
 	void OnSampleRecorded(const Profiler::FrameData& a_data);
 
 	void BuildItemTree();
-	void BuildItemsFromDepth(SampleItem& a_pParent, int& a_idx);
+	bool BuildItemsFromDepth(SampleItem& a_pParent, int& a_idx);
 
 	void DrawCurrentSampleData();
 	void DrawSampleItem(SampleItem& a_item);

@@ -20,6 +20,7 @@ void ParticleSystemScenario::Run()
 	PROFILER_BEGIN_SAMPLE(ParticleSystemScenario::Run);
 	if (m_RunTimeTimer.IsStarted() == false) // Begin
 	{
+		
 		Initialise();
 		m_RunTimeTimer.Start();
 	}
@@ -157,6 +158,7 @@ ParticleSystemScenario::ParticleSystem::Particle::Particle(float a_fX, float a_f
 
 void ParticleSystemScenario::ParticleSystem::SpawnParticle()
 {
+	PROFILER_BEGIN_SAMPLE(ParticleSystem::SpawnParticle);
 	// Push new Particle
 #if USE_MEM_SYS
 	Particle* pParticle = (Particle*)m_ParticlePool.allocate(sizeof(Particle), 8);
@@ -174,10 +176,13 @@ void ParticleSystemScenario::ParticleSystem::SpawnParticle()
 	{
 		m_NextParticleTimer.Start();
 	}
+
+	PROFILER_END_SAMPLE();
 }
 
 void ParticleSystemScenario::ParticleSystem::DestroyParticle(int a_pIdx)
 {
+	PROFILER_BEGIN_SAMPLE(ParticleSystem::DestroyParticle);
 	Particle* pParticle = m_Particles[a_pIdx];
 	m_Particles.erase(m_Particles.begin() + a_pIdx);
 #if USE_MEM_SYS
@@ -185,10 +190,12 @@ void ParticleSystemScenario::ParticleSystem::DestroyParticle(int a_pIdx)
 #else
 	delete pParticle;
 #endif
+	PROFILER_END_SAMPLE();
 }
 
 void ParticleSystemScenario::Initialise()
 {
+	PROFILER_BEGIN_SAMPLE(ParticleSystemScenario::Initialise);
 	m_ParticleSystems.reserve(m_Config.ParticleSystemsCount);
 	while ((int)m_ParticleSystems.size() != m_Config.ParticleSystemsCount)
 	{
@@ -203,5 +210,6 @@ void ParticleSystemScenario::Initialise()
 		};
 		m_ParticleSystems.emplace_back(config);
 	}
+	PROFILER_END_SAMPLE();
 }
 

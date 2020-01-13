@@ -41,9 +41,6 @@ public:
 	static void OnFrameStart();
 	static void OnFrameEnd();
 
-	static void Pause() { s_bPaused = true; }
-	static void Play() { s_bPaused = false; }
-
 	static void RecordNextFrame();
 
 	static ProfilerSamplerEvent* OnSampleRecorded();
@@ -106,12 +103,12 @@ private:
 	void OnFrameStartInternal();
 	void OnFrameEndInternal();
 
-	
+	bool IsRecording() const { return m_bRecordNext || m_bRecording; }
 
 	static Profiler* s_pInstance;
 
-	static bool s_bPaused;
 	bool m_bRecording;
+	bool m_bRecordNextRequested;
 	bool m_bRecordNext;
 
 	int m_CurrentFrame;
@@ -119,11 +116,12 @@ private:
 
 	std::vector<Sample*> m_SampleStack;
 	std::vector<SampleScope> m_CurrentScope;
+
+	// Recorded Frame Data
 	FrameData m_CurrentFrameData;
 	std::vector<FrameData> m_RecordedFrameData;
 
 	ProfilerSamplerEvent m_SampleRecordedEvent;
-	//static std::chrono::high_resolution_clock::time_point s_FrameStartTime;
 };
 
 #define PROFILER_BEGIN_SAMPLE(name) Profiler::BeginSample(#name)

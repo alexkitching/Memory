@@ -2,6 +2,7 @@
 #include "GlobalTime.h"
 #include "Win.h"
 #include <psapi.h>
+#include "Profiler.h"
 
 
 float PerformanceCounter::s_fFPS = 0.f;
@@ -15,6 +16,7 @@ float PerformanceCounter::s_fVirMemTotal = 0.f;
 
 void PerformanceCounter::Tick()
 {
+	PROFILER_BEGIN_SAMPLE(PerformanceCounter::Tick);
 	s_fDeltaTime = Time::DeltaTime();
 	s_fAccumFPS += s_fDeltaTime;
 	s_FrameCount++;
@@ -37,4 +39,6 @@ void PerformanceCounter::Tick()
 	GetProcessMemoryInfo(GetCurrentProcess(), (PPROCESS_MEMORY_COUNTERS)&pmc, sizeof(pmc));
 	s_fVirMemUsed = (float)pmc.PrivateUsage / MB;
 	s_fPhysMemUsed = (float)pmc.WorkingSetSize / MB;
+
+	PROFILER_END_SAMPLE();
 }

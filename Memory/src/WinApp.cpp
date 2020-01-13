@@ -55,6 +55,8 @@ int WinApp::Run()
 
 bool WinApp::Initialise()
 {
+	Profiler::Initialise();
+	
 	m_pWindow = new Window(1280, 768, "Memory");
 
 #if DEBUG
@@ -68,20 +70,16 @@ bool WinApp::Initialise()
 
 void WinApp::OnPreFrame()
 {
+	PROFILER_BEGIN_SAMPLE(WinApp::OnPreFrame);
 	// Process Windows Messages
 	if(const std::optional<int> errorCode = Window::ProcessMessages())
 	{
 		// Optional Has Value
 		SetShouldClose(*errorCode);
 	}
-	PROFILER_BEGIN_SAMPLE(PerformanceCounter::Tick);
+	
 	PerformanceCounter::Tick();
 	PROFILER_END_SAMPLE();
-
-	PROFILER_BEGIN_SAMPLE(PerformanceCounter::Tick);
-	//PerformanceCounter::Tick();
-	PROFILER_END_SAMPLE();
-	
 }
 
 float MouseX;
@@ -90,23 +88,29 @@ float Angle;
 
 void WinApp::OnFrame()
 {
+	PROFILER_BEGIN_SAMPLE(WinApp::OnFrame);
 	MouseX = 1.f - (float)m_pWindow->GetMouse.GetXPos() / ((float)m_pWindow->GetWidth() * 0.5f);
 	MouseY = 1.f - (float)m_pWindow->GetMouse.GetYPos() / ((float)m_pWindow->GetHeight() * 0.5f);
 
 	Angle -= Time::DeltaTime();
+
+	PROFILER_END_SAMPLE();
 }
 
 
 
 void WinApp::OnPreRenderFrame()
 {
+	PROFILER_BEGIN_SAMPLE(WinApp::OnPreRenderFrame);
 	// <---- Clear Render ---->
 	m_pWindow->GetRenderer().Clear(0.7f, 0.7f, 0.7f);
+	PROFILER_END_SAMPLE();
 }
 
 void WinApp::OnRenderFrame(IRenderer* a_pRenderer)
 {
 	// Draw Stuff
+	PROFILER_BEGIN_SAMPLE(WinApp::OnRenderFrame);
 	
 	const float zOffs = 0.f;
 	//m_pWindow->GetRenderer().DrawCube(-MouseX, 0.f, zOffs + MouseY, Time::TimeSinceStartup());
@@ -118,13 +122,15 @@ void WinApp::OnRenderFrame(IRenderer* a_pRenderer)
 	//m_pWindow->GetIMGUI().Test();
 	m_pWindow->GetIMGUI().RenderGUIFrame();
 
-	
+	PROFILER_END_SAMPLE();
 }
 
 void WinApp::OnPostRenderFrame()
 {
+	PROFILER_BEGIN_SAMPLE(WinApp::OnPostRenderFrame);
 	// <---- Present ---->
 	m_pWindow->GetRenderer().EndFrame();
+	PROFILER_END_SAMPLE();
 }
 
 void WinApp::OnPostFrame()
@@ -144,6 +150,7 @@ void WinApp::CycleFrame()
 	switch (m_FrameStage)
 	{
 	case FrameStage::PreFrame:
+		Profiler::OnFrameStart();
 		m_Time.Update();
 		OnPreFrame();
 		m_FrameStage = FrameStage::OnFrame;
@@ -161,6 +168,7 @@ void WinApp::CycleFrame()
 	case FrameStage::PostFrame:
 		OnPostFrame();
 		m_FrameStage = FrameStage::PreFrame;
+		Profiler::OnFrameEnd();
 		break;
 	default:
 		break;

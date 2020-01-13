@@ -1,7 +1,6 @@
 #include "Profiler.h"
 
 Profiler* Profiler::s_pInstance = nullptr;
-bool Profiler::s_bPaused = false;
  
 void Profiler::Initialise()
 {
@@ -14,7 +13,7 @@ void Profiler::BeginSample(const char* a_pName)
 {
 	ASSERT(s_pInstance != nullptr);
 	
-	if (s_bPaused)
+	if (s_pInstance->IsRecording() == false)
 		return;
 	
 	s_pInstance->BeginSampleInternal(a_pName);
@@ -24,7 +23,7 @@ void Profiler::EndSample()
 {
 	ASSERT(s_pInstance != nullptr);
 
-	if (s_bPaused)
+	if (s_pInstance->IsRecording() == false)
 		return;
 	
 	s_pInstance->EndSampleInternal();
@@ -45,7 +44,7 @@ void Profiler::OnFrameEnd()
 void Profiler::RecordNextFrame()
 {
 	ASSERT(s_pInstance != nullptr);
-	s_pInstance->m_bRecordNext = true;
+	s_pInstance->m_bRecordNextRequested = true;
 }
 
 Profiler::ProfilerSamplerEvent* Profiler::OnSampleRecorded()
@@ -72,8 +71,6 @@ m_CurrentFrame(1)
 
 void Profiler::BeginSampleInternal(const char* a_pName)
 {
-	Sample test;
-	
 	m_SampleStack.push_back(Sample::Create(a_pName));
 
 	// Push New Scope
@@ -176,7 +173,7 @@ void Profiler::OnFrameEndInternal()
 	const std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - m_FrameStartTime;
 	m_CurrentFrameData.TotalTimeTaken = duration.count();
 	
-	if (m_bRecording || m_bRecordNext)
+	if (IsRecording())
 	{
 		// Record This Frames Data
 		m_RecordedFrameData.push_back(m_CurrentFrameData);
@@ -184,10 +181,16 @@ void Profiler::OnFrameEndInternal()
 		m_SampleRecordedEvent.Raise(m_CurrentFrameData);
 		
 		m_bRecordNext = false;
+		m_bRecordNextRequested = false;
 	}
 	
 	// Clear Current Frame Data
 	m_CurrentFrameData.SampleData.clear();
 
 	m_CurrentFrame++;
+
+	if(m_bRecordNextRequested)
+	{
+		m_bRecordNext = true;
+	}
 }

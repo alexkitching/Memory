@@ -19,7 +19,6 @@ void ProfilerWindow::Initialise()
 
 void ProfilerWindow::OnGUIWindow(const IMGUIInterface& a_gui)
 {
-	
 	if (a_gui.Button("Play", MemoryApp::IsPaused()))
 	{
 		MemoryApp::Play();
@@ -42,8 +41,7 @@ void ProfilerWindow::OnGUIWindow(const IMGUIInterface& a_gui)
 		else
 		{
 			m_bSampleNext = false;
-			MemoryApp::Pause();
-
+			
 			Profiler::RecordNextFrame();
 		}
 	}
@@ -62,7 +60,6 @@ void ProfilerWindow::OnGUIWindow(const IMGUIInterface& a_gui)
 		}
 	}
 	ImGui::EndChild();
-	//Im
 }
 
 void ProfilerWindow::OnSampleRecorded(const Profiler::FrameData& a_data)
@@ -70,6 +67,7 @@ void ProfilerWindow::OnSampleRecorded(const Profiler::FrameData& a_data)
 	m_CurrentData = Profiler::GetCurrentFrameData();
 	
 	BuildItemTree();
+	MemoryApp::Pause();
 }
 
 void ProfilerWindow::BuildItemTree()
@@ -79,55 +77,55 @@ void ProfilerWindow::BuildItemTree()
 	BuildItemsFromDepth(m_Root, idx);
 }
 
-void ProfilerWindow::BuildItemsFromDepth(SampleItem& a_pParent, int& a_idx)
+bool ProfilerWindow::BuildItemsFromDepth(SampleItem& a_pParent, int& a_idx)
 {
-	bool bContinue = true;
-
-	while(bContinue)
+	while(a_idx + 1 < m_CurrentData.SampleData.size())
 	{
-		bContinue = false;
-		
 		SampleItem& item = a_pParent.Children.emplace_back();
 		item.Data = m_CurrentData.SampleData[a_idx];
-		if(a_pParent.Data.Depth == m_Root.Data.Depth)
-		{
-			// Is Root
-			item.TotalPercent = (float) (item.Data.TimeTaken / m_CurrentData.TotalTimeTaken * 100.f);
-		}
-		else
-		{
-			item.TotalPercent = (float)(item.Data.TimeTaken / m_CurrentData.TotalTimeTaken * 100.f);
-		}
+
+		item.TotalPercent = (float) (item.Data.TimeTaken / m_CurrentData.TotalTimeTaken * 100.f);
 
 		Profiler::SampleData* pNextItemData = nullptr;
-		if (a_idx != (int)m_CurrentData.SampleData.size() - 1) // Not Last Item
+
+		const bool bIsLastItem = a_idx == (int)m_CurrentData.SampleData.size() - 1;
+		if (bIsLastItem == false) // Not Last Item
 		{
 			pNextItemData = &m_CurrentData.SampleData[a_idx + 1];
 		}
 		
 		if (pNextItemData != nullptr)
 		{
-			a_idx++;
-			if (pNextItemData->Depth == item.Data.Depth)
+			if (pNextItemData->Depth < item.Data.Depth)
 			{
-				bContinue = true;
+				return true;
 			}
-			else if (pNextItemData->Depth > item.Data.Depth)
-			{
-				BuildItemsFromDepth(item, a_idx);
-				bContinue = true;
-			}
-			else if(pNextItemData->Depth < item.Data.Depth)
-			{
-				return;
-			}
-		}
 
-		if(a_idx == m_CurrentData.SampleData.size() - 1)
-		{
-			return;
+			a_idx++;
+			
+			if (pNextItemData->Depth > item.Data.Depth)
+			{
+				const bool bNextDepthLower = BuildItemsFromDepth(item, a_idx);
+
+				if(bNextDepthLower)
+				{
+					const bool bIsLastItem = a_idx == (int)m_CurrentData.SampleData.size() - 1;
+					if (bIsLastItem == false) // Not Last Item
+					{
+						pNextItemData = &m_CurrentData.SampleData[a_idx + 1];
+					}
+
+					if (pNextItemData->Depth < item.Data.Depth)
+					{
+						return true;
+					}
+					
+					a_idx++; // Now Not Lower
+				}
+			}
 		}
 	}
+	return false;
 }
 
 void ProfilerWindow::DrawCurrentSampleData()
