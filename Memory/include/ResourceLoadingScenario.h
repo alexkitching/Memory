@@ -15,7 +15,7 @@ public:
 			float LoadInterval;
 			size_t MinResourceSize;
 			size_t MaxResourceSize;
-			size_t m_NumResourcesToLoad;
+			size_t TotalSizeToLoad;
 		} Bootup;
 
 		struct
@@ -107,7 +107,7 @@ private:
 	int m_NextSeed;
 
 	std::vector<IDummyResource*> m_LoadedResources;
-
+	size_t m_TotalLoadedSize;
 	struct
 	{
 		float m_TotalRunTime;

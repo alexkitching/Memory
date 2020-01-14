@@ -1,8 +1,6 @@
 #include "ScenarioWindow.h"
 #include <imgui.h>
-#include <functional>
 #include "Delegate.h"
-#include "imgui_internal.h"
 
 ScenarioWindow::ScenarioWindow(ScenarioManager* a_pScenarioManager)
 	:

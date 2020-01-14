@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Types.h"
+#include "Platform.h"
 
 class AllocatorBase
 {
@@ -13,7 +14,7 @@ public:
 	AllocatorBase(const AllocatorBase&) = delete;
 	AllocatorBase& operator=(const AllocatorBase&) = delete;
 
-	virtual void* allocate(size_t a_size, uint8 a_alignment = 4u) = 0;
+	virtual void* allocate(size_t a_size, uint8 a_alignment = DEFAULT_ALIGNMENT) = 0;
 	virtual void deallocate(void* a_pBlock) = 0;
 
 	void* GetStartAddress() const { return m_pStart;  }

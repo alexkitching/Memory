@@ -24,24 +24,4 @@ namespace PointerMath
 
 		return adjustment;
 	}
-
-	inline uint8 AlignForwardWithHeader(const void* a_pAddress, uint8 a_alignment, uint8 a_headerSize)
-	{
-		uint8 adjustment = AlignForwardAdjustment(a_pAddress, a_alignment);
-
-		if(adjustment < a_headerSize)
-		{
-			const uint8 extra = a_headerSize - adjustment;
-
-			adjustment += a_alignment * (extra / a_alignment);
-
-			if(extra % adjustment > 0)
-			{
-				adjustment += a_alignment;
-			}
-		}
-
-		return adjustment;
-	}
-	
 }

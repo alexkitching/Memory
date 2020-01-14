@@ -17,13 +17,6 @@ StackAllocator::~StackAllocator()
 
 void* StackAllocator::allocate(size_t a_size, uint8 a_alignment)
 {
-	const uint8 adjustment = PointerMath::AlignForwardWithHeader(m_pCurrentPos, a_alignment, sizeof(AllocationHeader));
-
-	if (m_usedSize + a_size + adjustment > m_capacity)
-	{
-		return nullptr;
-	}
-
 	union
 	{
 		void* as_voidPtr;
@@ -31,10 +24,18 @@ void* StackAllocator::allocate(size_t a_size, uint8 a_alignment)
 		AllocationHeader* as_header;
 	};
 
-	// Set Current Position
 	as_voidPtr = m_pCurrentPos;
-	// Offset by adjustment to get aligned address
-	as_intptr += adjustment;
+	as_intptr += sizeof(AllocationHeader);
+	const uint8 adjustment = PointerMath::AlignForwardAdjustment(as_voidPtr, a_alignment);
+	as_intptr -= (sizeof(AllocationHeader) - adjustment);
+
+	if (m_usedSize + a_size + adjustment + sizeof(AllocationHeader) > m_capacity)
+	{
+		return nullptr;
+	}
+
+	// Offset by header to get aligned address
+	as_intptr += sizeof(AllocationHeader);
 
 	void* pAlignedBlockAddr = as_voidPtr;
 

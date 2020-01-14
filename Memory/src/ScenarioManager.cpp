@@ -18,7 +18,11 @@ Scenarios({nullptr, nullptr})
 	config.Bootup.LoadInterval = 0.25f;
 	config.Bootup.MaxResourceSize = 200 * MB;
 	config.Bootup.MinResourceSize = 20 * MB;
-	config.Bootup.m_NumResourcesToLoad = 20;
+#ifdef x64
+	config.Bootup.TotalSizeToLoad = 2 * GB;
+#else
+	config.Bootup.TotalSizeToLoad = 0.9 * GB;
+#endif
 
 	config.Gameplay.LoadInterval = 0.5f;
 	config.Gameplay.MaxResourceSize = 60 * MB;

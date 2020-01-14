@@ -152,7 +152,7 @@ void Profiler::EndSampleInternal()
 		m_CurrentFrameData.SampleData.push_back(data);
 
 		// Push Mid Child Data
-		for(int i = 0; i < pCurrent->ChildData.size(); ++i)
+		for(int i = 0; i < (int)pCurrent->ChildData.size(); ++i)
 		{
 			m_CurrentFrameData.SampleData.push_back(pCurrent->ChildData[i]);
 		}
@@ -167,7 +167,7 @@ void Profiler::EndSampleInternal()
 			data.Calls = pScope->Calls;
 			m_CurrentFrameData.SampleData.push_back(data);
 			
-			for (int i = 0; i < pScope->ChildData.size(); ++i)
+			for (int i = 0; i < (int)pScope->ChildData.size(); ++i)
 			{
 				m_CurrentFrameData.SampleData.push_back(pScope->ChildData[i]);
 			}

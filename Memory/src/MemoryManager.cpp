@@ -1,7 +1,7 @@
 #include "MemoryManager.h"
 #include "Debug.h"
 #include "Common.h"
-
+#include "PointerMath.h"
 
 bool MemoryManager::s_bInitialised = false;
 Heap* MemoryManager::s_pGlobalHeap = nullptr;
@@ -29,6 +29,8 @@ void MemoryManager::Initialise(size_t a_maxGlobalMem)
 
 	// Set All Memory to 0
 	memset(pGlobalMem, 0, a_maxGlobalMem);
+
+	uint8 adjustment = PointerMath::AlignForwardAdjustment(pGlobalMem, DEFAULT_ALIGNMENT);
 	
 	const Heap::Config GlobalConfig
 	{
@@ -43,7 +45,7 @@ void MemoryManager::Initialise(size_t a_maxGlobalMem)
 	{
 		DEFAULT_HEAP_NAME,
 		nullptr, // To be Allocated from Global
-		a_maxGlobalMem - sizeof(Heap::AllocationHeader) + sizeof(unsigned int)
+		a_maxGlobalMem - HEAP_ALLOC_HEADER_FOOTER_SIZE
 	};
 	
 	s_pDefaultHeap = CreateHeapFromGlobal(DefaultConfig);

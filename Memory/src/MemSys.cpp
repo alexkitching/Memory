@@ -29,7 +29,7 @@ void* operator new(size_t a_size, Heap* a_pHeap)
 void* operator new(std::size_t a_size)
 {
 	void* pPtr = operator new(a_size, MemoryManager::GetDefaultHeap());
-
+	
 	if (pPtr)
 		return pPtr;
 

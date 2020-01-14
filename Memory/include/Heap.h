@@ -8,6 +8,8 @@
 
 #define MEM_HEAP_SIG 0xFFC0FFEE
 
+#define HEAP_ALLOC_HEADER_FOOTER_SIZE (sizeof(Heap::AllocationHeader) + sizeof(unsigned int))
+
 class Heap : public AllocatorBase
 {
 public:
@@ -20,15 +22,15 @@ public:
 
 	struct AllocationHeader
 	{
-		Heap* pHeap; // Heap the Allocation is within // 8 Bytes
-		size_t Size; // 16 Bytes
-		AllocationHeader* pNext; // 24 Bytes
-		AllocationHeader* pPrev; // 32 Bytes
+		Heap* pHeap;
+		size_t Size; 
+		AllocationHeader* pNext;
+		AllocationHeader* pPrev;
 #ifdef x64
 		uint32 padding;
 #endif
-		uint32 Sig; // 36 Bytes
-	};
+		uint32 Sig; 
+	}; // 24 Bytes x64, 20 x32
 
 	Heap();
 	virtual~Heap();
@@ -40,9 +42,11 @@ public:
 	void Activate(const Config& a_config);
 	//void Deactivate();
 	//
-	virtual void* allocate(size_t a_size, uint8 a_alignment = 4u) override;
+	virtual void* allocate(size_t a_size, uint8 a_alignment = DEFAULT_ALIGNMENT) override;
 	static void Deallocate(void* a_pBlock);
 	virtual void deallocate(void* a_pBlock) override;
+
+	float CalculateFragmentation() const;
 
 	const char* GetName() const { return m_Name; }
 	bool IsActive() const { return m_bActive; }
@@ -50,9 +54,11 @@ public:
 	void SetParent(Heap* a_pParent);
 private:
 
-	AllocationHeader* TryAllocate(size_t a_size);
-	void* TryAllocateBestFit(size_t a_size, AllocationHeader*& a_pPrevClosestAlloc) const;
-	void* TryAllocateFirstFit(size_t a_size, AllocationHeader*& a_pPrevClosestAlloc);
+	AllocationHeader* TryAllocate(size_t a_size, uint8 a_alignment);
+	AllocationHeader* TryAllocateBestFit(size_t a_size, uint8 a_alignment, AllocationHeader*& a_pPrevClosestAlloc) const;
+	AllocationHeader* TryAllocateFirstFit(size_t a_size, uint8 a_alignment, AllocationHeader*& a_pPrevClosestAlloc);
+
+	inline bool CapacityWouldExceed(size_t a_size) const;
 	
 	char m_Name[MAX_HEAP_NAME_LEN];
 	bool m_bActive : 1;

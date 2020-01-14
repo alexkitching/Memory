@@ -6,8 +6,8 @@
 
 #ifdef x64
 constexpr size_t MM_GLOBAL_MEM_SIZE = (size_t)3 * GB;
-#elif
-constexpr size_t MM_GLOBAL_MEM_SIZE = (size_t) 1.5 * GB;
+#else
+constexpr size_t MM_GLOBAL_MEM_SIZE = (size_t) 1.6 * GB;
 #endif
 
 

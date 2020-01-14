@@ -1,6 +1,5 @@
 #include "PerformanceCounterWindow.h"
 #include "PerformanceCounter.h"
-#include "GlobalTime.h"
 #include "MemoryManager.h"
 #include "Heap.h"
 #include "MemSys.h"
@@ -33,6 +32,7 @@ void PerformanceCounterWindow::OnGUIWindow(const IMGUIInterface& a_interface)
 	
 #if USE_MEM_SYS 
 	ImGui::Text("Default Heap Usage: %.1f Mbs", (float)((float)MemoryManager::GetDefaultHeap()->GetUsedMemory()/ MB));
+	ImGui::Text("Default Heap Fragmentation: %.1f %s", MemoryManager::GetDefaultHeap()->CalculateFragmentation(), "%");
 	ImGui::Separator();
 #endif
 	

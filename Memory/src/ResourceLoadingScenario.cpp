@@ -60,11 +60,15 @@ void ResourceLoadingScenario::RunBootType()
 	}
 
 	// Load Resource
-	const size_t ResourceSize = Random::IntRangeWithSeed(m_Config.Bootup.MinResourceSize, m_Config.Bootup.MaxResourceSize, m_NextSeed++);
+	size_t ResourceSize = Random::IntRangeWithSeed(m_Config.Bootup.MinResourceSize, m_Config.Bootup.MaxResourceSize, m_NextSeed++);
+	if (m_TotalLoadedSize + ResourceSize > m_Config.Bootup.TotalSizeToLoad)
+	{
+		ResourceSize = m_Config.Bootup.TotalSizeToLoad - m_TotalLoadedSize;
+	}
 	LoadResource(ResourceSize);
 
-
-	if (m_LoadedResources.size() == m_Config.Bootup.m_NumResourcesToLoad) // Loaded All our Resources
+	
+	if (m_TotalLoadedSize >= m_Config.Bootup.TotalSizeToLoad) // Loaded All our Resources
 	{
 		m_bComplete = true;
 	}
@@ -134,6 +138,7 @@ void ResourceLoadingScenario::LoadResource(size_t a_size)
 	PROFILER_BEGIN_SAMPLE(ResourceLoadingScenario::LoadResource);
 	IDummyResource* pResource = new DummyResource(a_size);
 	m_LoadedResources.push_back(pResource);
+	m_TotalLoadedSize += a_size;
 	PROFILER_END_SAMPLE();
 }
 
