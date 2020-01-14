@@ -9,7 +9,7 @@
 
 PerformanceCounterWindow::PerformanceCounterWindow(ProfilerWindow* a_pProfilerWindow)
 	:
-IMGUIWindow("Performance Counter"),
+IMGUIWindow("Performance Counter", false),
 m_pProfiler(a_pProfilerWindow)
 {
 }

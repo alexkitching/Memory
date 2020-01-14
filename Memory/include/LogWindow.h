@@ -10,7 +10,7 @@ class LogWindow : public IMGUIWindow, public ILogHandler
 public:
 	LogWindow()
 		:
-	IMGUIWindow(TEXT(LogWindow)),
+	IMGUIWindow(TEXT(LogWindow), false),
 	m_bAutoScroll(true)
 	{
 		Debug::SetLogHandler(this);

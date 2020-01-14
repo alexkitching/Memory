@@ -5,7 +5,7 @@
 class IMGUIWindow
 {
 public:
-	IMGUIWindow(const char* a_pName, bool a_bStartOpen = true) : m_bOpen(a_bStartOpen), m_Name(a_pName) {};
+	IMGUIWindow(const char* a_pName, bool a_bClosable, bool a_bStartOpen = true) : m_bOpen(a_bStartOpen), m_bClosable(a_bClosable), m_Name(a_pName) {};
 	virtual ~IMGUIWindow() {}
 
 	void OnGUI(const IMGUIInterface& a_interface);
@@ -21,5 +21,6 @@ protected:
 
 	bool m_bOpen;
 private:
+	bool m_bClosable;
 	std::string m_Name;
 };

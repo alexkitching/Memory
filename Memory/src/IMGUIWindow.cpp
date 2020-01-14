@@ -7,8 +7,14 @@ void IMGUIWindow::OnGUI(const IMGUIInterface& a_interface)
 	{
 		return;
 	}
+
+	bool* pCloseBool = nullptr;
+	if(m_bClosable)
+	{
+		pCloseBool = &m_bOpen;
+	}
 	
-	if (ImGui::Begin(m_Name.c_str(), &m_bOpen) == false)
+	if (ImGui::Begin(m_Name.c_str(), pCloseBool) == false)
 	{
 		ImGui::End();
 		return;

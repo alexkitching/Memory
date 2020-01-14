@@ -6,7 +6,7 @@
 
 ScenarioWindow::ScenarioWindow(ScenarioManager* a_pScenarioManager)
 	:
-IMGUIWindow("Scenario Window"),
+IMGUIWindow("Scenario Window", false),
 m_bScenarioActive{false},
 m_pScenarioManager(a_pScenarioManager)
 {

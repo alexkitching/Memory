@@ -4,7 +4,7 @@
 
 ProfilerWindow::ProfilerWindow()
 	:
-IMGUIWindow("Profiler", false),
+IMGUIWindow("Profiler", true, false),
 m_bPauseNext(false),
 m_bSampleNext(false)
 {
