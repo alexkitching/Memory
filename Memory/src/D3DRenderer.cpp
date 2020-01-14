@@ -1,4 +1,5 @@
 #include "D3DRenderer.h"
+#include "Profiler.h"
 
 D3DRenderer::D3DRenderer(HWND a_hwnd)
 	:
@@ -102,6 +103,7 @@ m_pRenderTarget(nullptr)
 
 void D3DRenderer::EndFrame()
 {
+	PROFILER_BEGIN_SAMPLE(D3DRenderer::EndFrame());
 	HRESULT hr = m_pSwapChain->Present(1u, 0u); // 1u - 60fps 2u - 30fps
 
 	if(FAILED(hr))
@@ -116,7 +118,7 @@ void D3DRenderer::EndFrame()
 		}
 	}
 	
-	
+	PROFILER_END_SAMPLE();
 }
 
 void D3DRenderer::Clear(float a_r, float a_g, float a_b)
@@ -128,6 +130,7 @@ void D3DRenderer::Clear(float a_r, float a_g, float a_b)
 
 void D3DRenderer::DrawCube(float a_x, float a_y, float a_z, float a_scale, float a_angle)
 {
+	PROFILER_BEGIN_SAMPLE(D3DRenderer::DrawCube);
 	struct Vertex
 	{
 		struct
@@ -370,4 +373,5 @@ void D3DRenderer::DrawCube(float a_x, float a_y, float a_z, float a_scale, float
 	D3D_THROW_INFO(m_pContext->RSSetViewports(1u, &vp));
 
 	D3D_THROW_INFO(m_pContext->DrawIndexed((UINT)std::size(indices), 0u, 0u));
+	PROFILER_END_SAMPLE();
 }

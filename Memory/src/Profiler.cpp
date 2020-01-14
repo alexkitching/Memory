@@ -96,13 +96,24 @@ void Profiler::BeginSampleInternal(const char* a_pName)
 					data.Depth = pScope->Depth;
 					data.TimeTaken = pScope->TimeTaken;
 					data.Calls = pScope->Calls;
+
+					std::vector<SampleData>* pDataContainer = nullptr;
 					if(m_CurrentScope.size() > 0)
 					{
-						m_CurrentScope.back().ChildData.push_back(data);
+						pDataContainer = &m_CurrentScope.back().ChildData;
 					}
 					else
 					{
-						m_CurrentFrameData.SampleData.push_back(data);
+						pDataContainer = &m_CurrentFrameData.SampleData;
+					}
+
+					if(pDataContainer != nullptr)
+					{
+						pDataContainer->push_back(data);
+						for (int i = 0; i < (int)pScope->ChildData.size(); ++i)
+						{
+							pDataContainer->push_back(pScope->ChildData[i]);
+						}
 					}
 					
 					m_OldScopeStack.pop_back();
@@ -114,10 +125,8 @@ void Profiler::BeginSampleInternal(const char* a_pName)
 	// Push New Scope
 	SampleScope newScope;
 	newScope.Sample = newSample;
-	newScope.Depth = m_CurrentScope.size();
+	newScope.Depth = (int)m_CurrentScope.size();
 	m_CurrentScope.push_back(newScope);
-
-	//m_LastPeakScope.push_back(newScope);
 }
 
 void Profiler::EndSampleInternal()
