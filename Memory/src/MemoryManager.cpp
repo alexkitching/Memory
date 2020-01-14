@@ -112,6 +112,11 @@ void MemoryManager::Delete(void* a_pPtr)
 	}
 }
 
+void MemoryManager::DefragmentHeaps()
+{
+	s_pGlobalHeap->Defragment();
+}
+
 Heap* MemoryManager::CreateHeap(Heap::Config& a_config, const char* a_pParentName)
 {
 	Heap* pParent = FindActiveHeap(a_pParentName);

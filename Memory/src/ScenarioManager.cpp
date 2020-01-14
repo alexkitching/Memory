@@ -21,7 +21,7 @@ Scenarios({nullptr, nullptr})
 #ifdef x64
 	config.Bootup.TotalSizeToLoad = 2 * GB;
 #else
-	config.Bootup.TotalSizeToLoad = 0.9 * GB;
+	config.Bootup.TotalSizeToLoad = (size_t)0.9 * GB;
 #endif
 
 	config.Gameplay.LoadInterval = 0.5f;

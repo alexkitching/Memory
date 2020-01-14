@@ -19,9 +19,24 @@ public:
 	void RenderGUIFrame();
 
 	bool Button(const char* a_pName, bool a_bEnabled = true) const;
+
 private:
 	bool m_bInitialised;
 	
 	Window* m_pWindow;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_pDXRenderTarget;
+};
+
+struct IMGUIQuad
+{
+	float x;
+	float y;
+
+	float w;
+	float h;
+
+	float r;
+	float g;
+	float b;
+	float a;
 };

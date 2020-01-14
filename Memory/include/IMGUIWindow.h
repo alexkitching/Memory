@@ -20,6 +20,8 @@ protected:
 	virtual void OnClose() {}
 
 	bool m_bOpen;
+
+	void DrawQuad(const IMGUIQuad& a_quad);
 private:
 	bool m_bClosable;
 	std::string m_Name;

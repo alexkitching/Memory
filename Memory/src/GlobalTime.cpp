@@ -35,3 +35,10 @@ float Time::DeltaTime()
 {
 	return s_pInstance->m_deltaTime;
 }
+
+float Time::CurrentFrameTime()
+{
+	const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+	const std::chrono::duration<float> currentFrameTime = now - s_pInstance->m_lastFrameTime;
+	return currentFrameTime.count();
+}

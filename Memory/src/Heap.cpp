@@ -2,6 +2,8 @@
 #include "Debug.h"
 #include "MemSys.h"
 #include "PointerMath.h"
+#include "PerformanceCounter.h"
+#include "GlobalTime.h"
 
 // Min 1 Byte Heap Allocation
 #define MIN_HEAP_ALLOC_SIZE (sizeof(Heap::AllocationHeader) + sizeof(char) + sizeof(unsigned int))
@@ -179,6 +181,11 @@ float Heap::CalculateFragmentation() const
 	
 }
 
+void Heap::Defragment()
+{
+
+}
+
 void Heap::SetParent(Heap* a_pParent)
 {
 	ASSERT(a_pParent != nullptr && "Parent Heap is null!");
@@ -238,6 +245,7 @@ Heap::AllocationHeader* Heap::TryAllocate(size_t a_size, uint8 a_alignment)
 		as_header->Sig = MEM_HEAP_SIG;
 		as_header->pHeap = this;
 		as_header->Size = a_size;
+		as_header->Alignment = a_alignment;
 		as_header->pNext = nullptr;
 		as_header->pPrev = nullptr;
 
@@ -263,6 +271,7 @@ Heap::AllocationHeader* Heap::TryAllocate(size_t a_size, uint8 a_alignment)
 		as_header->Sig = MEM_HEAP_SIG;
 		as_header->pHeap = this;
 		as_header->Size = a_size;
+		as_header->Alignment = a_alignment;
 		as_header->pNext = nullptr;
 		as_header->pPrev = m_pHeadAlloc;
 		
@@ -273,18 +282,16 @@ Heap::AllocationHeader* Heap::TryAllocate(size_t a_size, uint8 a_alignment)
 	}
 
 	AllocationHeader* pPrevClosestAlloc = nullptr;
-	AllocationHeader* pAllocHeader = nullptr;
-
 	if(m_bFavourBestFit)
 	{
-		pAllocHeader = (AllocationHeader*)TryAllocateBestFit(a_size, a_alignment, pPrevClosestAlloc);
+		as_header = (AllocationHeader*)TryAllocateBestFit(a_size, a_alignment, pPrevClosestAlloc);
 	}
 	else
 	{
-		pAllocHeader = (AllocationHeader*)TryAllocateFirstFit(a_size, a_alignment, pPrevClosestAlloc);
+		as_header = (AllocationHeader*)TryAllocateFirstFit(a_size, a_alignment, pPrevClosestAlloc);
 	}
 
-	if(pAllocHeader == nullptr)
+	if(as_header == nullptr)
 	{
 		// Failed to Fit Allocation
 		return nullptr;
@@ -292,38 +299,39 @@ Heap::AllocationHeader* Heap::TryAllocate(size_t a_size, uint8 a_alignment)
 	// Returned Header has Alignment Set
 
 
-	pAllocHeader->Sig = MEM_HEAP_SIG;
-	pAllocHeader->Size = a_size;
-	pAllocHeader->pHeap = this;
+	as_header->Sig = MEM_HEAP_SIG;
+	as_header->Size = a_size;
+	as_header->Alignment = a_alignment;
+	as_header->pHeap = this;
 	
-	pAllocHeader->pPrev = pPrevClosestAlloc;
-	pAllocHeader->pNext = nullptr;
+	as_header->pPrev = pPrevClosestAlloc;
+	as_header->pNext = nullptr;
 
 	if(pPrevClosestAlloc != nullptr)
 	{
-		ASSERT((char*)pPrevClosestAlloc + HEAP_ALLOC_HEADER_FOOTER_SIZE + (uint8)pPrevClosestAlloc->Size <= (char*)pAllocHeader);
+		ASSERT((char*)pPrevClosestAlloc + HEAP_ALLOC_HEADER_FOOTER_SIZE + (uint8)pPrevClosestAlloc->Size <= (char*)as_header);
 		if(pPrevClosestAlloc->pNext == nullptr) // Should Be Tail Alloc
 		{
 			ASSERT(pPrevClosestAlloc == m_pTailAlloc && "Expected Tail Alloc");
-			m_pTailAlloc->pNext = pAllocHeader; // Old Tail next to this
-			m_pTailAlloc = pAllocHeader; // Set This to Tail
+			m_pTailAlloc->pNext = as_header; // Old Tail next to this
+			m_pTailAlloc = as_header; // Set This to Tail
 		}
 		else // Not Tail
 		{
-			pAllocHeader->pNext = pPrevClosestAlloc->pNext; // Set Next
-			pPrevClosestAlloc->pNext->pPrev = pAllocHeader; // Set Nexts Prev to This
-			pPrevClosestAlloc->pNext = pAllocHeader; // Set Prev to This
+			as_header->pNext = pPrevClosestAlloc->pNext; // Set Next
+			pPrevClosestAlloc->pNext->pPrev = as_header; // Set Nexts Prev to This
+			pPrevClosestAlloc->pNext = as_header; // Set Prev to This
 		}
 	}
 	else // This should be the new head
 	{
-		ASSERT(pAllocHeader < m_pHeadAlloc && "Expected Address Before Current Head!");
-		m_pHeadAlloc->pPrev = pAllocHeader; // Set Old Heads Prev to this
-		pAllocHeader->pNext = m_pHeadAlloc; // Set this Next to Old Head
-		m_pHeadAlloc = pAllocHeader; // Set this as new head
+		ASSERT(as_header < m_pHeadAlloc && "Expected Address Before Current Head!");
+		m_pHeadAlloc->pPrev = as_header; // Set Old Heads Prev to this
+		as_header->pNext = m_pHeadAlloc; // Set this Next to Old Head
+		m_pHeadAlloc = as_header; // Set this as new head
 	}
 
-	return pAllocHeader;
+	return as_header;
 }
 
 Heap::AllocationHeader* Heap::TryAllocateBestFit(size_t a_size, uint8 a_alignment, AllocationHeader*& a_pPrevClosestAlloc) const
@@ -370,23 +378,20 @@ Heap::AllocationHeader* Heap::TryAllocateBestFit(size_t a_size, uint8 a_alignmen
 		const uint8 adjustment = PointerMath::AlignForwardAdjustment(pStart, a_alignment);  // Align Memory Block
 		pStart -= (sizeof(AllocationHeader) - adjustment); // Get Header
 
-		if(pStart > pEnd)
+		if(pStart <= pEnd)
 		{
-			pCur = pCur->pNext;
-			continue;
-		}
+			// Calculate Gap Size
+			GapSize = pEnd - pStart;
 
-		// Calculate Gap Size
-		GapSize = pEnd - pStart;
+			if (GapSize >= a_size + HEAP_ALLOC_HEADER_FOOTER_SIZE && // Will Fit
+				GapSize < bestSize) // Better than Best Size
+			{
+				pBestFit = pStart;
+				bestSize = GapSize;
+				pLast = pCur;
+			}
+		}
 		
-		if(GapSize >= a_size + HEAP_ALLOC_HEADER_FOOTER_SIZE && // Will Fit
-			GapSize < bestSize) // Better than Best Size
-		{
-			pBestFit = pStart;
-			bestSize = GapSize;
-			pLast = pCur;
-		}
-
 		pCur = pCur->pNext;
 	}
 
@@ -420,7 +425,78 @@ Heap::AllocationHeader* Heap::TryAllocateBestFit(size_t a_size, uint8 a_alignmen
 
 Heap::AllocationHeader* Heap::TryAllocateFirstFit(size_t a_size, uint8 a_alignment, AllocationHeader*& a_pPrevClosestAlloc)
 {
-	ASSERT(false);
+	char* pStart = nullptr;
+	char* pEnd = nullptr;
+	size_t GapSize;
+	if (m_pStart != m_pHeadAlloc) // Gap Between Start - Head Check First
+	{
+		pStart = (char*)m_pStart;
+		pEnd = (char*)m_pHeadAlloc;
+		// Align Start
+		pStart += sizeof(AllocationHeader); // Get Block Start
+		const uint8 adjustment = PointerMath::AlignForwardAdjustment(pStart, a_alignment);  // Align Memory Block
+		pStart -= (sizeof(AllocationHeader) - adjustment); // Get Header
+
+		if (pStart < pEnd)
+		{
+			GapSize = pEnd - pStart;
+
+			if (GapSize >= a_size + HEAP_ALLOC_HEADER_FOOTER_SIZE) // Tail - Capacity Can fit, Set as Best for now
+			{
+				return (AllocationHeader*)pStart;
+			}
+		}
+	}
+
+	AllocationHeader* pCur = m_pHeadAlloc;
+	while (pCur != nullptr && pCur->pNext != nullptr) // We have at least 2 Allocations
+	{
+		// Get Start and End Addresses Between Allocations
+		pStart = (char*)pCur + HEAP_ALLOC_HEADER_FOOTER_SIZE + pCur->Size;
+		pEnd = (char*)pCur->pNext;
+
+		// Align Start
+		pStart += sizeof(AllocationHeader); // Get Block Start
+		const uint8 adjustment = PointerMath::AlignForwardAdjustment(pStart, a_alignment);  // Align Memory Block
+		pStart -= (sizeof(AllocationHeader) - adjustment); // Get Header
+
+		if (pStart <= pEnd)
+		{
+			// Calculate Gap Size
+			GapSize = pEnd - pStart;
+
+			if (GapSize >= a_size + HEAP_ALLOC_HEADER_FOOTER_SIZE) // Better than Best Size
+			{
+				a_pPrevClosestAlloc = pCur;
+				return (AllocationHeader*)pStart;
+			}
+		}
+		pCur = pCur->pNext;
+	}
+
+	// Check for Gap between final alloc and capacity
+	pStart = (char*)m_pTailAlloc + HEAP_ALLOC_HEADER_FOOTER_SIZE + m_pTailAlloc->Size; // Tail Alloc End
+
+	pEnd = (char*)m_pStart + m_capacity;
+	if (pStart != pEnd) // End Point
+	{
+		// Align Start
+		pStart += sizeof(AllocationHeader); // Get Block Start
+		const uint8 adjustment = PointerMath::AlignForwardAdjustment(pStart, a_alignment);  // Align Memory Block
+		pStart -= (sizeof(AllocationHeader) - adjustment); // Get Header
+
+		if (pStart < pEnd)
+		{
+			GapSize = pEnd - pStart;
+
+			if (GapSize >= a_size + HEAP_ALLOC_HEADER_FOOTER_SIZE)
+			{
+				a_pPrevClosestAlloc = m_pTailAlloc;
+				return (AllocationHeader*)pStart;
+			}
+		}
+	}
+	
 	return nullptr;
 }
 

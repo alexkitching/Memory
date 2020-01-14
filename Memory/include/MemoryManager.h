@@ -22,6 +22,8 @@ public:
 
 	static void* New(size_t a_size);
 	static void Delete(void* a_pPtr);
+
+	static void DefragmentHeaps();
 	
 private:
 

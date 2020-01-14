@@ -11,6 +11,8 @@ public:
 
 	static float TimeSinceStartup();
 	static float DeltaTime();
+
+	static float CurrentFrameTime();
 private:
 	static Time* s_pInstance;
 

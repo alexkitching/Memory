@@ -13,6 +13,7 @@ ParticleSystemScenario::ParticleSystemScenario(const Config& a_config)
 	m_Config(a_config),
 	m_bComplete(false)
 {
+	m_ParticleSystems.reserve(m_Config.ParticleSystemsCount);
 }
 
 void ParticleSystemScenario::Run()
@@ -90,6 +91,9 @@ ParticleSystemScenario::ParticleSystem::~ParticleSystem()
 	{
 		DestroyParticle(0);
 	}
+#if USE_MEM_SYS
+	MemoryManager::GetDefaultHeap()->deallocate(m_ParticlePool.GetStartAddress());
+#endif
 }
 
 void ParticleSystemScenario::ParticleSystem::Update()
@@ -203,7 +207,7 @@ void ParticleSystemScenario::ParticleSystem::DestroyParticle(int a_pIdx)
 void ParticleSystemScenario::Initialise()
 {
 	PROFILER_BEGIN_SAMPLE(ParticleSystemScenario::Initialise);
-	m_ParticleSystems.reserve(m_Config.ParticleSystemsCount);
+	
 	while ((int)m_ParticleSystems.size() != m_Config.ParticleSystemsCount)
 	{
 		ParticleSystem::Config config =

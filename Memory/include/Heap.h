@@ -26,9 +26,7 @@ public:
 		size_t Size; 
 		AllocationHeader* pNext;
 		AllocationHeader* pPrev;
-#ifdef x64
-		uint32 padding;
-#endif
+		uint32 Alignment;
 		uint32 Sig; 
 	}; // 24 Bytes x64, 20 x32
 
@@ -46,12 +44,17 @@ public:
 	static void Deallocate(void* a_pBlock);
 	virtual void deallocate(void* a_pBlock) override;
 
+	// Fragmentation/Defragmentation
 	float CalculateFragmentation() const;
+	void Defragment();
 
 	const char* GetName() const { return m_Name; }
 	bool IsActive() const { return m_bActive; }
 
 	void SetParent(Heap* a_pParent);
+
+	AllocationHeader* GetHeadAllocation() const { return m_pHeadAlloc; }
+	AllocationHeader* GetTailAllocation() const { return m_pTailAlloc; }
 private:
 
 	AllocationHeader* TryAllocate(size_t a_size, uint8 a_alignment);

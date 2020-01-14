@@ -398,6 +398,9 @@
     <ClInclude Include="include\ProfilerWindow.h">
       <Filter>Header Files\IMGUI\Windows</Filter>
     </ClInclude>
+    <ClInclude Include="include\MoveableHeap.h">
+      <Filter>Header Files\Memory\Allocators</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Memory.rc">

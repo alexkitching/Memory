@@ -43,6 +43,7 @@ void VertexDataProcessingScenario::Run()
 void VertexDataProcessingScenario::Reset()
 {
 	PROFILER_BEGIN_SAMPLE(VertexDataProcessingScenario::Run);
+	m_runTimer.Stop();
 	m_bComplete = false;
 	ClearFrameSubs();
 	PROFILER_END_SAMPLE();
