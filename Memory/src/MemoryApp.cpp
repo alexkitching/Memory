@@ -8,6 +8,7 @@ bool MemoryApp::s_bShouldPause = false;
 MemoryApp::MemoryApp()
 	:
 m_ScenarioManager(ScenarioManager()),
+m_PerformanceCounterWindow(&m_ProfilerWindow),
 m_ScenarioWindow(&m_ScenarioManager)
 {
 }

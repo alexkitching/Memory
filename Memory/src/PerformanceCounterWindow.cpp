@@ -1,17 +1,16 @@
 #include "PerformanceCounterWindow.h"
 #include "PerformanceCounter.h"
-#include "Win.h"
-#include "psapi.h"
-
-#include <imgui.h>
 #include "GlobalTime.h"
 #include "MemoryManager.h"
 #include "Heap.h"
 #include "MemSys.h"
+#include "ProfilerWindow.h"
+#include <imgui.h>
 
-PerformanceCounterWindow::PerformanceCounterWindow()
+PerformanceCounterWindow::PerformanceCounterWindow(ProfilerWindow* a_pProfilerWindow)
 	:
-IMGUIWindow("Performance Counter")
+IMGUIWindow("Performance Counter"),
+m_pProfiler(a_pProfilerWindow)
 {
 }
 
@@ -34,5 +33,19 @@ void PerformanceCounterWindow::OnGUIWindow(const IMGUIInterface& a_interface)
 	
 #if USE_MEM_SYS 
 	ImGui::Text("Default Heap Usage: %.1f Mbs", (float)((float)MemoryManager::GetDefaultHeap()->GetUsedMemory()/ MB));
+	ImGui::Separator();
 #endif
+	
+	if(a_interface.Button("Toggle Profiler"))
+	{
+		if(m_pProfiler->IsOpen())
+		{
+			m_pProfiler->Close();
+		}
+		else
+		{
+			m_pProfiler->Open();
+		}
+	}
+	
 }

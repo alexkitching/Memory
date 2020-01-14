@@ -78,46 +78,45 @@ void Profiler::BeginSampleInternal(const char* a_pName)
 		SampleScope* pTop = &m_OldScopeStack[(int)m_OldScopeStack.size() - 1];
 		if(pTop != nullptr)
 		{
-			if(pTop->Sample.Name == a_pName)
+			if(pTop->Sample.Name == a_pName) // Reuse Scope
 			{
 				// Reset Sample Time
 				pTop->Sample.Reset();
 				m_CurrentScope.push_back(*pTop);
 				m_OldScopeStack.pop_back();
+				
 				return;
 			}
-			else
+			
+			SampleData data;
+			while (m_OldScopeStack.size() > 0)
 			{
-				SampleData data;
-				while (m_OldScopeStack.size() > 0)
+				SampleScope* pScope = &m_OldScopeStack.back();
+				data.Name = pScope->Sample.Name;
+				data.Depth = pScope->Depth;
+				data.TimeTaken = pScope->TimeTaken;
+				data.Calls = pScope->Calls;
+
+				std::vector<SampleData>* pDataContainer = nullptr;
+				if(m_CurrentScope.size() > 0)
 				{
-					SampleScope* pScope = &m_OldScopeStack.back();
-					data.Name = pScope->Sample.Name;
-					data.Depth = pScope->Depth;
-					data.TimeTaken = pScope->TimeTaken;
-					data.Calls = pScope->Calls;
-
-					std::vector<SampleData>* pDataContainer = nullptr;
-					if(m_CurrentScope.size() > 0)
-					{
-						pDataContainer = &m_CurrentScope.back().ChildData;
-					}
-					else
-					{
-						pDataContainer = &m_CurrentFrameData.SampleData;
-					}
-
-					if(pDataContainer != nullptr)
-					{
-						pDataContainer->push_back(data);
-						for (int i = 0; i < (int)pScope->ChildData.size(); ++i)
-						{
-							pDataContainer->push_back(pScope->ChildData[i]);
-						}
-					}
-					
-					m_OldScopeStack.pop_back();
+					pDataContainer = &m_CurrentScope.back().ChildData;
 				}
+				else
+				{
+					pDataContainer = &m_CurrentFrameData.SampleData;
+				}
+
+				if(pDataContainer != nullptr)
+				{
+					pDataContainer->push_back(data);
+					for (int i = 0; i < (int)pScope->ChildData.size(); ++i)
+					{
+						pDataContainer->push_back(pScope->ChildData[i]);
+					}
+				}
+					
+				m_OldScopeStack.pop_back();
 			}
 		}
 	}

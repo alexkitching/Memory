@@ -3,7 +3,12 @@
 
 void IMGUIWindow::OnGUI(const IMGUIInterface& a_interface)
 {
-	if (ImGui::Begin(m_Name.c_str(), nullptr) == false)
+	if(m_bOpen == false)
+	{
+		return;
+	}
+	
+	if (ImGui::Begin(m_Name.c_str(), &m_bOpen) == false)
 	{
 		ImGui::End();
 		return;
