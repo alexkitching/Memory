@@ -25,6 +25,9 @@ public:
 	size_t GetAllocationCount() const { return m_allocationCount; }
 #endif
 protected:
+
+	virtual inline bool CapacityWouldExceed(size_t a_size) const;
+	
 	void* m_pStart;
 	size_t m_capacity;
 	

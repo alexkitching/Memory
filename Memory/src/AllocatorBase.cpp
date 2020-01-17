@@ -36,3 +36,13 @@ AllocatorBase::~AllocatorBase()
 #endif
 }
 
+bool AllocatorBase::CapacityWouldExceed(size_t a_size) const
+{
+	if (m_usedSize + a_size > m_capacity)
+	{
+		LOG("Heap: %s Failed Attempted Allocation of Size %u REASON - Exceeds Capacity")
+			return true;
+	}
+	return false;
+}
+

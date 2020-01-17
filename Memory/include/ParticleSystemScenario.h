@@ -22,8 +22,6 @@ public:
 			float ParticleLifeTimeMax;
 			float ParticleLifeTimeMin;
 		}ParticleSystem;
-
-		float RunLength;
 	};
 
 	ParticleSystemScenario() = default;
@@ -34,9 +32,9 @@ public:
 	void Run() override;
 	void OnRender(IRenderer* a_pRenderer) override;
 	void Reset() override;
-	bool IsComplete() override { return m_bComplete; }
+	bool IsComplete() override { return false; }
 
-	static int TotalAllocatedParticles;
+	static int m_TotalAllocatedParticles;
 private:
 	
 	
@@ -86,8 +84,7 @@ private:
 	void Initialise();
 	
 	Config m_Config;
-	DT_Timer m_RunTimeTimer;
-	bool m_bComplete;
+	bool m_bStarted;
 
 	std::vector<ParticleSystem> m_ParticleSystems;
 };

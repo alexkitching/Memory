@@ -24,7 +24,6 @@ public:
 			size_t MinResourceSize;
 			size_t MaxResourceSize;
 			size_t MaxAllocatedResourceSize;
-			float RunLength;
 		} Gameplay;
 	};
 
@@ -101,8 +100,6 @@ private:
 	Config m_Config;
 
 	DT_Timer m_IntervalTimer;
-	DT_Timer m_RunTimeTimer;
-	
 
 	int m_NextSeed;
 

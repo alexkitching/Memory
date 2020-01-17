@@ -21,14 +21,13 @@ Scenarios({nullptr, nullptr})
 #ifdef x64
 	config.Bootup.TotalSizeToLoad = 2 * GB;
 #else
-	config.Bootup.TotalSizeToLoad = (size_t)0.9 * GB;
+	config.Bootup.TotalSizeToLoad = (size_t)(0.9f * GB);
 #endif
 
 	config.Gameplay.LoadInterval = 0.5f;
 	config.Gameplay.MaxResourceSize = 60 * MB;
 	config.Gameplay.MinResourceSize = MB;
 	config.Gameplay.MaxAllocatedResourceSize = 400 * MB;
-	config.Gameplay.RunLength = 20.f;
 
 	Scenarios.pResourceLoading = new ResourceLoadingScenario(config);
 
@@ -41,7 +40,6 @@ Scenarios({nullptr, nullptr})
 	psConfig.ParticleSystem.ParticleLifeTimeMax = 5.f;
 	psConfig.ParticleSystem.ParticleLifeTimeMin = 1.5f;
 	psConfig.ParticleSystemsCount = 50;
-	psConfig.RunLength = 20.f;
 
 	Scenarios.pParticleSystem = new ParticleSystemScenario(psConfig);
 
@@ -49,7 +47,6 @@ Scenarios({nullptr, nullptr})
 	vpConfig.MinVertsPerSub = 3;
 	vpConfig.MaxVertsPerSub = 300;
 	vpConfig.PerFrameTotalData = 5 * MB;
-	vpConfig.RunLength = 20.f;
 
 	Scenarios.pVertexProcessing = new VertexDataProcessingScenario(vpConfig);
 }
@@ -120,7 +117,7 @@ void ScenarioManager::Update()
 		ActiveScenario& active = m_ActiveScenarios[i];
 		active.Timer.Tick();
 		active.Ticks++;
-		active.AverageFPS += (PerformanceCounter::FPS() - active.AverageFPS) / active.Ticks;
+		active.AverageFPS += (PerformanceCounter::FPS() - active.AverageFPS) / (float)active.Ticks;
 		
 		if(active.pScenario->IsComplete() == false)
 		{

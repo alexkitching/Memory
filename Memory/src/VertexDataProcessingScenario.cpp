@@ -7,8 +7,7 @@
 
 VertexDataProcessingScenario::VertexDataProcessingScenario(const Config& a_config)
 	:
-m_Config(a_config),
-m_bComplete(false)
+m_Config(a_config)
 #if USE_MEM_SYS
 ,
 m_VertexAllocator(a_config.PerFrameTotalData + (size_t)(0.5 * MB),
@@ -20,11 +19,6 @@ m_VertexAllocator(a_config.PerFrameTotalData + (size_t)(0.5 * MB),
 void VertexDataProcessingScenario::Run()
 {
 	PROFILER_BEGIN_SAMPLE(VertexDataProcessingScenario::Run);
-	if(m_runTimer.IsStarted() == false)
-	{
-		m_runTimer.Start();
-	}
-	m_runTimer.Tick();
 	
 	ClearFrameSubs();
 	
@@ -33,18 +27,12 @@ void VertexDataProcessingScenario::Run()
 		AddRandomSub();
 	}
 
-	if(m_runTimer.GetTime() > m_Config.RunLength)
-	{
-		m_bComplete = true;
-	}
 	PROFILER_END_SAMPLE();
 }
 
 void VertexDataProcessingScenario::Reset()
 {
 	PROFILER_BEGIN_SAMPLE(VertexDataProcessingScenario::Run);
-	m_runTimer.Stop();
-	m_bComplete = false;
 	ClearFrameSubs();
 	PROFILER_END_SAMPLE();
 }

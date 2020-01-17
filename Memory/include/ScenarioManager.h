@@ -6,6 +6,7 @@
 enum class ScenarioType
 {
 	Invalid = -1,
+	
 	ResourceLoadingBootup,
 	ResourceLoadingGameplay,
 	ParticleSystem,
@@ -14,7 +15,6 @@ enum class ScenarioType
 };
 
 DECLARE_EVENT_ONE_PARAM(ScenarioEvent, void, ScenarioType);
-DECLARE_DELEGATE_ONE_PARAM(ScenarioEventDelegate, void, ScenarioType);
 
 class IScenario;
 class ResourceLoadingScenario;

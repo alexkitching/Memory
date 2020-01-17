@@ -6,12 +6,12 @@
 #include "MemoryManager.h"
 #include "Profiler.h"
 
-int ParticleSystemScenario::TotalAllocatedParticles = 0;
+int ParticleSystemScenario::m_TotalAllocatedParticles = 0;
 
 ParticleSystemScenario::ParticleSystemScenario(const Config& a_config)
 	:
 	m_Config(a_config),
-	m_bComplete(false)
+	m_bStarted(false)
 {
 	m_ParticleSystems.reserve(m_Config.ParticleSystemsCount);
 }
@@ -19,31 +19,16 @@ ParticleSystemScenario::ParticleSystemScenario(const Config& a_config)
 void ParticleSystemScenario::Run()
 {
 	PROFILER_BEGIN_SAMPLE(ParticleSystemScenario::Run);
-	if (m_RunTimeTimer.IsStarted() == false) // Begin
+	if (m_bStarted == false) // Begin
 	{
-		
 		Initialise();
-		m_RunTimeTimer.Start();
+		m_bStarted = true;
 	}
 
-	m_RunTimeTimer.Tick();
-
 	// Update Particle Systems
-	int iTotalParticles = 0;
 	for (auto& ps : m_ParticleSystems)
 	{
 		ps.Update();
-		iTotalParticles += ps.GetParticleCount();
-	}
-
-	LOG("Total Particle Count: %i \n", iTotalParticles);
-	
-
-	if (m_RunTimeTimer.GetTime() >= m_Config.RunLength)
-	{
-		m_bComplete = true;
-		LOG("COMPLETE :: Total Allocated Particles: %i \n", TotalAllocatedParticles);
-		TotalAllocatedParticles = 0;
 	}
 	
 	PROFILER_END_SAMPLE();
@@ -62,8 +47,9 @@ void ParticleSystemScenario::OnRender(IRenderer* a_pRenderer)
 void ParticleSystemScenario::Reset()
 {
 	PROFILER_BEGIN_SAMPLE(ParticleSystemScenario::Reset);
-	m_bComplete = false;
-	m_RunTimeTimer.Stop();
+	LOG("COMPLETE :: Total Allocated Particles: %i \n", m_TotalAllocatedParticles);
+	m_TotalAllocatedParticles = 0;
+	m_bStarted = false;
 	m_ParticleSystems.clear();
 	PROFILER_END_SAMPLE();
 }
@@ -179,7 +165,7 @@ void ParticleSystemScenario::ParticleSystem::SpawnParticle()
 	m_Particles.push_back(new Particle(m_Config.OriginPosition[0], m_Config.OriginPosition[1], m_Config.OriginPosition[2]));
 #endif
 
-	TotalAllocatedParticles++;
+	m_TotalAllocatedParticles++;
 
 	// Stop Timer
 	m_NextParticleTimer.Stop();

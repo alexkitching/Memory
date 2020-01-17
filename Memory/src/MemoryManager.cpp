@@ -101,7 +101,7 @@ void MemoryManager::Delete(void* a_pPtr)
 		const auto pGlobalHeader = (MemoryManager::GlobalAllocationHeader*)((char*)a_pPtr -
 			sizeof(MemoryManager::GlobalAllocationHeader));
 
-		if (pGlobalHeader->AllocTypeSig == MEM_HEAP_SIG)
+		if (pGlobalHeader->AllocTypeSig == HEAP_ALLOC_SIG)
 		{
 			Heap::Deallocate(a_pPtr);
 		}

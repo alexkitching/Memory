@@ -4,9 +4,9 @@
 #include "Platform.h"
 #include "AllocatorBase.h"
 
-#define MAX_HEAP_NAME_LEN 64
+#define HEAP_MAX_NAME_LEN 64
 
-#define MEM_HEAP_SIG 0xFFC0FFEE
+#define HEAP_ALLOC_SIG 0xFFC0FFEE
 
 #define HEAP_ALLOC_HEADER_FOOTER_SIZE (sizeof(Heap::AllocationHeader) + sizeof(unsigned int))
 
@@ -33,7 +33,7 @@ public:
 	Heap();
 	virtual~Heap();
 
-	// Prevent Copies
+	// Prevent Copies (TODO Remove?)
 	Heap(const Heap&) = delete;
 	Heap& operator=(const Heap&) = delete;
 
@@ -63,7 +63,7 @@ private:
 
 	inline bool CapacityWouldExceed(size_t a_size) const;
 	
-	char m_Name[MAX_HEAP_NAME_LEN];
+	char m_Name[HEAP_MAX_NAME_LEN];
 	bool m_bActive : 1;
 	bool m_bFavourBestFit : 1;
 	

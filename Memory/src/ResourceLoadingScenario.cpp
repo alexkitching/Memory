@@ -5,13 +5,7 @@
 void ResourceLoadingScenario::Run()
 {
 	PROFILER_BEGIN_SAMPLE(ResourceLoadingScenario::Run);
-	if (m_RunTimeTimer.IsStarted() == false)
-	{
-		m_RunTimeTimer.Start();
-	}
-
 	// Tick Timers
-	m_RunTimeTimer.Tick();
 	m_IntervalTimer.Tick();
 
 	switch (m_CurrentType)
@@ -37,7 +31,6 @@ void ResourceLoadingScenario::Reset()
 	m_NextSeed = 0;
 
 	m_IntervalTimer.Stop();
-	m_RunTimeTimer.Stop();
 
 	for (auto& res : m_LoadedResources)
 	{
@@ -45,6 +38,7 @@ void ResourceLoadingScenario::Reset()
 	}
 
 	m_LoadedResources.clear();
+	m_TotalLoadedSize = 0;
 	GameplayData.m_TotalLoadedResourceSize = 0u;
 	PROFILER_END_SAMPLE();
 }
@@ -123,11 +117,6 @@ void ResourceLoadingScenario::RunGameplayType()
 	{
 		m_IntervalTimer.Stop();
 		m_IntervalTimer.Start();
-	}
-
-	if (m_RunTimeTimer.GetTime() >= m_Config.Gameplay.RunLength)
-	{
-		m_bComplete = true;
 	}
 
 	PROFILER_END_SAMPLE();

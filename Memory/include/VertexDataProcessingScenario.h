@@ -14,7 +14,6 @@ public:
 		size_t PerFrameTotalData;
 		int MaxVertsPerSub;
 		int MinVertsPerSub;
-		float RunLength;
 	};
 
 	VertexDataProcessingScenario() = default;
@@ -25,7 +24,7 @@ public:
 	void Run() override;
 	
 	void Reset() override;
-	bool IsComplete() override { return m_bComplete; }
+	bool IsComplete() override { return false; }
 
 	
 
@@ -49,9 +48,6 @@ private:
 	void ClearFrameSubs();
 
 	Config m_Config;
-
-	bool m_bComplete;
-	DT_Timer m_runTimer;
 
 	size_t m_fCurrentFrameDataSize;
 

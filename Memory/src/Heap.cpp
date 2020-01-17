@@ -37,7 +37,7 @@ void Heap::Activate(const Config& a_config)
 	m_bActive = true;
 	m_pStart = a_config.pStartPtr;
 	m_capacity = a_config.Capacity;
-	strcpy_s(m_Name, MAX_HEAP_NAME_LEN, a_config.Name);
+	strcpy_s(m_Name, HEAP_MAX_NAME_LEN, a_config.Name);
 }
 
 void* Heap::allocate(size_t a_size, uint8 a_alignment)
@@ -77,7 +77,7 @@ void* Heap::allocate(size_t a_size, uint8 a_alignment)
 void Heap::Deallocate(void* a_pBlock)
 {
 	auto pHeader = (AllocationHeader*)((char*)a_pBlock - sizeof(AllocationHeader));
-	ASSERT(pHeader->Sig == MEM_HEAP_SIG && "Expected Heap Signature?");
+	ASSERT(pHeader->Sig == HEAP_ALLOC_SIG && "Expected Heap Signature?");
 	pHeader->pHeap->deallocate(a_pBlock); // Perform Deallocation
 }
 
@@ -116,6 +116,11 @@ void Heap::deallocate(void* a_pBlock)
 
 float Heap::CalculateFragmentation() const
 {
+	if(m_pHeadAlloc == nullptr || m_pTailAlloc == nullptr)
+	{
+		return 0.f;
+	}
+	
 	size_t largestFreeBlock = 0u;
 	size_t blockSize;
 
@@ -242,7 +247,7 @@ Heap::AllocationHeader* Heap::TryAllocate(size_t a_size, uint8 a_alignment)
 		{
 			return nullptr;
 		}
-		as_header->Sig = MEM_HEAP_SIG;
+		as_header->Sig = HEAP_ALLOC_SIG;
 		as_header->pHeap = this;
 		as_header->Size = a_size;
 		as_header->Alignment = a_alignment;
@@ -268,7 +273,7 @@ Heap::AllocationHeader* Heap::TryAllocate(size_t a_size, uint8 a_alignment)
 			return nullptr;
 		}
 
-		as_header->Sig = MEM_HEAP_SIG;
+		as_header->Sig = HEAP_ALLOC_SIG;
 		as_header->pHeap = this;
 		as_header->Size = a_size;
 		as_header->Alignment = a_alignment;
@@ -299,7 +304,7 @@ Heap::AllocationHeader* Heap::TryAllocate(size_t a_size, uint8 a_alignment)
 	// Returned Header has Alignment Set
 
 
-	as_header->Sig = MEM_HEAP_SIG;
+	as_header->Sig = HEAP_ALLOC_SIG;
 	as_header->Size = a_size;
 	as_header->Alignment = a_alignment;
 	as_header->pHeap = this;
