@@ -13,14 +13,20 @@ void Profiler::BeginSample(const char* a_pName)
 {
 	ASSERT(s_pInstance != nullptr);
 	
+	if (s_pInstance->IsRecording() == false)
+		return;
+	
 	s_pInstance->BeginSampleInternal(a_pName);
 }
 
-void Profiler::EndSample(bool a_bLogTime)
+void Profiler::EndSample()
 {
 	ASSERT(s_pInstance != nullptr);
+
+	if (s_pInstance->IsRecording() == false)
+		return;
 	
-	s_pInstance->EndSampleInternal(a_bLogTime);
+	s_pInstance->EndSampleInternal();
 }
 
 void Profiler::OnFrameStart()
@@ -65,8 +71,8 @@ m_CurrentFrame(1)
 
 void Profiler::BeginSampleInternal(const char* a_pName)
 {
-	Sample newSample = Sample::Create(a_pName);
-
+	BeginOverheadTimer();
+	
 	if(m_OldScopeStack.size() > 0)
 	{
 		SampleScope* pTop = &m_OldScopeStack[(int)m_OldScopeStack.size() - 1];
@@ -78,7 +84,8 @@ void Profiler::BeginSampleInternal(const char* a_pName)
 				pTop->Sample.Reset();
 				m_CurrentScope.push_back(*pTop);
 				m_OldScopeStack.pop_back();
-				
+
+				StopOverheadTimer();
 				return;
 			}
 			
@@ -117,27 +124,26 @@ void Profiler::BeginSampleInternal(const char* a_pName)
 	
 	// Push New Scope
 	SampleScope newScope;
-	newScope.Sample = newSample;
+	newScope.Sample = Sample::Create(a_pName);
 	newScope.Depth = (int)m_CurrentScope.size();
 	m_CurrentScope.push_back(newScope);
+	
+	StopOverheadTimer();
 }
 
-void Profiler::EndSampleInternal(bool a_bLogTime)
+void Profiler::EndSampleInternal()
 {
 	ASSERT(m_CurrentScope.empty() == false && "No Samples Started!");
+	BeginOverheadTimer();
 
 	// Get Current Scope
 	SampleScope* pCurrent = &m_CurrentScope.back();
-	pCurrent->Calls++;
-
+	
 	// Record Duration
 	const std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - pCurrent->Sample.StartTime;
+	
 	pCurrent->TimeTaken += duration.count();
-
-	if(a_bLogTime)
-	{
-		LOG("Sample: %s took %.2f ms \n", pCurrent->Sample.Name.c_str(), duration.count());
-	}
+	pCurrent->Calls++;
 
 	if (m_CurrentScope.size() == 1) // At least another Scope
 	{
@@ -181,6 +187,7 @@ void Profiler::EndSampleInternal(bool a_bLogTime)
 
 	
 	m_CurrentScope.pop_back();
+	StopOverheadTimer();
 }
 
 void Profiler::OnFrameStartInternal()
@@ -196,6 +203,7 @@ void Profiler::OnFrameEndInternal()
 	// Record Total Frame Time
 	const std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - m_FrameStartTime;
 	m_CurrentFrameData.TotalTimeTaken = duration.count();
+	m_CurrentFrameData.ProfilerOverhead = m_OverheadTime;
 	m_CurrentFrameData.Frame = m_CurrentFrame;
 	
 	if (IsRecording())
@@ -203,13 +211,14 @@ void Profiler::OnFrameEndInternal()
 		// Record This Frames Data
 		m_RecordedFrameData.push_back(m_CurrentFrameData);
 
-		m_SampleRecordedEvent.Raise(m_CurrentFrameData);
+		m_SampleRecordedEvent.Raise();
 		
 		m_bRecordNext = false;
 		m_bRecordNextRequested = false;
 	}
 	
 	// Clear Current Frame Data
+	m_OverheadTime = 0.f;
 	m_CurrentFrameData.SampleData.clear();
 
 	m_CurrentFrame++;
@@ -218,4 +227,15 @@ void Profiler::OnFrameEndInternal()
 	{
 		m_bRecordNext = true;
 	}
+}
+
+void Profiler::BeginOverheadTimer()
+{
+	m_OverheadStartTime = std::chrono::high_resolution_clock::now();
+}
+
+void Profiler::StopOverheadTimer()
+{
+	const std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - m_OverheadStartTime;
+	m_OverheadTime += duration.count();
 }

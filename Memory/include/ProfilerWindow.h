@@ -36,7 +36,7 @@ private:
 	void DrawHeapBlocks();
 	void BuildHeapBlocks();
 
-	void OnSampleRecorded(const Profiler::FrameData& a_data);
+	void OnSampleRecorded();
 
 	void BuildItemTree();
 	bool BuildItemsFromDepth(SampleItem& a_pParent, int& a_idx);

@@ -278,7 +278,7 @@ void ProfilerWindow::BuildHeapBlocks()
 	}
 }
 
-void ProfilerWindow::OnSampleRecorded(const Profiler::FrameData& a_data)
+void ProfilerWindow::OnSampleRecorded()
 {
 	m_CurrentData = Profiler::GetCurrentFrameData();
 	
@@ -367,7 +367,8 @@ void ProfilerWindow::DrawCurrentSampleData()
 	}
 	ImGui::Columns();
 	ImGui::Separator();
-	ImGui::Text("Total Frame Time: %0.2f ms", m_CurrentData.TotalTimeTaken);
+	ImGui::Text("Total Frame Time: %0.3f ms", m_CurrentData.TotalTimeTaken);
+	ImGui::Text("Profiler Overhead: %0.3f ms", m_CurrentData.ProfilerOverhead);
 }
 
 void ProfilerWindow::DrawSampleItem(SampleItem& a_item)
