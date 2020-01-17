@@ -2,9 +2,16 @@
 #include "Debug.h"
 #include "Profiler.h"
 
+ResourceLoadingScenario::Config ResourceLoadingScenario::Configuration = {};
+
 void ResourceLoadingScenario::Run()
 {
 	PROFILER_BEGIN_SAMPLE(ResourceLoadingScenario::Run);
+	if(m_IntervalTimer.IsStarted() == false)
+	{
+		m_IntervalTimer.Start();
+	}
+	
 	// Tick Timers
 	m_IntervalTimer.Tick();
 
@@ -47,22 +54,22 @@ void ResourceLoadingScenario::RunBootType()
 {
 	PROFILER_BEGIN_SAMPLE(ResourceLoadingScenario::RunBootType);
 	if (m_IntervalTimer.IsStarted() &&
-		m_IntervalTimer.GetTime() < m_Config.Bootup.LoadInterval) // Wait Interval When Set
+		m_IntervalTimer.GetTime() < Configuration.Bootup.LoadInterval) // Wait Interval When Set
 	{
 		PROFILER_END_SAMPLE();
 		return;
 	}
 
 	// Load Resource
-	size_t ResourceSize = Random::IntRangeWithSeed(m_Config.Bootup.MinResourceSize, m_Config.Bootup.MaxResourceSize, m_NextSeed++);
-	if (m_TotalLoadedSize + ResourceSize > m_Config.Bootup.TotalSizeToLoad)
+	size_t ResourceSize = Random::IntRangeWithSeed(Configuration.Bootup.MinResourceSize, Configuration.Bootup.MaxResourceSize, m_NextSeed++);
+	if (m_TotalLoadedSize + ResourceSize > Configuration.Bootup.TotalSizeToLoad)
 	{
-		ResourceSize = m_Config.Bootup.TotalSizeToLoad - m_TotalLoadedSize;
+		ResourceSize = Configuration.Bootup.TotalSizeToLoad - m_TotalLoadedSize;
 	}
 	LoadResource(ResourceSize);
 
 	
-	if (m_TotalLoadedSize >= m_Config.Bootup.TotalSizeToLoad) // Loaded All our Resources
+	if (m_TotalLoadedSize >= Configuration.Bootup.TotalSizeToLoad) // Loaded All our Resources
 	{
 		m_bComplete = true;
 	}
@@ -78,13 +85,13 @@ void ResourceLoadingScenario::RunGameplayType()
 {
 	PROFILER_BEGIN_SAMPLE(ResourceLoadingScenario::RunGameplayType);
 	if (m_IntervalTimer.IsStarted() &&
-		m_IntervalTimer.GetTime() < m_Config.Gameplay.LoadInterval) // Wait Interval When Set
+		m_IntervalTimer.GetTime() < Configuration.Gameplay.LoadInterval) // Wait Interval When Set
 	{
 		PROFILER_END_SAMPLE();
 		return;
 	}
 
-	const bool bCapacityReached = GameplayData.m_TotalLoadedResourceSize >= m_Config.Gameplay.MaxAllocatedResourceSize;
+	const bool bCapacityReached = GameplayData.m_TotalLoadedResourceSize >= Configuration.Gameplay.AllocatedResourceCap;
 	bool bAllocateDeallocate = bCapacityReached ? false : true; // Default Allocate
 
 	if (m_LoadedResources.empty() == false && // Potential to Deallocate
@@ -96,7 +103,7 @@ void ResourceLoadingScenario::RunGameplayType()
 	if (bAllocateDeallocate)
 	{
 		// Load Resource
-		const size_t ResourceSize = Random::IntRangeWithSeed(m_Config.Bootup.MinResourceSize, m_Config.Bootup.MaxResourceSize, m_NextSeed++);
+		const size_t ResourceSize = Random::IntRangeWithSeed(Configuration.Bootup.MinResourceSize, Configuration.Bootup.MaxResourceSize, m_NextSeed++);
 		LoadResource(ResourceSize);
 		GameplayData.m_TotalLoadedResourceSize += ResourceSize;
 	}
@@ -113,7 +120,7 @@ void ResourceLoadingScenario::RunGameplayType()
 		FreeResource(idx);
 	}
 
-	if (m_IntervalTimer.GetTime() >= m_Config.Gameplay.LoadInterval)
+	if (m_IntervalTimer.GetTime() >= Configuration.Gameplay.LoadInterval)
 	{
 		m_IntervalTimer.Stop();
 		m_IntervalTimer.Start();

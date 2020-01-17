@@ -42,7 +42,7 @@ public:
 	static void Initialise();
 	
 	static void BeginSample(const char* a_pName);
-	static void EndSample();
+	static void EndSample(bool a_bLogTime = false);
 
 	static void OnFrameStart();
 	static void OnFrameEnd();
@@ -73,29 +73,6 @@ private:
 		std::chrono::high_resolution_clock::time_point StartTime;
 	};
 
-	struct SampleIdentifier
-	{
-		std::string Name;
-		int Index;
-
-		friend bool operator<(const SampleIdentifier& a_lhs, const SampleIdentifier& a_rhs)
-		{
-			return CompareStrings(a_lhs.Name, a_rhs.Name);
-		}
-
-	private:
-		static bool icompare_pred(unsigned char a, unsigned char b)
-		{
-			return std::tolower(a) < std::tolower(b);
-		}
-
-		static bool CompareStrings(const std::string& a, const std::string& b)
-		{
-			return std::lexicographical_compare(a.begin(), a.end(),
-				b.begin(), b.end(), icompare_pred);
-		}
-	};
-	
 	struct SampleScope
 	{
 		SampleScope()
@@ -112,13 +89,10 @@ private:
 		std::vector<SampleData> ChildData;
 	};
 
-	
-
 	Profiler();
 
 	void BeginSampleInternal(const char* a_pName);
-
-	void EndSampleInternal();
+	void EndSampleInternal(bool a_bLogTime);
 
 	void OnFrameStartInternal();
 	void OnFrameEndInternal();
@@ -149,12 +123,14 @@ private:
 
 #if PROFILER_ONLY_CUSTOM
 #define PROFILER_BEGIN_SAMPLE(name) 
-#define PROFILER_END_SAMPLE() 
+#define PROFILER_END_SAMPLE()
+#define PROFILER_END_SAMPLE_LOG()
 #define PROFILER_BEGIN_CUSTOMSAMPLE(name) Profiler::BeginSample(#name)
 #define PROFILER_END_CUSTOMSAMPLE() Profiler::EndSample()
 #else
 #define PROFILER_BEGIN_SAMPLE(name) Profiler::BeginSample(#name)
 #define PROFILER_END_SAMPLE() Profiler::EndSample()
+#define PROFILER_END_SAMPLE_LOG() Profiler::EndSample(true)
 #define PROFILER_BEGIN_CUSTOMSAMPLE(name)
 #define PROFILER_END_CUSTOMSAMPLE() 
 #endif

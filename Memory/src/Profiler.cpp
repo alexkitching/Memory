@@ -13,20 +13,14 @@ void Profiler::BeginSample(const char* a_pName)
 {
 	ASSERT(s_pInstance != nullptr);
 	
-	if (s_pInstance->IsRecording() == false)
-		return;
-	
 	s_pInstance->BeginSampleInternal(a_pName);
 }
 
-void Profiler::EndSample()
+void Profiler::EndSample(bool a_bLogTime)
 {
 	ASSERT(s_pInstance != nullptr);
-
-	if (s_pInstance->IsRecording() == false)
-		return;
 	
-	s_pInstance->EndSampleInternal();
+	s_pInstance->EndSampleInternal(a_bLogTime);
 }
 
 void Profiler::OnFrameStart()
@@ -128,7 +122,7 @@ void Profiler::BeginSampleInternal(const char* a_pName)
 	m_CurrentScope.push_back(newScope);
 }
 
-void Profiler::EndSampleInternal()
+void Profiler::EndSampleInternal(bool a_bLogTime)
 {
 	ASSERT(m_CurrentScope.empty() == false && "No Samples Started!");
 
@@ -139,6 +133,11 @@ void Profiler::EndSampleInternal()
 	// Record Duration
 	const std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - pCurrent->Sample.StartTime;
 	pCurrent->TimeTaken += duration.count();
+
+	if(a_bLogTime)
+	{
+		LOG("Sample: %s took %.2f ms \n", pCurrent->Sample.Name.c_str(), duration.count());
+	}
 
 	if (m_CurrentScope.size() == 1) // At least another Scope
 	{

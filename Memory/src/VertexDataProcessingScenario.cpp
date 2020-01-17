@@ -5,13 +5,13 @@
 #include "Common.h"
 #include "Profiler.h"
 
-VertexDataProcessingScenario::VertexDataProcessingScenario(const Config& a_config)
-	:
-m_Config(a_config)
+VertexDataProcessingScenario::Config VertexDataProcessingScenario::Configuration = {};
+
+VertexDataProcessingScenario::VertexDataProcessingScenario()
 #if USE_MEM_SYS
-,
-m_VertexAllocator(a_config.PerFrameTotalData + (size_t)(0.5 * MB),
-		MemoryManager::GetDefaultHeap()->allocate(a_config.PerFrameTotalData + (size_t)(0.5 * MB)))
+	:
+m_VertexAllocator(Configuration.PerFrameTotalData + (size_t)(0.5 * MB),
+		MemoryManager::GetDefaultHeap()->allocate(Configuration.PerFrameTotalData + (size_t)(0.5 * MB)))
 #endif
 {
 }
@@ -22,7 +22,7 @@ void VertexDataProcessingScenario::Run()
 	
 	ClearFrameSubs();
 	
-	while(m_fCurrentFrameDataSize < m_Config.PerFrameTotalData)
+	while(m_fCurrentFrameDataSize < Configuration.PerFrameTotalData)
 	{
 		AddRandomSub();
 	}
@@ -40,7 +40,7 @@ void VertexDataProcessingScenario::Reset()
 void VertexDataProcessingScenario::AddRandomSub()
 {
 	PROFILER_BEGIN_SAMPLE(VertexDataProcessingScenario::AddRandomSub);
-	const int VertCount = Random::IntRange(m_Config.MinVertsPerSub, m_Config.MaxVertsPerSub);
+	const int VertCount = Random::IntRange(Configuration.MinVertsPerSub, Configuration.MaxVertsPerSub);
 
 #if USE_MEM_SYS
 	Vertex* pVerts = (Vertex*)m_VertexAllocator.allocate(sizeof(Vertex) * VertCount, 4u);

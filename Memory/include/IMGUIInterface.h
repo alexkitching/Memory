@@ -19,7 +19,13 @@ public:
 	void RenderGUIFrame();
 
 	bool Button(const char* a_pName, bool a_bEnabled = true) const;
-
+	bool IntSlider(const char* a_pName, bool a_bEnabled,
+					int* a_pData, float a_Speed, int a_Min,
+				int a_Max, const char* a_Format = "%d") const;
+	bool FloatSlider(const char* a_pName, bool a_bEnabled,
+		float* a_pData, float a_Speed, float a_Min,
+		float a_Max, const char* a_Format = "%.3f", float a_Power = 1) const;
+	
 private:
 	bool m_bInitialised;
 	

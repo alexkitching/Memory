@@ -53,7 +53,7 @@ void operator delete(void* a_pPtr)
 		const auto pGlobalHeader = (MemoryManager::GlobalAllocationHeader*)((char*)a_pPtr -
 			sizeof(MemoryManager::GlobalAllocationHeader));
 		
-		if(pGlobalHeader->AllocTypeSig == MEM_HEAP_SIG)
+		if(pGlobalHeader->AllocTypeSig == HEAP_ALLOC_SIG)
 		{
 			Heap::Deallocate(a_pPtr);
 		}
@@ -72,7 +72,7 @@ void operator delete [](void* _Block) noexcept
 		const auto pGlobalHeader = (MemoryManager::GlobalAllocationHeader*)((char*)_Block -
 			sizeof(MemoryManager::GlobalAllocationHeader));
 
-		if (pGlobalHeader->AllocTypeSig == MEM_HEAP_SIG)
+		if (pGlobalHeader->AllocTypeSig == HEAP_ALLOC_SIG)
 		{
 			Heap::Deallocate(_Block);
 		}

@@ -23,9 +23,10 @@ public:
 			float LoadInterval;
 			size_t MinResourceSize;
 			size_t MaxResourceSize;
-			size_t MaxAllocatedResourceSize;
+			size_t AllocatedResourceCap;
 		} Gameplay;
 	};
+	static Config Configuration;
 
 	enum class Type
 	{
@@ -35,12 +36,10 @@ public:
 	};
 
 	// Constructors
-	ResourceLoadingScenario() = default;
-	ResourceLoadingScenario(const Config& a_config)
+	ResourceLoadingScenario()
 		:
 		m_bComplete(false),
 		m_CurrentType(Type::Invalid),
-		m_Config(a_config),
 		m_NextSeed(0),
 		GameplayData({0.f, 0u})
 	{
@@ -97,7 +96,6 @@ private:
 
 	bool m_bComplete;
 	Type m_CurrentType;
-	Config m_Config;
 
 	DT_Timer m_IntervalTimer;
 

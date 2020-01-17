@@ -7,13 +7,13 @@
 #include "Profiler.h"
 
 int ParticleSystemScenario::m_TotalAllocatedParticles = 0;
+ParticleSystemScenario::Config ParticleSystemScenario::Configuration = ParticleSystemScenario::Config();
 
-ParticleSystemScenario::ParticleSystemScenario(const Config& a_config)
+ParticleSystemScenario::ParticleSystemScenario()
 	:
-	m_Config(a_config),
 	m_bStarted(false)
 {
-	m_ParticleSystems.reserve(m_Config.ParticleSystemsCount);
+	m_ParticleSystems.reserve(Configuration.ParticleSystemsCount);
 }
 
 void ParticleSystemScenario::Run()
@@ -59,12 +59,12 @@ ParticleSystemScenario::ParticleSystem::ParticleSystem(const Config& a_config)
 	m_Config(a_config)
 #if USE_MEM_SYS
 	,
-m_ParticlePool(m_Config.MaxParticles * sizeof(Particle),
-				MemoryManager::GetDefaultHeap()->allocate(m_Config.MaxParticles * sizeof(Particle), 64u))
+m_ParticlePool(Configuration.ParticleSystem.MaxParticles * sizeof(Particle),
+				MemoryManager::GetDefaultHeap()->allocate(Configuration.ParticleSystem.MaxParticles * sizeof(Particle), 64u))
 #endif
 { 
 	PROFILER_BEGIN_SAMPLE(ParticleSystem::_ctor);
-	while ((int)m_Particles.size() != m_Config.StartParticles)
+	while ((int)m_Particles.size() != Configuration.ParticleSystem.ParticleStartCount)
 	{
 		SpawnParticle();
 	}
@@ -88,7 +88,7 @@ void ParticleSystemScenario::ParticleSystem::Update()
 	m_NextParticleTimer.Tick();
 
 	// Spawn Particles
-	if ((int)m_Particles.size() < m_Config.MaxParticles) // Not Reached Max Particles
+	if ((int)m_Particles.size() < Configuration.ParticleSystem.MaxParticles) // Not Reached Max Particles
 	{
 		if (m_NextParticleTimer.IsStarted() == false) // Ensure Timer is Started
 		{
@@ -96,9 +96,9 @@ void ParticleSystemScenario::ParticleSystem::Update()
 		}
 
 		const float fNextTime = m_NextParticleTimer.GetTime();
-		if (fNextTime >= m_Config.FixedParticleSpawnInterval) // Timer Elapsed
+		if (fNextTime >= Configuration.ParticleSystem.FixedParticleSpawnInterval) // Timer Elapsed
 		{
-			for (int i = 0; i < m_Config.ParticlesPerInterval; ++i)
+			for (int i = 0; i < Configuration.ParticleSystem.ParticlesPerInterval; ++i)
 			{
 				SpawnParticle();
 			}
@@ -169,7 +169,7 @@ void ParticleSystemScenario::ParticleSystem::SpawnParticle()
 
 	// Stop Timer
 	m_NextParticleTimer.Stop();
-	if ((int)m_Particles.size() < m_Config.MaxParticles) // Still Not Reached Max - Start Timer
+	if ((int)m_Particles.size() < Configuration.ParticleSystem.MaxParticles) // Still Not Reached Max - Start Timer
 	{
 		m_NextParticleTimer.Start();
 	}
@@ -194,15 +194,11 @@ void ParticleSystemScenario::Initialise()
 {
 	PROFILER_BEGIN_SAMPLE(ParticleSystemScenario::Initialise);
 	
-	while ((int)m_ParticleSystems.size() != m_Config.ParticleSystemsCount)
+	while ((int)m_ParticleSystems.size() != Configuration.ParticleSystemsCount)
 	{
 		ParticleSystem::Config config =
 		{
-			m_Config.ParticleSystem.MaxParticles,
-			m_Config.ParticleSystem.ParticleStartCount,
-			m_Config.ParticleSystem.FixedParticleSpawnInterval,
-			m_Config.ParticleSystem.ParticlesPerInterval,
-			Random::FloatRange(m_Config.ParticleSystem.ParticleLifeTimeMin, m_Config.ParticleSystem.ParticleLifeTimeMax),
+			Random::FloatRange(Configuration.ParticleSystem.ParticleLifeTimeMin, Configuration.ParticleSystem.ParticleLifeTimeMax),
 		{0.f} // Zero Vector
 		};
 		m_ParticleSystems.emplace_back(config);

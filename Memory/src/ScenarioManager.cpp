@@ -14,7 +14,7 @@ ScenarioManager::ScenarioManager()
 Scenarios({nullptr, nullptr})
 {
 	// Setup Scenarios
-	ResourceLoadingScenario::Config config = {};
+	ResourceLoadingScenario::Config& config = ResourceLoadingScenario::Configuration;
 	config.Bootup.LoadInterval = 0.25f;
 	config.Bootup.MaxResourceSize = 200 * MB;
 	config.Bootup.MinResourceSize = 20 * MB;
@@ -27,12 +27,13 @@ Scenarios({nullptr, nullptr})
 	config.Gameplay.LoadInterval = 0.5f;
 	config.Gameplay.MaxResourceSize = 60 * MB;
 	config.Gameplay.MinResourceSize = MB;
-	config.Gameplay.MaxAllocatedResourceSize = 400 * MB;
+	config.Gameplay.AllocatedResourceCap = 400 * MB;
 
-	Scenarios.pResourceLoading = new ResourceLoadingScenario(config);
+	Scenarios.pResourceLoading = new ResourceLoadingScenario();
 
 	
-	ParticleSystemScenario::Config psConfig = {};
+	ParticleSystemScenario::Config& psConfig = ParticleSystemScenario::Configuration;
+	// Set Defaults
 	psConfig.ParticleSystem.MaxParticles = 2000;
 	psConfig.ParticleSystem.FixedParticleSpawnInterval = 0.0001f;
 	psConfig.ParticleSystem.ParticlesPerInterval = 10;
@@ -41,19 +42,21 @@ Scenarios({nullptr, nullptr})
 	psConfig.ParticleSystem.ParticleLifeTimeMin = 1.5f;
 	psConfig.ParticleSystemsCount = 50;
 
-	Scenarios.pParticleSystem = new ParticleSystemScenario(psConfig);
+	Scenarios.pParticleSystem = new ParticleSystemScenario();
 
-	VertexDataProcessingScenario::Config vpConfig = {};
+	VertexDataProcessingScenario::Config& vpConfig = VertexDataProcessingScenario::Configuration;
 	vpConfig.MinVertsPerSub = 3;
 	vpConfig.MaxVertsPerSub = 300;
 	vpConfig.PerFrameTotalData = 5 * MB;
 
-	Scenarios.pVertexProcessing = new VertexDataProcessingScenario(vpConfig);
+	Scenarios.pVertexProcessing = new VertexDataProcessingScenario();
 }
 
 ScenarioManager::~ScenarioManager()
 {
 	delete Scenarios.pResourceLoading;
+	delete Scenarios.pParticleSystem;
+	delete Scenarios.pVertexProcessing;
 }
 
 void ScenarioManager::StartScenario(ScenarioType a_type)

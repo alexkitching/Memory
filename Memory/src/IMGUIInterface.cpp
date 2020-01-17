@@ -130,3 +130,44 @@ bool IMGUIInterface::Button(const char* a_pName, bool a_bEnabled) const
 
 	return bPressed;
 }
+
+bool IMGUIInterface::IntSlider(const char* a_pName, bool a_bEnabled,
+	int* a_pData, float a_Speed, int a_Min,
+	int a_Max, const char* a_Format) const
+{
+	if (a_bEnabled == false)
+	{
+		ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+	}
+	
+	const bool bPressed = ImGui::DragInt(a_pName, a_pData, a_Speed, a_Min, a_Max, a_Format);
+
+	if (a_bEnabled == false)
+	{
+		ImGui::PopStyleVar();
+		ImGui::PopItemFlag();
+	}
+
+	return bPressed;
+}
+
+bool IMGUIInterface::FloatSlider(const char* a_pName, bool a_bEnabled, float* a_pData, float a_Speed, float a_Min,
+	float a_Max, const char* a_Format, float a_Power) const
+{
+	if (a_bEnabled == false)
+	{
+		ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+	}
+
+	const bool bPressed = ImGui::DragFloat(a_pName, a_pData, a_Speed, a_Min, a_Max, a_Format, a_Power);
+
+	if (a_bEnabled == false)
+	{
+		ImGui::PopStyleVar();
+		ImGui::PopItemFlag();
+	}
+
+	return bPressed;
+}

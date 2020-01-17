@@ -23,9 +23,9 @@ public:
 			float ParticleLifeTimeMin;
 		}ParticleSystem;
 	};
+	static Config Configuration;
 
-	ParticleSystemScenario() = default;
-	ParticleSystemScenario(const Config& a_config);
+	ParticleSystemScenario();
 	
 	virtual ~ParticleSystemScenario() {}
 
@@ -44,13 +44,10 @@ private:
 	public:
 		struct Config
 		{
-			int MaxParticles;
-			int StartParticles;
-			float FixedParticleSpawnInterval;
-			int ParticlesPerInterval;
 			float LifeTime;
 			float OriginPosition[3];
 		};
+		
 		
 		ParticleSystem(const Config& a_config);
 		~ParticleSystem();
@@ -83,7 +80,6 @@ private:
 
 	void Initialise();
 	
-	Config m_Config;
 	bool m_bStarted;
 
 	std::vector<ParticleSystem> m_ParticleSystems;

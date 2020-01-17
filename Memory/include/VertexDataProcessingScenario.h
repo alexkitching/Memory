@@ -15,9 +15,9 @@ public:
 		int MaxVertsPerSub;
 		int MinVertsPerSub;
 	};
+	static Config Configuration;
 
-	VertexDataProcessingScenario() = default;
-	VertexDataProcessingScenario(const Config& a_config);
+	VertexDataProcessingScenario();
 
 	virtual ~VertexDataProcessingScenario() {}
 
@@ -25,8 +25,6 @@ public:
 	
 	void Reset() override;
 	bool IsComplete() override { return false; }
-
-	
 
 private:
 	struct Vertex
@@ -46,8 +44,6 @@ private:
 
 	void AddRandomSub();
 	void ClearFrameSubs();
-
-	Config m_Config;
 
 	size_t m_fCurrentFrameDataSize;
 
