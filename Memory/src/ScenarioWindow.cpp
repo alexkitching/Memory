@@ -305,7 +305,7 @@ void ScenarioWindow::DrawVertexDataProcessingScenario(const IMGUIInterface& a_gu
 {
 	ImGui::Text("Vertex Data Processing");
 
-	const ScenarioType scenario = ScenarioType::ParticleSystem;
+	const ScenarioType scenario = ScenarioType::VertexDataProcessing;
 
 	if (a_gui.Button("Start##VDP",
 		IsolatedScenarioRunning(scenario) == false &&
