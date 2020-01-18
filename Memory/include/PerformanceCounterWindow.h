@@ -3,6 +3,7 @@
 #include "IMGUIWindow.h"
 
 class ProfilerWindow;
+class HeapBase;
 class PerformanceCounterWindow : public IMGUIWindow
 {
 public:
@@ -12,6 +13,7 @@ public:
 protected:
 	void OnGUIWindow(const IMGUIInterface& a_interface) override;
 
+	void RecursivePrintHeapStats(const HeapBase* a_Heap) const;
 private:
 	ProfilerWindow* m_pProfiler;
 };

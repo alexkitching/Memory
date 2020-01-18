@@ -1,7 +1,6 @@
 #include "MemoryManager.h"
 #include "Debug.h"
 #include "Common.h"
-#include "PointerMath.h"
 
 bool MemoryManager::s_bInitialised = false;
 Heap* MemoryManager::s_pGlobalHeap = nullptr;
@@ -10,16 +9,17 @@ Heap* MemoryManager::s_pDefaultHeap = nullptr;
 #define MM_ASSERT_INIT() ASSERT(s_bInitialised && "Memory Manager not Initialised!")
 
 constexpr const char* GLOBAL_HEAP_NAME = "Global";
-
 constexpr const char* DEFAULT_HEAP_NAME = "Default";
+
 constexpr size_t DEFAULT_HEAP_SIZE = 512 * MB;
 
 Heap MemoryManager::s_Heaps[MAX_HEAPS] = { };
+MoveableHeap MemoryManager::s_MoveableHeaps[MAX_MOVEABLE_HEAPS] = {};
 
 void MemoryManager::Initialise(size_t a_maxGlobalMem)
 {
 	ASSERT(s_bInitialised == false && "Trying to Init Twice!");
-
+	
 	void* pGlobalMem = malloc(a_maxGlobalMem);
 	if(pGlobalMem == nullptr)
 	{
@@ -30,9 +30,7 @@ void MemoryManager::Initialise(size_t a_maxGlobalMem)
 	// Set All Memory to 0
 	memset(pGlobalMem, 0, a_maxGlobalMem);
 
-	uint8 adjustment = PointerMath::AlignForwardAdjustment(pGlobalMem, DEFAULT_ALIGNMENT);
-	
-	const Heap::Config GlobalConfig
+	Heap::Config GlobalConfig
 	{
 		GLOBAL_HEAP_NAME,
 		pGlobalMem,
@@ -45,7 +43,7 @@ void MemoryManager::Initialise(size_t a_maxGlobalMem)
 	{
 		DEFAULT_HEAP_NAME,
 		nullptr, // To be Allocated from Global
-		a_maxGlobalMem - HEAP_ALLOC_HEADER_FOOTER_SIZE
+		a_maxGlobalMem - (sizeof(Heap::BaseAllocationHeader) + sizeof(HeapBase::HeapSignature))
 	};
 	
 	s_pDefaultHeap = CreateHeapFromGlobal(DefaultConfig);
@@ -64,7 +62,7 @@ Heap* MemoryManager::GetDefaultHeap()
 	return s_pDefaultHeap;
 }
 
-Heap* MemoryManager::ActivateEmptyHeap(const Heap::Config& a_config)
+Heap* MemoryManager::ActivateEmptyHeap(Heap::Config& a_config)
 {
 	for(int i = 0; i < MAX_HEAPS; ++i)
 	{
@@ -76,6 +74,21 @@ Heap* MemoryManager::ActivateEmptyHeap(const Heap::Config& a_config)
 		}
 	}
 	
+	return nullptr;
+}
+
+MoveableHeap* MemoryManager::ActivateEmptyMoveableHeap(Heap::Config& a_config)
+{
+	for (int i = 0; i < MAX_MOVEABLE_HEAPS; ++i)
+	{
+		MoveableHeap* pHeap = &s_MoveableHeaps[i];
+		if (pHeap->IsActive() == false)
+		{
+			pHeap->Activate(a_config);
+			return pHeap;
+		}
+	}
+
 	return nullptr;
 }
 
@@ -114,13 +127,14 @@ void MemoryManager::Delete(void* a_pPtr)
 
 void MemoryManager::DefragmentHeaps()
 {
-	s_pGlobalHeap->Defragment();
+	
 }
 
 Heap* MemoryManager::CreateHeap(Heap::Config& a_config, const char* a_pParentName)
 {
 	Heap* pParent = FindActiveHeap(a_pParentName);
 	ASSERT(pParent != nullptr && "No Parent Heap Found!");
+	ASSERT(pParent->IsMoveable() == false && "Parent Heap cannot be moveable!");
 	ASSERT(FindActiveHeap(a_config.Name) == nullptr && "Heap with identical name already exists!");
 
 	Heap* pChildHeap = CreateHeap(a_config, pParent);
@@ -132,6 +146,7 @@ Heap* MemoryManager::CreateHeap(Heap::Config& a_config, const char* a_pParentNam
 Heap* MemoryManager::CreateHeap(Heap::Config& a_config, Heap* a_pParent)
 {
 	ASSERT(a_pParent != nullptr && "Parent Heap is null!");
+	ASSERT(a_pParent->IsMoveable() == false && "Parent Heap cannot be moveable!");
 	ASSERT(FindActiveHeap(a_config.Name) == nullptr && "Heap with identical name already exists!");
 
 	void* pHeapStart = a_pParent->allocate(a_config.Capacity);
@@ -142,6 +157,37 @@ Heap* MemoryManager::CreateHeap(Heap::Config& a_config, Heap* a_pParent)
 	a_config.pStartPtr = pHeapStart;
 	
 	Heap* pHeap = ActivateEmptyHeap(a_config);
+	pHeap->SetParent(a_pParent);
+	return pHeap;
+}
+
+MoveableHeap* MemoryManager::CreateMoveableHeap(MoveableHeap::Config& a_config, const char* a_pParentName)
+{
+	Heap* pParent = FindActiveHeap(a_pParentName);
+	ASSERT(pParent != nullptr && "No Parent Heap Found!");
+	ASSERT(pParent->IsMoveable() == false && "Parent Heap cannot be moveable!");
+	ASSERT(FindActiveHeap(a_config.Name) == nullptr && "Heap with identical name already exists!");
+
+	MoveableHeap* pChildHeap = CreateMoveableHeap(a_config, pParent);
+	pChildHeap->SetParent(pParent);
+
+	return pChildHeap;
+}
+
+MoveableHeap* MemoryManager::CreateMoveableHeap(MoveableHeap::Config& a_config, Heap* a_pParent)
+{
+	ASSERT(a_pParent != nullptr && "Parent Heap is null!");
+	ASSERT(a_pParent->IsMoveable() == false && "Parent Heap cannot be moveable!");
+	ASSERT(FindActiveHeap(a_config.Name) == nullptr && "Heap with identical name already exists!");
+
+	void* pHeapStart = a_pParent->allocate(a_config.Capacity);
+
+	if (pHeapStart == nullptr) // Failed to Allocate
+		return nullptr;
+
+	a_config.pStartPtr = pHeapStart;
+
+	MoveableHeap* pHeap = ActivateEmptyMoveableHeap(a_config);
 	pHeap->SetParent(a_pParent);
 	return pHeap;
 }

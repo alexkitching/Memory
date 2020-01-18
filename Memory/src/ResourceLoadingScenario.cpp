@@ -1,17 +1,17 @@
 #include "ResourceLoadingScenario.h"
 #include "Debug.h"
 #include "Profiler.h"
+#include "MemoryManager.h"
 
 ResourceLoadingScenario::Config ResourceLoadingScenario::Configuration = {};
+
+#if USE_MOVEABLE_HEAP
+MoveableHeap* ResourceLoadingScenario::DummyResource::s_pMoveableHeap = nullptr;
+#endif
 
 void ResourceLoadingScenario::Run()
 {
 	PROFILER_BEGIN_SAMPLE(ResourceLoadingScenario::Run);
-	if(m_IntervalTimer.IsStarted() == false)
-	{
-		m_IntervalTimer.Start();
-	}
-	
 	// Tick Timers
 	m_IntervalTimer.Tick();
 
@@ -30,6 +30,31 @@ void ResourceLoadingScenario::Run()
 	PROFILER_END_SAMPLE();
 }
 
+void ResourceLoadingScenario::Initialise()
+{
+	m_IntervalTimer.Start();
+#if USE_MEM_SYS && USE_MOVEABLE_HEAP
+	if(DummyResource::s_pMoveableHeap == nullptr)
+	{
+		MoveableHeap::Config config;
+		config.Name = "Moveable Resource Heap";
+		size_t capacity;
+
+		if (m_CurrentType == Type::Bootup)
+		{
+			capacity = Configuration.Bootup.TotalSizeToLoad;
+		}
+		else
+		{
+			capacity = Configuration.Gameplay.AllocatedResourceCap;
+		}
+
+		config.Capacity = capacity + 6 * MB;
+		DummyResource::s_pMoveableHeap = MemoryManager::CreateMoveableHeap(config, MemoryManager::GetDefaultHeap());
+	}
+#endif
+}
+
 void ResourceLoadingScenario::Reset()
 {
 	PROFILER_BEGIN_SAMPLE(ResourceLoadingScenario::Reset);
@@ -45,9 +70,33 @@ void ResourceLoadingScenario::Reset()
 	}
 
 	m_LoadedResources.clear();
-	m_TotalLoadedSize = 0;
-	GameplayData.m_TotalLoadedResourceSize = 0u;
+	m_CurrentTotalLoadedSize = 0u;
 	PROFILER_END_SAMPLE();
+}
+
+ResourceLoadingScenario::DummyResource::DummyResource(size_t a_size) :
+	m_Size(a_size),
+	m_pData(nullptr)
+{
+#if USE_MOVEABLE_HEAP
+	m_pData = s_pMoveableHeap->allocate<char>(a_size);
+
+	if(m_pData.IsNull())
+	{
+		LOG("Failed to Allocate Data \n");
+	}
+#else
+	m_pData = new char[a_size];
+#endif
+}
+
+ResourceLoadingScenario::DummyResource::~DummyResource()
+{
+#if USE_MOVEABLE_HEAP
+	m_pData.Release();
+#else
+	delete[] m_pData;
+#endif
 }
 
 void ResourceLoadingScenario::RunBootType()
@@ -62,14 +111,14 @@ void ResourceLoadingScenario::RunBootType()
 
 	// Load Resource
 	size_t ResourceSize = Random::IntRangeWithSeed(Configuration.Bootup.MinResourceSize, Configuration.Bootup.MaxResourceSize, m_NextSeed++);
-	if (m_TotalLoadedSize + ResourceSize > Configuration.Bootup.TotalSizeToLoad)
+	if (m_CurrentTotalLoadedSize + ResourceSize > Configuration.Bootup.TotalSizeToLoad)
 	{
-		ResourceSize = Configuration.Bootup.TotalSizeToLoad - m_TotalLoadedSize;
+		ResourceSize = Configuration.Bootup.TotalSizeToLoad - m_CurrentTotalLoadedSize;
 	}
 	LoadResource(ResourceSize);
 
 	
-	if (m_TotalLoadedSize >= Configuration.Bootup.TotalSizeToLoad) // Loaded All our Resources
+	if (m_CurrentTotalLoadedSize >= Configuration.Bootup.TotalSizeToLoad) // Loaded All our Resources
 	{
 		m_bComplete = true;
 	}
@@ -91,7 +140,7 @@ void ResourceLoadingScenario::RunGameplayType()
 		return;
 	}
 
-	const bool bCapacityReached = GameplayData.m_TotalLoadedResourceSize >= Configuration.Gameplay.AllocatedResourceCap;
+	const bool bCapacityReached = m_CurrentTotalLoadedSize >= Configuration.Gameplay.AllocatedResourceCap;
 	bool bAllocateDeallocate = bCapacityReached ? false : true; // Default Allocate
 
 	if (m_LoadedResources.empty() == false && // Potential to Deallocate
@@ -103,9 +152,12 @@ void ResourceLoadingScenario::RunGameplayType()
 	if (bAllocateDeallocate)
 	{
 		// Load Resource
-		const size_t ResourceSize = Random::IntRangeWithSeed(Configuration.Bootup.MinResourceSize, Configuration.Bootup.MaxResourceSize, m_NextSeed++);
+		size_t ResourceSize = Random::IntRangeWithSeed(Configuration.Bootup.MinResourceSize, Configuration.Bootup.MaxResourceSize, m_NextSeed++);
+		if (m_CurrentTotalLoadedSize + ResourceSize > Configuration.Gameplay.AllocatedResourceCap)
+		{
+			ResourceSize = Configuration.Gameplay.AllocatedResourceCap - m_CurrentTotalLoadedSize;
+		}
 		LoadResource(ResourceSize);
-		GameplayData.m_TotalLoadedResourceSize += ResourceSize;
 	}
 	else
 	{
@@ -115,8 +167,6 @@ void ResourceLoadingScenario::RunGameplayType()
 		{
 			idx = Random::IntRangeWithSeed(0, ((int)m_LoadedResources.size()) - 1, m_NextSeed++);
 		}
-
-		GameplayData.m_TotalLoadedResourceSize -= m_LoadedResources[idx]->GetSize();
 		FreeResource(idx);
 	}
 
@@ -132,16 +182,19 @@ void ResourceLoadingScenario::RunGameplayType()
 void ResourceLoadingScenario::LoadResource(size_t a_size)
 {
 	PROFILER_BEGIN_SAMPLE(ResourceLoadingScenario::LoadResource);
+
 	IDummyResource* pResource = new DummyResource(a_size);
 	m_LoadedResources.push_back(pResource);
-	m_TotalLoadedSize += a_size;
+	m_CurrentTotalLoadedSize += a_size;
 	PROFILER_END_SAMPLE();
 }
 
 void ResourceLoadingScenario::FreeResource(int a_idx)
 {
 	PROFILER_BEGIN_SAMPLE(ResourceLoadingScenario::FreeResource);
-	delete m_LoadedResources[a_idx];
+	IDummyResource* pRes = m_LoadedResources[a_idx];
+	m_CurrentTotalLoadedSize -= pRes->GetSize();
+	delete pRes;
 	m_LoadedResources.erase(m_LoadedResources.begin() + a_idx);
 	PROFILER_END_SAMPLE();
 }

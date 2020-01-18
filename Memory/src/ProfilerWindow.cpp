@@ -234,14 +234,14 @@ void ProfilerWindow::BuildHeapBlocks()
 		m_Blocks.push_back(block);
 	}
 
-	Heap::AllocationHeader* pCurrent = pDefaultHeap->GetHeadAllocation();
+	Heap::BaseAllocationHeader* pCurrent = pDefaultHeap->GetHeadAllocation();
 	while(pCurrent != nullptr)
 	{
 		// Push Allocated Blocks
 		Block block
 		{
 			block.Start = (uintptr)pCurrent - Base,
-			block.End = (uintptr)pCurrent + pCurrent->Size + HEAP_ALLOC_HEADER_FOOTER_SIZE - Base,
+			block.End = (uintptr)pCurrent + pCurrent->Size + pDefaultHeap->GetAllocHeaderSize() - Base,
 			block.bFree = false
 		};
 
@@ -263,7 +263,7 @@ void ProfilerWindow::BuildHeapBlocks()
 	}
 
 	pCurrent = pDefaultHeap->GetTailAllocation();
-	const uintptr TailEnd = (uintptr)pCurrent + pCurrent->Size + HEAP_ALLOC_HEADER_FOOTER_SIZE;
+	const uintptr TailEnd = (uintptr)pCurrent + pCurrent->Size + pDefaultHeap->GetAllocHeaderSize();
 	const uintptr End = (uintptr)pDefaultHeap->GetStartAddress() + pDefaultHeap->GetCapacity();
 	if(TailEnd != End)
 	{
@@ -300,7 +300,7 @@ bool ProfilerWindow::BuildItemsFromDepth(SampleItem& a_pParent, int& a_idx)
 		SampleItem& item = a_pParent.Children.emplace_back();
 		item.Data = m_CurrentData.SampleData[a_idx];
 
-		item.TotalPercent = (float) ((item.Data.TimeTaken / item.Data.Calls)/ m_CurrentData.TotalTimeTaken * 100.f);
+		item.TotalPercent = (float) (item.Data.TimeTaken / m_CurrentData.TotalTimeTaken * 100.f);
 
 		Profiler::SampleData* pNextItemData = nullptr;
 

@@ -58,12 +58,6 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{951174a7-fffa-45d9-8f63-eea38aee9f9d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\IMGUI">
-      <UniqueIdentifier>{af9158fe-13d4-4137-b2ad-95f6df414cfd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\IMGUI">
-      <UniqueIdentifier>{4b0d661b-1fdf-4a92-ad7b-764160a447b4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="IMGUI">
       <UniqueIdentifier>{08ec75db-7ffa-4285-8c21-98248b6c0cbf}</UniqueIdentifier>
     </Filter>
@@ -94,12 +88,6 @@
     <Filter Include="Source Files\Memory\Allocators">
       <UniqueIdentifier>{cbff3239-5af9-4e94-b40a-ded79a90074a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\IMGUI\Windows">
-      <UniqueIdentifier>{569a82a4-7d0d-4ee5-9a83-0adda5da47d1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\IMGUI\Windows">
-      <UniqueIdentifier>{f59a6e2f-0aaa-4760-8300-8727d2971798}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Time">
       <UniqueIdentifier>{99a24a00-95ba-4e04-9f01-2579339168da}</UniqueIdentifier>
     </Filter>
@@ -117,6 +105,18 @@
     </Filter>
     <Filter Include="Source Files\Performance">
       <UniqueIdentifier>{e68abf57-39ad-49bd-bc70-1796c06262ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UI">
+      <UniqueIdentifier>{4b0d661b-1fdf-4a92-ad7b-764160a447b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UI\Windows">
+      <UniqueIdentifier>{f59a6e2f-0aaa-4760-8300-8727d2971798}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\UI">
+      <UniqueIdentifier>{af9158fe-13d4-4137-b2ad-95f6df414cfd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\UI\Windows">
+      <UniqueIdentifier>{569a82a4-7d0d-4ee5-9a83-0adda5da47d1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -151,7 +151,7 @@
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="src\IMGUIInterface.cpp">
-      <Filter>Source Files\IMGUI</Filter>
+      <Filter>Source Files\UI</Filter>
     </ClCompile>
     <ClCompile Include="src\Debug.cpp">
       <Filter>Source Files\Debug</Filter>
@@ -184,13 +184,13 @@
       <Filter>Source Files\Scenario</Filter>
     </ClCompile>
     <ClCompile Include="src\IMGUIWindow.cpp">
-      <Filter>Source Files\IMGUI\Windows</Filter>
+      <Filter>Source Files\UI\Windows</Filter>
     </ClCompile>
     <ClCompile Include="src\LogWindow.cpp">
-      <Filter>Source Files\IMGUI\Windows</Filter>
+      <Filter>Source Files\UI\Windows</Filter>
     </ClCompile>
     <ClCompile Include="src\PerformanceCounterWindow.cpp">
-      <Filter>Source Files\IMGUI\Windows</Filter>
+      <Filter>Source Files\UI\Windows</Filter>
     </ClCompile>
     <ClCompile Include="src\Timer.cpp">
       <Filter>Source Files\Time</Filter>
@@ -199,7 +199,7 @@
       <Filter>Source Files\Time</Filter>
     </ClCompile>
     <ClCompile Include="src\ScenarioWindow.cpp">
-      <Filter>Source Files\IMGUI\Windows</Filter>
+      <Filter>Source Files\UI\Windows</Filter>
     </ClCompile>
     <ClCompile Include="src\ResourceLoadingScenario.cpp">
       <Filter>Source Files\Scenario\Scenarios</Filter>
@@ -225,14 +225,20 @@
     <ClCompile Include="src\StackAllocator.cpp">
       <Filter>Source Files\Memory\Allocators</Filter>
     </ClCompile>
-    <ClCompile Include="src\LinearAllocator.cpp">
-      <Filter>Source Files\Memory</Filter>
-    </ClCompile>
     <ClCompile Include="src\Profiler.cpp">
       <Filter>Source Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="src\ProfilerWindow.cpp">
-      <Filter>Source Files\IMGUI\Windows</Filter>
+      <Filter>Source Files\UI\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MoveableHeap.cpp">
+      <Filter>Source Files\Memory\Allocators</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LinearAllocator.cpp">
+      <Filter>Source Files\Memory\Allocators</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HeapBase.cpp">
+      <Filter>Source Files\Memory\Allocators</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -279,7 +285,7 @@
       <Filter>Header Files\Graphics\D3D</Filter>
     </ClInclude>
     <ClInclude Include="include\IMGUIInterface.h">
-      <Filter>Header Files\IMGUI</Filter>
+      <Filter>Header Files\UI</Filter>
     </ClInclude>
     <ClInclude Include="include\Debug.h">
       <Filter>Header Files\Debug</Filter>
@@ -333,13 +339,13 @@
       <Filter>Header Files\Scenario</Filter>
     </ClInclude>
     <ClInclude Include="include\LogWindow.h">
-      <Filter>Header Files\IMGUI\Windows</Filter>
+      <Filter>Header Files\UI\Windows</Filter>
     </ClInclude>
     <ClInclude Include="include\IMGUIWindow.h">
-      <Filter>Header Files\IMGUI\Windows</Filter>
+      <Filter>Header Files\UI\Windows</Filter>
     </ClInclude>
     <ClInclude Include="include\PerformanceCounterWindow.h">
-      <Filter>Header Files\IMGUI\Windows</Filter>
+      <Filter>Header Files\UI\Windows</Filter>
     </ClInclude>
     <ClInclude Include="include\Timer.h">
       <Filter>Header Files\Time</Filter>
@@ -348,7 +354,7 @@
       <Filter>Header Files\Time</Filter>
     </ClInclude>
     <ClInclude Include="include\ScenarioWindow.h">
-      <Filter>Header Files\IMGUI\Windows</Filter>
+      <Filter>Header Files\UI\Windows</Filter>
     </ClInclude>
     <ClInclude Include="include\Delegate.h">
       <Filter>Header Files</Filter>
@@ -396,9 +402,12 @@
       <Filter>Header Files\Debug</Filter>
     </ClInclude>
     <ClInclude Include="include\ProfilerWindow.h">
-      <Filter>Header Files\IMGUI\Windows</Filter>
+      <Filter>Header Files\UI\Windows</Filter>
     </ClInclude>
     <ClInclude Include="include\MoveableHeap.h">
+      <Filter>Header Files\Memory\Allocators</Filter>
+    </ClInclude>
+    <ClInclude Include="include\HeapBase.h">
       <Filter>Header Files\Memory\Allocators</Filter>
     </ClInclude>
   </ItemGroup>
