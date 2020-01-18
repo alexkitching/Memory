@@ -71,6 +71,12 @@ void ResourceLoadingScenario::Reset()
 
 	m_LoadedResources.clear();
 	m_CurrentTotalLoadedSize = 0u;
+
+#if USE_MEM_SYS && USE_MOVEABLE_HEAP
+	MemoryManager::ReleaseHeap(DummyResource::s_pMoveableHeap);
+	DummyResource::s_pMoveableHeap = nullptr;
+#endif
+	
 	PROFILER_END_SAMPLE();
 }
 
@@ -84,6 +90,13 @@ ResourceLoadingScenario::DummyResource::DummyResource(size_t a_size) :
 	if(m_pData.IsNull())
 	{
 		LOG("Failed to Allocate Data \n");
+	}
+	else
+	{
+		char str[] = "DummyResourceData";
+		const size_t size = sizeof(str);
+
+		std::memcpy(m_pData.Get(), str, size);
 	}
 #else
 	m_pData = new char[a_size];

@@ -1,6 +1,7 @@
 #include "MemoryManager.h"
 #include "Debug.h"
 #include "Common.h"
+#include "Profiler.h"
 
 bool MemoryManager::s_bInitialised = false;
 Heap* MemoryManager::s_pGlobalHeap = nullptr;
@@ -127,7 +128,28 @@ void MemoryManager::Delete(void* a_pPtr)
 
 void MemoryManager::DefragmentHeaps()
 {
-	
+	PROFILER_BEGIN_SAMPLE(MemoryManager::DefragmentHeaps);
+	RecursiveDefragHeap(s_pGlobalHeap);
+	PROFILER_END_SAMPLE();
+}
+
+void MemoryManager::RecursiveDefragHeap(HeapBase* a_pHeap)
+{
+	if(a_pHeap->IsMoveable())
+	{
+		MoveableHeap* pMoveableHeap = (MoveableHeap*)a_pHeap;
+		pMoveableHeap->Defragment();
+	}
+
+	if(a_pHeap->m_pChild != nullptr)
+	{
+		RecursiveDefragHeap(a_pHeap->m_pChild);
+	}
+
+	if(a_pHeap->m_pNextSibling)
+	{
+		RecursiveDefragHeap(a_pHeap->m_pNextSibling);
+	}
 }
 
 Heap* MemoryManager::CreateHeap(Heap::Config& a_config, const char* a_pParentName)
@@ -190,6 +212,21 @@ MoveableHeap* MemoryManager::CreateMoveableHeap(MoveableHeap::Config& a_config, 
 	MoveableHeap* pHeap = ActivateEmptyMoveableHeap(a_config);
 	pHeap->SetParent(a_pParent);
 	return pHeap;
+}
+
+void MemoryManager::ReleaseHeap(HeapBase* a_pHeap)
+{
+	ASSERT(a_pHeap->m_pChild == nullptr && "Child Heap Should be released first");
+	ASSERT(a_pHeap->GetAllocationCount() == 0 && "Existing Allocations still live!");
+
+	HeapBase* pParent = a_pHeap->m_pParent;
+	pParent->deallocate(a_pHeap->m_pStart); // Deallocate Heap from Parent
+	
+	// Unparent Heap
+	a_pHeap->SetParent(nullptr);
+
+	// Deactivate Heap
+	a_pHeap->Deactivate();
 }
 
 Heap* MemoryManager::FindActiveHeap(const char* a_pName)

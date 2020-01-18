@@ -1,6 +1,8 @@
 #include "MemoryApp.h"
 #include "Debug.h"
 #include "Profiler.h"
+#include "MemSys.h"
+#include "MemoryManager.h"
 
 bool MemoryApp::s_bPaused = false;
 bool MemoryApp::s_bShouldPause = false;
@@ -92,6 +94,10 @@ void MemoryApp::OnPostFrame()
 	PROFILER_BEGIN_SAMPLE(MemoryApp::OnPostFrame);
 
 	WinApp::OnPostFrame();
+
+#if USE_MEM_SYS
+	MemoryManager::DefragmentHeaps();
+#endif
 
 	if(s_bPaused != s_bShouldPause)
 	{

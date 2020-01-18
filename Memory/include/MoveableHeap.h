@@ -77,7 +77,7 @@ public:
 		uint32 Sig;
 	}; // 48 Bytes
 	
-	MoveableHeap();
+	MoveableHeap() : m_pBridgePointerAllocator(nullptr) {}
 	virtual ~MoveableHeap() {}
 
 	virtual void Activate(Config& a_config) override;
@@ -91,6 +91,9 @@ public:
 	static void Deallocate(MoveablePointer<T> a_p);
 	
 	void deallocate(MoveableAllocationHeader* a_pHeader);
+
+	void Defragment();
+	inline void MoveAllocation(MoveableAllocationHeader*& a_pHeader, void* pDestination);
 
 private:
 	void* allocate(size_t a_size, uint8 a_alignment) override;
