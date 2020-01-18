@@ -6,6 +6,7 @@
 
 class HeapBase : public AllocatorBase
 {
+	friend class MemoryManager;
 public:
 	typedef uint32 HeapSignature;
 	struct Config
@@ -31,12 +32,14 @@ public:
 	virtual ~HeapBase();
 
 	virtual void Activate(Config& a_config);
+	virtual void Deactivate();
 
 	const char* GetName() const { return m_Name; }
 	bool IsActive() const { return m_bActive; }
 	virtual bool IsMoveable() { return false; }
 
 	void SetParent(HeapBase* a_pParent);
+
 	const HeapBase* GetParent() const { return m_pParent; }
 	const HeapBase* GetNextSibling() const { return m_pNextSibling; }
 	const HeapBase* GetPreviousSibling() const { return m_pPreviousSibling; }

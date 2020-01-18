@@ -5,6 +5,7 @@
 
 #define HEAP_ALLOC_HEADER_FOOTER_SIZE (GetAllocHeaderSize() + sizeof(HeapBase::HeapSignature))
 
+constexpr const char* kInvalidName = "Invalid";
 
 HeapBase::HeapBase()
 	:
@@ -12,12 +13,13 @@ HeapBase::HeapBase()
 	m_pChild(nullptr),
 	m_pNextSibling(nullptr),
 	m_pPreviousSibling(nullptr),
-	m_Name{ "INVALID" },
+	m_Name{  },
 	m_bActive(false),
 	m_bFavourBestFit(true),
 	m_pHeadAlloc(nullptr),
 	m_pTailAlloc(nullptr)
 {
+	strcpy_s(m_Name, HEAP_MAX_NAME_LEN, kInvalidName);
 }
 
 HeapBase::~HeapBase()
@@ -35,11 +37,28 @@ void HeapBase::Activate(Config& a_config)
 	strcpy_s(m_Name, HEAP_MAX_NAME_LEN, a_config.Name);
 }
 
+void HeapBase::Deactivate()
+{
+	m_bActive = false;
+	m_pStart = nullptr;
+	m_capacity = 0u;
+	m_pChild = nullptr;
+	m_pNextSibling = nullptr;
+	m_pPreviousSibling = nullptr;
+	m_pParent = nullptr;
+	
+	strcpy_s(m_Name, HEAP_MAX_NAME_LEN, kInvalidName);
+}
+
 void HeapBase::SetParent(HeapBase* a_pParent)
 {
-	ASSERT(a_pParent != nullptr && "Parent Heap is null!");
-	ASSERT(a_pParent->IsMoveable() == false && "Can't Parent Heap under Moveable Parent");
-
+#if DEBUG
+	if(a_pParent != nullptr)
+	{
+		ASSERT(a_pParent->IsMoveable() == false && "Can't Parent Heap under Moveable Parent");
+	}
+#endif
+	
 	if (m_pParent == a_pParent) // Avoid Reparenting
 		return;
 
@@ -65,8 +84,11 @@ void HeapBase::SetParent(HeapBase* a_pParent)
 	m_pParent = a_pParent;
 	m_pPreviousSibling = nullptr;
 	// Insert as First Child
-	m_pNextSibling = m_pParent->m_pChild;
-	m_pParent->m_pChild = this;
+	if(m_pParent != nullptr)
+	{
+		m_pNextSibling = m_pParent->m_pChild;
+		m_pParent->m_pChild = this;
+	}
 }
 
 float HeapBase::CalculateFragmentation() const
