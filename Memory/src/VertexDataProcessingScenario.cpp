@@ -16,6 +16,10 @@ m_VertexAllocator(Configuration.PerFrameTotalData + (size_t)(0.5 * MB),
 {
 }
 
+void VertexDataProcessingScenario::Initialise()
+{
+}
+
 void VertexDataProcessingScenario::Run()
 {
 	PROFILER_BEGIN_SAMPLE(VertexDataProcessingScenario::Run);

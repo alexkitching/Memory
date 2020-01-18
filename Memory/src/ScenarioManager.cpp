@@ -87,6 +87,9 @@ void ScenarioManager::StartScenario(ScenarioType a_type)
 
 	const char* pName = ScenarioTypeNames[(int)a_type].c_str();
 	SMLOG("Starting Memory Scenario - %s \n", pName);
+
+	// Initialise Scenario
+	pScenarioToStart->Initialise();
 	
 	m_ActiveScenarios.emplace_back(pScenarioToStart, a_type);
 	

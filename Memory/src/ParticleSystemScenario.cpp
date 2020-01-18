@@ -10,8 +10,6 @@ int ParticleSystemScenario::m_TotalAllocatedParticles = 0;
 ParticleSystemScenario::Config ParticleSystemScenario::Configuration = ParticleSystemScenario::Config();
 
 ParticleSystemScenario::ParticleSystemScenario()
-	:
-	m_bStarted(false)
 {
 	m_ParticleSystems.reserve(Configuration.ParticleSystemsCount);
 }
@@ -19,11 +17,6 @@ ParticleSystemScenario::ParticleSystemScenario()
 void ParticleSystemScenario::Run()
 {
 	PROFILER_BEGIN_SAMPLE(ParticleSystemScenario::Run);
-	if (m_bStarted == false) // Begin
-	{
-		Initialise();
-		m_bStarted = true;
-	}
 
 	// Update Particle Systems
 	for (auto& ps : m_ParticleSystems)
@@ -49,7 +42,6 @@ void ParticleSystemScenario::Reset()
 	PROFILER_BEGIN_SAMPLE(ParticleSystemScenario::Reset);
 	LOG("COMPLETE :: Total Allocated Particles: %i \n", m_TotalAllocatedParticles);
 	m_TotalAllocatedParticles = 0;
-	m_bStarted = false;
 	m_ParticleSystems.clear();
 	PROFILER_END_SAMPLE();
 }

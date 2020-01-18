@@ -21,6 +21,7 @@ public:
 
 	virtual ~VertexDataProcessingScenario() {}
 
+	void Initialise() override;
 	void Run() override;
 	
 	void Reset() override;

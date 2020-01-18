@@ -29,6 +29,7 @@ public:
 	
 	virtual ~ParticleSystemScenario() {}
 
+	void Initialise() override;
 	void Run() override;
 	void OnRender(IRenderer* a_pRenderer) override;
 	void Reset() override;
@@ -77,10 +78,6 @@ private:
 #endif
 		std::vector<Particle*> m_Particles;
 	};
-
-	void Initialise();
-	
-	bool m_bStarted;
 
 	std::vector<ParticleSystem> m_ParticleSystems;
 };
