@@ -71,6 +71,7 @@ m_CurrentFrame(1)
 
 void Profiler::BeginSampleInternal(const char* a_pName)
 {
+	RecordCurrentStackTimes();
 	BeginOverheadTimer();
 	
 	if(m_OldScopeStack.size() > 0)
@@ -80,12 +81,11 @@ void Profiler::BeginSampleInternal(const char* a_pName)
 		{
 			if(pTop->Sample.Name == a_pName) // Reuse Scope
 			{
-				// Reset Sample Time
-				pTop->Sample.Reset();
 				m_CurrentScope.push_back(*pTop);
 				m_OldScopeStack.pop_back();
 
 				StopOverheadTimer();
+				ResetCurrentStackTimes();
 				return;
 			}
 			
@@ -129,20 +129,18 @@ void Profiler::BeginSampleInternal(const char* a_pName)
 	m_CurrentScope.push_back(newScope);
 	
 	StopOverheadTimer();
+	ResetCurrentStackTimes();
 }
 
 void Profiler::EndSampleInternal()
 {
 	ASSERT(m_CurrentScope.empty() == false && "No Samples Started!");
+	RecordCurrentStackTimes();
 	BeginOverheadTimer();
 
 	// Get Current Scope
 	SampleScope* pCurrent = &m_CurrentScope.back();
 	
-	// Record Duration
-	const std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - pCurrent->Sample.StartTime;
-	
-	pCurrent->TimeTaken += duration.count();
 	pCurrent->Calls++;
 
 	if (m_CurrentScope.size() == 1) // At least another Scope
@@ -187,7 +185,9 @@ void Profiler::EndSampleInternal()
 
 	
 	m_CurrentScope.pop_back();
+	
 	StopOverheadTimer();
+	ResetCurrentStackTimes();
 }
 
 void Profiler::OnFrameStartInternal()
@@ -201,7 +201,7 @@ void Profiler::OnFrameEndInternal()
 	ASSERT(m_CurrentScope.empty() && "Mismatched Samples");
 
 	// Record Total Frame Time
-	const std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - m_FrameStartTime;
+	const std::chrono::duration<float> duration = std::chrono::high_resolution_clock::now() - m_FrameStartTime;
 	m_CurrentFrameData.TotalTimeTaken = duration.count();
 	m_CurrentFrameData.ProfilerOverhead = m_OverheadTime;
 	m_CurrentFrameData.Frame = m_CurrentFrame;
@@ -236,6 +236,22 @@ void Profiler::BeginOverheadTimer()
 
 void Profiler::StopOverheadTimer()
 {
-	const std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - m_OverheadStartTime;
+	const std::chrono::duration<float> duration = std::chrono::high_resolution_clock::now() - m_OverheadStartTime;
 	m_OverheadTime += duration.count();
+}
+
+void Profiler::RecordCurrentStackTimes()
+{
+	for(int i = 0; i < m_CurrentScope.size(); ++i)
+	{
+		m_CurrentScope[i].RecordTimer();
+	}
+}
+
+void Profiler::ResetCurrentStackTimes()
+{
+	for (int i = 0; i < m_CurrentScope.size(); ++i)
+	{
+		m_CurrentScope[i].ResetTimer();
+	}
 }

@@ -291,6 +291,12 @@ void ProfilerWindow::BuildItemTree()
 	m_Root.Children.clear();
 	int idx = 0;
 	BuildItemsFromDepth(m_Root, idx);
+	
+	m_Overhead.Data.Name = "ProfilerOverhead";
+	m_Overhead.Data.Calls = 0;
+	m_Overhead.Data.Depth = 0;
+	m_Overhead.Data.TimeTaken = m_CurrentData.ProfilerOverhead;
+	m_Overhead.TotalPercent = (m_CurrentData.ProfilerOverhead / m_CurrentData.TotalTimeTaken * 100.f);
 }
 
 bool ProfilerWindow::BuildItemsFromDepth(SampleItem& a_pParent, int& a_idx)
@@ -365,6 +371,9 @@ void ProfilerWindow::DrawCurrentSampleData()
 	{
 		DrawSampleItem(m_Root.Children[i]);
 	}
+	ImGui::Separator();
+	// Draw Overhead Item
+	DrawSampleItem(m_Overhead);
 	ImGui::Columns();
 	ImGui::Separator();
 	ImGui::Text("Total Frame Time: %0.3f ms", m_CurrentData.TotalTimeTaken);

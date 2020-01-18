@@ -49,6 +49,7 @@ private:
 
 	Profiler::FrameData m_CurrentData;
 	SampleItem m_Root;
+	SampleItem m_Overhead;
 
 	Tab m_CurrentTab;
 

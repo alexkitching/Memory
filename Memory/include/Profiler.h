@@ -26,15 +26,15 @@ public:
 		}
 		std::string Name;
 		int Depth;
-		double TimeTaken;
+		float TimeTaken;
 		int Calls;
 	};
 	
 	struct FrameData
 	{
 		int Frame;
-		double TotalTimeTaken;
-		double ProfilerOverhead;
+		float TotalTimeTaken;
+		float ProfilerOverhead;
 		std::vector<SampleData> SampleData;
 	};
 	
@@ -64,38 +64,11 @@ private:
 			newSample.StartTime = std::chrono::high_resolution_clock::now();
 			return newSample;
 		}
-
-		void Reset()
-		{
-			StartTime = std::chrono::high_resolution_clock::now();
-		}
 		
 		std::string Name;
 		std::chrono::high_resolution_clock::time_point StartTime;
 	};
 
-	struct SampleIdentifier
-	{
-		std::string Name;
-		int Index;
-
-		friend bool operator<(const SampleIdentifier& a_lhs, const SampleIdentifier& a_rhs)
-		{
-			return CompareStrings(a_lhs.Name, a_rhs.Name);
-		}
-
-	private:
-		static bool icompare_pred(unsigned char a, unsigned char b)
-		{
-			return std::tolower(a) < std::tolower(b);
-		}
-
-		static bool CompareStrings(const std::string& a, const std::string& b)
-		{
-			return std::lexicographical_compare(a.begin(), a.end(),
-				b.begin(), b.end(), icompare_pred);
-		}
-	};
 	
 	struct SampleScope
 	{
@@ -105,9 +78,21 @@ private:
 			TimeTaken = 0.f;
 			Calls = 0;
 		}
+
+		inline void ResetTimer()
+		{
+			Sample.StartTime = std::chrono::high_resolution_clock::now();
+		}
+
+		inline void RecordTimer()
+		{
+			const std::chrono::duration<float> duration = std::chrono::high_resolution_clock::now() - Sample.StartTime;
+			TimeTaken += duration.count();
+		}
+		
 		Sample Sample;
 		int Depth;
-		double TimeTaken;
+		float TimeTaken;
 		int Calls;
 
 		std::vector<SampleData> ChildData;
@@ -129,6 +114,9 @@ private:
 	inline void BeginOverheadTimer();
 	inline void StopOverheadTimer();
 
+	inline void RecordCurrentStackTimes();
+	inline void ResetCurrentStackTimes();
+
 	static Profiler* s_pInstance;
 
 	bool m_bRecording;
@@ -136,7 +124,7 @@ private:
 	bool m_bRecordNext;
 
 	int m_CurrentFrame;
-	double m_OverheadTime;
+	float m_OverheadTime;
 	std::chrono::high_resolution_clock::time_point m_OverheadStartTime;
 	std::chrono::high_resolution_clock::time_point m_FrameStartTime;
 
