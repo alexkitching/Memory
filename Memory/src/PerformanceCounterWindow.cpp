@@ -30,9 +30,9 @@ void PerformanceCounterWindow::OnGUIWindow(const IMGUIInterface& a_interface)
 	ImGui::Text("Virtual Memory Capacity: %.1f Mbs", PerformanceCounter::VirtualMemoryTotal());
 	ImGui::Separator();
 	
-#if USE_MEM_SYS 
-	ImGui::Text("Default Heap Usage: %.1f Mbs", (float)((float)MemoryManager::GetDefaultHeap()->GetUsedMemory()/ MB));
-	ImGui::Text("Default Heap Fragmentation: %.1f %s", MemoryManager::GetDefaultHeap()->CalculateFragmentation(), "%");
+#if USE_MEM_SYS
+	RecursivePrintHeapStats(MemoryManager::GetDefaultHeap());
+	
 	ImGui::Separator();
 #endif
 	
@@ -48,4 +48,20 @@ void PerformanceCounterWindow::OnGUIWindow(const IMGUIInterface& a_interface)
 		}
 	}
 	
+}
+
+void PerformanceCounterWindow::RecursivePrintHeapStats(const HeapBase* a_Heap) const
+{
+	ImGui::Text("Heap:%s Usage: %.1f Mbs", a_Heap->GetName(), (float)((float)a_Heap->GetUsedMemory() / MB));
+	ImGui::Text("Heap:%s Fragmentation: %.1f %s", a_Heap->GetName(), a_Heap->CalculateFragmentation(), "%");
+
+	if(a_Heap->GetNextSibling() != nullptr)
+	{
+		RecursivePrintHeapStats(a_Heap->GetNextSibling());
+	}
+
+	if(a_Heap->GetChild() != nullptr)
+	{
+		RecursivePrintHeapStats(a_Heap->GetChild());
+	}
 }
