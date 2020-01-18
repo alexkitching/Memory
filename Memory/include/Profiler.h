@@ -32,7 +32,13 @@ public:
 	
 	struct FrameData
 	{
-		int Frame;
+		FrameData()
+		{
+			Frame = 0u;
+			TotalTimeTaken = 0.f;
+			ProfilerOverhead = 0.f;
+		}
+		unsigned int Frame;
 		float TotalTimeTaken;
 		float ProfilerOverhead;
 		std::vector<SampleData> SampleData;

@@ -74,7 +74,7 @@ void Profiler::BeginSampleInternal(const char* a_pName)
 	RecordCurrentStackTimes();
 	BeginOverheadTimer();
 	
-	if(m_OldScopeStack.size() > 0)
+	if(m_OldScopeStack.empty() == false)
 	{
 		SampleScope* pTop = &m_OldScopeStack[(int)m_OldScopeStack.size() - 1];
 		if(pTop != nullptr)
@@ -90,7 +90,7 @@ void Profiler::BeginSampleInternal(const char* a_pName)
 			}
 			
 			SampleData data;
-			while (m_OldScopeStack.size() > 0)
+			while (m_OldScopeStack.empty() == false)
 			{
 				SampleScope* pScope = &m_OldScopeStack.back();
 				data.Name = pScope->Sample.Name;
@@ -99,7 +99,7 @@ void Profiler::BeginSampleInternal(const char* a_pName)
 				data.Calls = pScope->Calls;
 
 				std::vector<SampleData>* pDataContainer = nullptr;
-				if(m_CurrentScope.size() > 0)
+				if(m_CurrentScope.empty() == false)
 				{
 					pDataContainer = &m_CurrentScope.back().ChildData;
 				}
@@ -161,7 +161,7 @@ void Profiler::EndSampleInternal()
 		}
 
 		// Push Tail
-		while(m_OldScopeStack.size() > 0)
+		while(m_OldScopeStack.empty() == false)
 		{
 			SampleScope* pScope = &m_OldScopeStack.back();
 			data.Name = pScope->Sample.Name;

@@ -47,6 +47,9 @@ public:
 
 	virtual size_t GetAllocHeaderSize() const { return sizeof(BaseAllocationHeader); }
 
+	BaseAllocationHeader* GetHeadAllocation() const { return m_pHeadAlloc; }
+	BaseAllocationHeader* GetTailAllocation() const { return m_pTailAlloc; }
+
 	
 	float CalculateFragmentation() const;
 

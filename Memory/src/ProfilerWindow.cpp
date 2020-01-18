@@ -95,19 +95,35 @@ void ProfilerWindow::DrawFrameTab(const IMGUIInterface& a_gui)
 void ProfilerWindow::DrawHeapTab(const IMGUIInterface& a_gui)
 {
 	DrawRecordFragmentationButton(a_gui);
-
+	ImGui::SameLine();
+	DrawCycleHeapButtons(a_gui);
+	
 	ImGui::Separator();
+
+	if (m_HeapData.empty()) // No Blocks, Early out
+	{
+		ImGui::Text("No Data");
+	}
+	else
+	{
+		ImGui::Text("Heap: %s", m_HeapData[m_CurrentHeapIdx].Name.c_str());
+		const float usedSize = m_HeapData[m_CurrentHeapIdx].UsedSize / MB;
+		const float capacity = m_HeapData[m_CurrentHeapIdx].Capacity / MB;
+		ImGui::Text("%.2f/%.2f Mbs Used", usedSize , capacity);
+		ImGui::Text("Movable: %s", m_HeapData[m_CurrentHeapIdx].Movable ? "True" : "False");
+	}
+	
 	// Draw Frame
 	ImGui::BeginChild("Heap Fragmentation", ImVec2(0, 0), true);
 	
-	if (m_Blocks.empty()) // No Blocks, Early out
+	if (m_HeapData.empty()) // No Blocks, Early out
 	{
 		ImGui::EndChild();
 		return;
 	}
 	
 	// Draw Heap Blocks
-	DrawHeapBlocks();
+	DrawCurrentHeapBlocks();
 	
 	ImGui::EndChild();
 }
@@ -125,13 +141,42 @@ void ProfilerWindow::DrawRecordFragmentationButton(const IMGUIInterface& a_gui)
 		{
 			MemoryApp::Pause();
 			m_bRecordNext = false;
-			BuildHeapBlocks();
+			m_HeapData.clear();
+			m_CurrentHeapIdx = 0;
+			RecursiveBuildHeapBlocks(MemoryManager::GetDefaultHeap());
 		}
 	}
 }
 
-void ProfilerWindow::DrawHeapBlocks()
+void ProfilerWindow::DrawCycleHeapButtons(const IMGUIInterface& a_gui)
 {
+	bool bEnableCycleLeft = false;
+	bool bEnableCycleRight = false;
+
+	if(m_HeapData.empty() == false)
+	{
+		bEnableCycleLeft |= m_CurrentHeapIdx > 0;
+		bEnableCycleRight |= m_CurrentHeapIdx < m_HeapData.size() - 1;
+	}
+	
+	
+	if(a_gui.Button("<", bEnableCycleLeft))
+	{
+		m_CurrentHeapIdx--;
+	}
+
+	ImGui::SameLine();
+
+	if(a_gui.Button(">", bEnableCycleRight))
+	{
+		m_CurrentHeapIdx++;
+	}
+}
+
+void ProfilerWindow::DrawCurrentHeapBlocks()
+{
+	std::vector<Block>& Blocks = m_HeapData[m_CurrentHeapIdx].Blocks;
+	
 	// Get Dimensions
 	const float rowW = ImGui::GetItemRectSize().x;
 	const float rowHW = rowW * 0.5f;
@@ -140,10 +185,10 @@ void ProfilerWindow::DrawHeapBlocks()
 	const float TotalPixelLen = rowW * (float)m_kHeapRows;
 
 	// Get Max Block Size
-	const uint32 BlockMax = (uint32)m_Blocks.back().End;
-	for (int i = 0; i < (int)m_Blocks.size(); ++i)
+	const uint32 BlockMax = (uint32)Blocks.back().End;
+	for (int i = 0; i < (int)Blocks.size(); ++i)
 	{
-		Block& block = m_Blocks[i];
+		Block& block = Blocks[i];
 
 		// Normalise Values within Block Range
 		const float normStart = (float)block.Start / (float)BlockMax;
@@ -213,68 +258,91 @@ void ProfilerWindow::DrawHeapBlocks()
 	}
 }
 
-void ProfilerWindow::BuildHeapBlocks()
+void ProfilerWindow::RecursiveBuildHeapBlocks(const HeapBase* a_pHeap)
 {
-	Heap* pDefaultHeap = MemoryManager::GetDefaultHeap();
-	m_Blocks.clear();
-	m_Blocks.reserve(pDefaultHeap->GetAllocationCount() * 3);
-	
-	const uintptr Base = (uintptr)pDefaultHeap->GetStartAddress();
+	BuildHeapBlocks(a_pHeap);
+	if(a_pHeap->GetChild() != nullptr)
+	{
+		RecursiveBuildHeapBlocks(a_pHeap->GetChild());
+	}
 
-	if(pDefaultHeap->GetHeadAllocation() != pDefaultHeap->GetStartAddress())
+	if(a_pHeap->GetNextSibling() != nullptr)
+	{
+		RecursiveBuildHeapBlocks(a_pHeap->GetNextSibling());
+	}
+}
+
+void ProfilerWindow::BuildHeapBlocks(const HeapBase* a_pHeap)
+{
+	HeapData& data = m_HeapData.emplace_back();
+	data.Name = a_pHeap->GetName();
+	data.UsedSize = a_pHeap->GetUsedMemory();
+	data.Capacity = a_pHeap->GetCapacity();
+
+	data.Blocks.reserve(a_pHeap->GetAllocationCount() * 3);
+	
+	const uintptr Base = (uintptr)a_pHeap->GetStartAddress();
+
+	if(a_pHeap->GetHeadAllocation() == nullptr) // No Allocations
+	{
+		const Block block
+		{
+			(uintptr)a_pHeap->GetStartAddress() - Base,
+			((uintptr)a_pHeap->GetStartAddress() + a_pHeap->GetCapacity()) - Base,
+			true
+		};
+
+		data.Blocks.push_back(block);
+		return;
+	}
+	
+	if(a_pHeap->GetHeadAllocation() != a_pHeap->GetStartAddress())
 	{
 		// Gap Between Start Addr and Head Allocation
 		Block block
 		{
-			block.Start = (uintptr)pDefaultHeap->GetStartAddress() - Base,
-			block.End = (uintptr)pDefaultHeap->GetHeadAllocation() - Base,
+			block.Start = (uintptr)a_pHeap->GetStartAddress() - Base,
+			block.End = (uintptr)a_pHeap->GetHeadAllocation() - Base,
 			block.bFree = true
 		};
 		
-		m_Blocks.push_back(block);
+		data.Blocks.push_back(block);
 	}
 
-	Heap::BaseAllocationHeader* pCurrent = pDefaultHeap->GetHeadAllocation();
+	Heap::BaseAllocationHeader* pCurrent = a_pHeap->GetHeadAllocation();
 	while(pCurrent != nullptr)
 	{
 		// Push Allocated Blocks
 		Block block
 		{
 			block.Start = (uintptr)pCurrent - Base,
-			block.End = (uintptr)pCurrent + pCurrent->Size + pDefaultHeap->GetAllocHeaderSize() - Base,
+			block.End = (uintptr)pCurrent + pCurrent->Size + a_pHeap->GetAllocHeaderSize() - Base,
 			block.bFree = false
 		};
 
-		m_Blocks.push_back(block);
+		data.Blocks.push_back(block);
 
+		uintptr nextEnd;
+		
 		if(pCurrent->pNext != nullptr) 
 		{
-			const uint32 diff = (uint32)((uintptr)pCurrent->pNext - Base - block.End);
-			if(diff != 0) // Gap Between Current and Next Allocation
-			{
-				block.Start = block.End;
-				block.End = (uintptr)pCurrent->pNext - Base;
-				block.bFree = true;
-				m_Blocks.push_back(block);
-			}
+			nextEnd = (uintptr)pCurrent->pNext - Base;
+		}
+		else // Must be Tail
+		{
+			nextEnd = (uintptr)a_pHeap->GetStartAddress() + a_pHeap->GetCapacity() - Base; // Get End of Heap
+		}
+
+		const uint32 diff = (uint32)(nextEnd - block.End);
+		if (diff != 0) // Gap Between Current and Next Allocation
+		{
+			block.Start = block.End;
+			block.End = nextEnd;
+			block.bFree = true;
+			data.Blocks.push_back(block);
 		}
 
 		pCurrent = pCurrent->pNext;
-	}
-
-	pCurrent = pDefaultHeap->GetTailAllocation();
-	const uintptr TailEnd = (uintptr)pCurrent + pCurrent->Size + pDefaultHeap->GetAllocHeaderSize();
-	const uintptr End = (uintptr)pDefaultHeap->GetStartAddress() + pDefaultHeap->GetCapacity();
-	if(TailEnd != End)
-	{
-		Block block
-		{
-			block.Start = TailEnd - Base,
-		block.End = End - Base,
-		block.bFree = true
-		};
-		
-		m_Blocks.push_back(block);
 	}
 }
 
@@ -282,15 +350,15 @@ void ProfilerWindow::OnSampleRecorded()
 {
 	m_CurrentData = Profiler::GetCurrentFrameData();
 	
-	BuildItemTree();
+	BuildSampleItemTree();
 	MemoryApp::Pause();
 }
 
-void ProfilerWindow::BuildItemTree()
+void ProfilerWindow::BuildSampleItemTree()
 {
 	m_Root.Children.clear();
-	int idx = 0;
-	BuildItemsFromDepth(m_Root, idx);
+	size_t idx = 0;
+	BuildSampleItemsFromDepth(m_Root, idx);
 	
 	m_Overhead.Data.Name = "ProfilerOverhead";
 	m_Overhead.Data.Calls = 0;
@@ -299,7 +367,7 @@ void ProfilerWindow::BuildItemTree()
 	m_Overhead.TotalPercent = (m_CurrentData.ProfilerOverhead / m_CurrentData.TotalTimeTaken * 100.f);
 }
 
-bool ProfilerWindow::BuildItemsFromDepth(SampleItem& a_pParent, int& a_idx)
+bool ProfilerWindow::BuildSampleItemsFromDepth(SampleItem& a_pParent, size_t& a_idx)
 {
 	while(a_idx != m_CurrentData.SampleData.size())
 	{
@@ -310,7 +378,7 @@ bool ProfilerWindow::BuildItemsFromDepth(SampleItem& a_pParent, int& a_idx)
 
 		Profiler::SampleData* pNextItemData = nullptr;
 
-		const bool bIsLastItem = a_idx == (int)m_CurrentData.SampleData.size() - 1;
+		bool bIsLastItem = a_idx == (int)m_CurrentData.SampleData.size() - 1;
 		if (bIsLastItem == false) // Not Last Item
 		{
 			pNextItemData = &m_CurrentData.SampleData[a_idx + 1];
@@ -332,14 +400,14 @@ bool ProfilerWindow::BuildItemsFromDepth(SampleItem& a_pParent, int& a_idx)
 			
 			if (pNextItemData->Depth > item.Data.Depth)
 			{
-				const bool bNextDepthLower = BuildItemsFromDepth(item, a_idx);
+				const bool bNextDepthLower = BuildSampleItemsFromDepth(item, a_idx);
 
 				if(bNextDepthLower)
 				{
-					const bool bIsLastItem = a_idx == (int)m_CurrentData.SampleData.size() - 1;
+					bIsLastItem = a_idx == (unsigned int)m_CurrentData.SampleData.size() - 1;
 					if (bIsLastItem == false) // Not Last Item
 					{
-						pNextItemData = &m_CurrentData.SampleData[a_idx + 1];
+						pNextItemData = &m_CurrentData.SampleData[a_idx + 1u];
 					}
 
 					if (pNextItemData->Depth < item.Data.Depth)
