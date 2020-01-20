@@ -8,16 +8,15 @@
 VertexDataProcessingScenario::Config VertexDataProcessingScenario::Configuration = {};
 
 VertexDataProcessingScenario::VertexDataProcessingScenario()
-#if USE_MEM_SYS
-
-#endif
 {
 }
 
 void VertexDataProcessingScenario::Initialise()
 {
+#if USE_MEM_SYS
 	m_VertexAllocator = LinearAllocator(Configuration.PerFrameTotalData + (size_t)(0.5 * MB),
 		MemoryManager::GetDefaultHeap()->allocate(Configuration.PerFrameTotalData + (size_t)(0.5 * MB)));
+#endif
 }
 
 void VertexDataProcessingScenario::Run()
@@ -38,8 +37,10 @@ void VertexDataProcessingScenario::Reset()
 {
 	PROFILER_BEGIN_SAMPLE(VertexDataProcessingScenario::Run);
 	ClearFrameSubs();
+#if USE_MEM_SYS
 	m_VertexAllocator.Clear();
 	MemoryManager::GetDefaultHeap()->deallocate(m_VertexAllocator.GetStartAddress());
+#endif
 	PROFILER_END_SAMPLE();
 }
 

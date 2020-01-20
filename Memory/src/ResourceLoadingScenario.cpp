@@ -72,7 +72,7 @@ void ResourceLoadingScenario::Initialise()
 			capacity = Configuration.Gameplay.AllocatedResourceCap;
 		}
 
-		config.Capacity = capacity *  + 1.25;
+		config.Capacity = capacity * 1.25;
 		DummyResource::s_pHeap = MemoryManager::CreateHeap(config, MemoryManager::GetDefaultHeap());
 	}
 #endif

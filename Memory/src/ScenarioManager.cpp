@@ -25,7 +25,7 @@ Scenarios({nullptr, nullptr})
 #endif
 
 	config.Gameplay.LoadInterval = 0.5f;
-	config.Gameplay.MaxResourceSize = 60 * MB;
+	config.Gameplay.MaxResourceSize = 80 * MB;
 	config.Gameplay.MinResourceSize = MB;
 	config.Gameplay.AllocatedResourceCap = 400 * MB;
 
@@ -86,7 +86,7 @@ void ScenarioManager::StartScenario(ScenarioType a_type)
 
 
 	const char* pName = ScenarioTypeNames[(int)a_type].c_str();
-	SMLOG("Starting Memory Scenario - %s \n", pName);
+	SMLOG("Starting Memory Scenario - %s  \n", pName);
 
 	// Initialise Scenario
 	pScenarioToStart->Initialise();
@@ -106,7 +106,7 @@ void ScenarioManager::StopScenario(ScenarioType a_type)
 		if (active.pScenario == pScenarioToStart)
 		{
 			active.pScenario->Reset();
-			SMLOG("Scenario Stopped - %s \n", ScenarioTypeNames[(int)a_type].c_str());
+			SMLOG("Scenario Stopped - %s AverageFPS - %f.1 \n", ScenarioTypeNames[(int)a_type].c_str(), active.AverageFPS);
 			m_ActiveScenarios.erase(m_ActiveScenarios.begin() + i);
 
 			OnScenarioStopped(a_type); // Raise Event
