@@ -2,14 +2,16 @@
 #include "Debug.h"
 #include "Profiler.h"
 #include "MemSys.h"
+
+#if USE_MEM_SYS
 #include "MemoryManager.h"
+#endif
 
 bool MemoryApp::s_bPaused = false;
 bool MemoryApp::s_bShouldPause = false;
 
 MemoryApp::MemoryApp()
 	:
-m_ScenarioManager(ScenarioManager()),
 m_PerformanceCounterWindow(&m_ProfilerWindow),
 m_ScenarioWindow(&m_ScenarioManager)
 {
@@ -17,16 +19,6 @@ m_ScenarioWindow(&m_ScenarioManager)
 
 MemoryApp::~MemoryApp()
 {
-}
-
-void MemoryApp::Play()
-{
-	s_bShouldPause = false;
-}
-
-void MemoryApp::Pause()
-{
-	s_bShouldPause = true;
 }
 
 bool MemoryApp::Initialise()
@@ -42,12 +34,18 @@ bool MemoryApp::Initialise()
 void MemoryApp::OnPreFrame()
 {	
 	PROFILER_BEGIN_SAMPLE(MemoryApp::OnPreFrame);
+
+	// Call Base
 	WinApp::OnPreFrame();
+
+
 	if (s_bPaused)
 	{
 		PROFILER_END_SAMPLE();
 		return;
 	}
+
+	// Preframe Stuff Here
 
 	PROFILER_END_SAMPLE();
 }
@@ -55,15 +53,14 @@ void MemoryApp::OnPreFrame()
 void MemoryApp::OnFrame()
 {
 	PROFILER_BEGIN_SAMPLE(MemoryApp::OnFrame);
+	
 	if (s_bPaused)
 	{
 		PROFILER_END_SAMPLE();
 		return;
 	}
-		
 	
 	WinApp::OnFrame();
-
 	
 	m_ScenarioManager.Update();
 	PROFILER_END_SAMPLE();
@@ -95,7 +92,7 @@ void MemoryApp::OnPostFrame()
 
 	WinApp::OnPostFrame();
 
-#if USE_MEM_SYS
+#if USE_MEM_SYS // Defrag Moveable Heaps
 	MemoryManager::DefragmentHeaps();
 #endif
 

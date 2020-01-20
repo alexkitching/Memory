@@ -1,5 +1,10 @@
 #pragma once
 
+//------------
+// Description
+//--------------
+// Common Defines i.e Byte Size Types and Text Macro
+//------------
 
 #define TEXT(x) #x
 

@@ -1,5 +1,11 @@
 #pragma once
 
+//------------
+// Description
+//--------------
+// Basic Renderer Interface for Purposes of the Program. Contains EndFrame which presents to the screen and clear plus a basic DrawCube function.
+//------------
+
 class IRenderer
 {
 public:

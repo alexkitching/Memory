@@ -1,15 +1,24 @@
 #pragma once
 #include "Scenario.h"
 #include "Timer.h"
-#include "RandomUtility.h"
+#include "MemSys.h"
 #include "PoolAllocator.h"
 #include <vector>
+
+//------------
+// Description
+//--------------
+// Particle System Memory Scenario
+// Particle Systems Spawn Particles with limited varied lifespans at a High Frequency demanding fast allocation.
+// Using the Custom Memory System the scenario uses a Pool Allocator
+//------------
 
 class Heap;
 
 class ParticleSystemScenario : public IScenario
 {
 public:
+	// Scenario Configuration
 	struct Config
 	{
 		int ParticleSystemsCount;
@@ -26,9 +35,9 @@ public:
 	static Config Configuration;
 
 	ParticleSystemScenario();
-	
 	virtual ~ParticleSystemScenario() {}
 
+	// Scenario Interface
 	void Initialise() override;
 	void Run() override;
 	void OnRender(IRenderer* a_pRenderer) override;
@@ -37,7 +46,6 @@ public:
 
 	static int m_TotalAllocatedParticles;
 private:
-	
 	
 	class ParticleSystem
 	{

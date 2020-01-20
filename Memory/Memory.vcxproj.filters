@@ -118,6 +118,9 @@
     <Filter Include="Header Files\UI\Windows">
       <UniqueIdentifier>{569a82a4-7d0d-4ee5-9a83-0adda5da47d1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\EventSystem">
+      <UniqueIdentifier>{3e47801b-d07d-4fd2-8a1e-e44ab0108a43}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -356,12 +359,6 @@
     <ClInclude Include="include\ScenarioWindow.h">
       <Filter>Header Files\UI\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="include\Delegate.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Event.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\ResourceLoadingScenario.h">
       <Filter>Header Files\Scenario\Scenarios</Filter>
     </ClInclude>
@@ -409,6 +406,12 @@
     </ClInclude>
     <ClInclude Include="include\HeapBase.h">
       <Filter>Header Files\Memory\Allocators</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Event.h">
+      <Filter>Header Files\EventSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Delegate.h">
+      <Filter>Header Files\EventSystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

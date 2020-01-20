@@ -10,10 +10,16 @@
 #include <memory>
 #include <optional>
 
+//------------
+// Description
+//--------------
+// MS Window Class containing primary window callback functions, dimensions and mouse/keyboard input via recieved windows messages.
+//------------
+
 class Window
 {
 private:
-	// Class Definition
+	// Static Class Definition
 	class WindowClassDef
 	{
 	public:
@@ -59,14 +65,19 @@ public:
 	
 	Window(int a_width, int a_height, const char* a_name);
 	~Window();
+	
 	Window(const Window&) = delete;
 	Window& operator=(const Window&) = delete;
+	
 	bool Initialise();
 
+	// Mouse Keyboard Public References
 	Keyboard& GetKeyboard;
 	Mouse& GetMouse;
+	
 	D3DRenderer& GetRenderer();
 	IMGUIInterface& GetIMGUI();
+	
 	std::string GetName() const { return m_name; }
 	HWND GetHandle() const {return m_hWnd;}
 
@@ -74,7 +85,7 @@ public:
 	int GetHeight() const { return m_height; }
 
 	void SetTitle(const std::string a_titleStr) const;
-	static std::optional<int> ProcessMessages();
+	static std::optional<int> ProcessMessages(); // Processes Messages, Returns exit code on recieving quit message
 private:
 	static LRESULT CALLBACK HandleMessageSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

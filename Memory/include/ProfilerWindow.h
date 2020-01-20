@@ -5,6 +5,13 @@
 #include "Types.h"
 #include <vector>
 
+//------------
+// Description
+//--------------
+// Profiler Window, provides a basic interface for a single frame profiler. Allows for Recording of a frame, the play/pausing of the applications main tick.
+// Contains Heap Visualisation Functionality when using the custom memory system allowing for heap fragmentation visualisation.
+//------------
+
 class HeapBase;
 
 class ProfilerWindow : public IMGUIWindow
@@ -13,7 +20,6 @@ public:
 	ProfilerWindow();
 
 	void Initialise();
-
 	void OnGUIWindow(const IMGUIInterface& a_gui) override;
 
 private:
@@ -35,6 +41,7 @@ private:
 		std::vector<SampleItem> Children;
 	};
 
+	// Draws the Frame Profiler Tab
 	void DrawFrameTab(const IMGUIInterface& a_gui);
 
 	// Heap Visualisation
@@ -43,6 +50,7 @@ private:
 	void DrawCycleHeapButtons(const IMGUIInterface& a_gui);
 	void DrawCurrentHeapBlocks();
 
+	// Building Heap Data
 	void RecursiveBuildHeapBlocks(const HeapBase* a_pHeap);
 	void BuildHeapBlocks(const HeapBase* a_pHeap);
 
@@ -79,7 +87,7 @@ private:
 		std::vector<Block> Blocks;
 	};
 
-	std::vector<HeapData> m_HeapData;
+	std::vector<HeapData> m_vHeapData;
 	unsigned int m_CurrentHeapIdx;
 
 	const int m_kHeapRows = 45;

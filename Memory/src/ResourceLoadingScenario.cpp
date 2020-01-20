@@ -2,6 +2,7 @@
 #include "Debug.h"
 #include "Profiler.h"
 #include "MemoryManager.h"
+#include <RandomUtility.h>
 
 ResourceLoadingScenario::Config ResourceLoadingScenario::Configuration = {};
 

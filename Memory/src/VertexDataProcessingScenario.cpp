@@ -9,15 +9,15 @@ VertexDataProcessingScenario::Config VertexDataProcessingScenario::Configuration
 
 VertexDataProcessingScenario::VertexDataProcessingScenario()
 #if USE_MEM_SYS
-	:
-m_VertexAllocator(Configuration.PerFrameTotalData + (size_t)(0.5 * MB),
-		MemoryManager::GetDefaultHeap()->allocate(Configuration.PerFrameTotalData + (size_t)(0.5 * MB)))
+
 #endif
 {
 }
 
 void VertexDataProcessingScenario::Initialise()
 {
+	m_VertexAllocator = LinearAllocator(Configuration.PerFrameTotalData + (size_t)(0.5 * MB),
+		MemoryManager::GetDefaultHeap()->allocate(Configuration.PerFrameTotalData + (size_t)(0.5 * MB)));
 }
 
 void VertexDataProcessingScenario::Run()
@@ -28,7 +28,7 @@ void VertexDataProcessingScenario::Run()
 	
 	while(m_fCurrentFrameDataSize < Configuration.PerFrameTotalData)
 	{
-		AddRandomSub();
+		AddSub(Random::IntRange(Configuration.MinVertsPerSub, Configuration.MaxVertsPerSub));
 	}
 
 	PROFILER_END_SAMPLE();
@@ -38,30 +38,29 @@ void VertexDataProcessingScenario::Reset()
 {
 	PROFILER_BEGIN_SAMPLE(VertexDataProcessingScenario::Run);
 	ClearFrameSubs();
+	m_VertexAllocator.Clear();
+	MemoryManager::GetDefaultHeap()->deallocate(m_VertexAllocator.GetStartAddress());
 	PROFILER_END_SAMPLE();
 }
 
-void VertexDataProcessingScenario::AddRandomSub()
+void VertexDataProcessingScenario::AddSub(uint32 a_VertCount)
 {
 	PROFILER_BEGIN_SAMPLE(VertexDataProcessingScenario::AddRandomSub);
-	const int VertCount = Random::IntRange(Configuration.MinVertsPerSub, Configuration.MaxVertsPerSub);
-
+	
+	m_fCurrentFrameDataSize += sizeof(Vertex) * a_VertCount;
+	
+	VertexSub& NewSub = m_Subs.emplace_back();
+	
+PROFILER_BEGIN_SAMPLE(VertexDataProcessingScenario::AllocateVertices); //7ms
 #if USE_MEM_SYS
-	Vertex* pVerts = (Vertex*)m_VertexAllocator.allocate(sizeof(Vertex) * VertCount, 4u);
+	NewSub.pVerts = static_cast<Vertex*>(m_VertexAllocator.allocate(sizeof(Vertex) * a_VertCount, 4u));
 #else
-	Vertex* pVerts = new Vertex[VertCount];
+	NewSub.pVerts = new Vertex[a_VertCount];
 #endif
+PROFILER_END_SAMPLE();
 	
-	const VertexSub sub
-	{
-		pVerts,
-		VertCount,
-		{0}
-	};
-
-	m_fCurrentFrameDataSize += sizeof(Vertex) * VertCount;
+	NewSub.Count = a_VertCount;
 	
-	m_Subs.push_back(sub);
 	PROFILER_END_SAMPLE();
 }
 

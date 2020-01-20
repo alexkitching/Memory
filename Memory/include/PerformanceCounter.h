@@ -1,10 +1,17 @@
 #pragma once
 
+//------------
+// Description
+//--------------
+// Static Performance Counter Class, used for Recording FPS/Memory Usage of the Application
+//------------
+
 class PerformanceCounter
 {
 public:
 	static void Tick();
 
+	// Stat Properties
 	static float FPS() { return s_fFPS;  }
 	static float PhysicalMemoryUsed() { return s_fPhysMemUsed; }
 	static float PhysicalMemoryTotal() { return s_fPhysMemTotal;  }

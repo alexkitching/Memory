@@ -1,5 +1,10 @@
 #pragma once
 
+//------------
+// Description
+//--------------
+// Standard Windows Keycode Enum for easy Keycode ID/Comparison
+//------------
 
 enum WinKeyCode
 {

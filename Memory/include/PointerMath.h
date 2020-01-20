@@ -1,17 +1,23 @@
 #pragma once
 #include "Types.h"
+
+//------------
+// Description
+//--------------
+// Pointer Math Utility Namespace Containing Common Alignment Functions used within all allocators.
+//------------
+
 namespace PointerMath
 {
-
 	inline void* AlignForward(void* a_pAddr, uint8 a_alignment)
 	{
 		return reinterpret_cast<void*>
 			(
-				(uintptr)a_pAddr
+				reinterpret_cast<uintptr>(a_pAddr)
 				+
-				(uintptr)a_alignment - 1 // Add 
+				static_cast<uintptr>(a_alignment) - 1 // Add 
 				&
-				(uintptr)~(a_alignment - 1) // Round Down to next multiple
+				static_cast<uintptr>(~(a_alignment - 1)) // Round Down to next multiple
 			);
 	}
 

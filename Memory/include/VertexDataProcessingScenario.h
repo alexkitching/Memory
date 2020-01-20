@@ -1,10 +1,16 @@
 #pragma once
 #include "Scenario.h"
-#include "Timer.h"
 #include "LinearAllocator.h"
+#include "MemSys.h"
 #include <vector>
 
-
+//------------
+// Description
+//--------------
+// Vertex Data Processing Memory Scenario
+// Super High Frequency Per Frame Allocations and subsequent deallocations with a lifetime of a single frame demand fast allocator
+// Using the custom memory system a linear allocator is used to allocate the vertex data.
+//------------
 
 class VertexDataProcessingScenario : public IScenario
 {
@@ -18,12 +24,11 @@ public:
 	static Config Configuration;
 
 	VertexDataProcessingScenario();
-
 	virtual ~VertexDataProcessingScenario() {}
 
+	// IScenario Interface
 	void Initialise() override;
 	void Run() override;
-	
 	void Reset() override;
 	bool IsComplete() override { return false; }
 
@@ -38,12 +43,13 @@ private:
 
 	struct VertexSub
 	{
-		Vertex* pVerts;
+		const Vertex* pVerts;
 		int Count;
 		char DummyExtraData[8];
 	};
 
-	void AddRandomSub();
+	// Adds a new Vertex Submission
+	inline void AddSub(uint32 a_VertCount);
 	void ClearFrameSubs();
 
 	size_t m_fCurrentFrameDataSize;

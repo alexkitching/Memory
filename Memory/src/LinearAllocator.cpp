@@ -33,7 +33,7 @@ void* LinearAllocator::allocate(size_t a_size, uint8 a_alignment)
 	as_intptr += adjustment;
 
 	// Set new current
-	m_pCurrentPos = (void*)((uintptr)as_intptr + a_size);
+	m_pCurrentPos = reinterpret_cast<void*>(as_intptr + a_size);
 
 	m_usedSize += a_size + adjustment;
 #if DEBUG

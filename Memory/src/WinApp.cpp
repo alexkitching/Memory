@@ -35,7 +35,7 @@ int WinApp::Run()
 
 		OnExit();
 
-		return m_ExitCode;
+		return m_iExitCode;
 	}
 	catch (const Exception& e)
 	{
@@ -140,9 +140,11 @@ void WinApp::OnPostFrame()
 
 void WinApp::OnExit()
 {
+	Profiler::Shutdown();
 #if DEBUG
 	DXGIInfoManager::Shutdown();
 #endif
+	delete m_pWindow;
 }
 
 void WinApp::CycleFrame()

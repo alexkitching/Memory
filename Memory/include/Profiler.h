@@ -3,10 +3,15 @@
 #include "Timer.h"
 #include "Debug.h"
 #include "Event.h"
-#include "Delegate.h"
 #include <vector>
 #include <string>
 #include <chrono>
+
+//------------
+// Description
+//--------------
+// Simple Profiler (Can be optimised more) but does the job for recording a single frames data accurately with consideration of overhead. 
+//------------
 
 #define PROFILER_ENABLED 1
 
@@ -16,6 +21,7 @@
 class Profiler
 {
 public:
+	// Data of a Single Sample
 	struct SampleData
 	{
 		SampleData()
@@ -29,7 +35,8 @@ public:
 		float TimeTaken;
 		int Calls;
 	};
-	
+
+	// Frame data containing a collection of sample data with framestats.
 	struct FrameData
 	{
 		FrameData()
@@ -43,10 +50,13 @@ public:
 		float ProfilerOverhead;
 		std::vector<SampleData> SampleData;
 	};
-	
+
+	// Declare Profiler Sample Event
 	DECLARE_EVENT_ONE_PARAM(ProfilerSamplerEvent, void, void);
-	
+
+	// Base Static Interface Function
 	static void Initialise();
+	static void Shutdown();
 	
 	static void BeginSample(const char* a_pName);
 	static void EndSample();
@@ -54,35 +64,39 @@ public:
 	static void OnFrameStart();
 	static void OnFrameEnd();
 
+	// Tells the profiler to record the next frame.
 	static void RecordNextFrame();
 
+	// Public Event for Subscribing to Sample Recorded 
 	static ProfilerSamplerEvent* OnSampleRecorded();
+	// Gets the Current Frame Data
 	static const FrameData& GetCurrentFrameData();
 
 private:
-	
+
+	// Live Sample Structure
 	struct Sample
 	{
-		static Sample Create(const char* a_pName)
+		Sample(const char* a_pName)
 		{
-			Sample newSample;
-			newSample.Name = a_pName;
-			newSample.StartTime = std::chrono::high_resolution_clock::now();
-			return newSample;
+			Name = a_pName;
+			StartTime = std::chrono::high_resolution_clock::now();
 		}
 		
 		std::string Name;
 		std::chrono::high_resolution_clock::time_point StartTime;
 	};
 
-	
+	// Sample Scope Structure, Contains Sample Itself + Extra Info about Current Scope including Child Data
 	struct SampleScope
 	{
-		SampleScope()
+		SampleScope(const char* a_pName, int a_Depth)
+			:
+		Sample(Profiler::Sample(a_pName)),
+		Depth(a_Depth),
+		TimeTaken(0.f),
+		Calls(0)
 		{
-			Depth = 0;
-			TimeTaken = 0.f;
-			Calls = 0;
 		}
 
 		inline void ResetTimer()
@@ -104,19 +118,20 @@ private:
 		std::vector<SampleData> ChildData;
 	};
 
-	
-
 	Profiler();
+	~Profiler() {}
+
+	Profiler(const Profiler&) = delete;
+	Profiler& operator=(const Profiler&) = delete;
 
 	void BeginSampleInternal(const char* a_pName);
-
 	void EndSampleInternal();
 
 	void OnFrameStartInternal();
 	void OnFrameEndInternal();
 
 	bool IsRecording() const { return m_bRecordNext || m_bRecording; }
-
+	
 	inline void BeginOverheadTimer();
 	inline void StopOverheadTimer();
 
@@ -130,17 +145,18 @@ private:
 	bool m_bRecordNext;
 
 	int m_CurrentFrame;
+
+	// Overhead Tracking Data
 	float m_OverheadTime;
 	std::chrono::high_resolution_clock::time_point m_OverheadStartTime;
 	std::chrono::high_resolution_clock::time_point m_FrameStartTime;
 
-	std::vector<SampleScope> m_CurrentScope;
-	std::vector<SampleScope> m_OldScopeStack;
-	std::vector<SampleData> m_OldDataCache;
+	std::vector<SampleScope> m_vCurrentScope;
+	std::vector<SampleScope> m_vOldScopeStack;
 
 	// Recorded Frame Data
 	FrameData m_CurrentFrameData;
-	std::vector<FrameData> m_RecordedFrameData;
+	std::vector<FrameData> m_vRecordedFrameData;
 
 	ProfilerSamplerEvent m_SampleRecordedEvent;
 };

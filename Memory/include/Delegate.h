@@ -2,6 +2,13 @@
 #include "Debug.h"
 #include <set>
 
+//------------
+// Description
+//--------------
+// Delegate Class allows for easy delegate creation similar to that of C#
+// Utilised by Events and support Instance/Static Functions
+//------------
+
 template<typename T>
 class Delegate;
 
@@ -55,7 +62,7 @@ private:
 		return (static_cast<T*>(a_pCallee)->*pFunc)(a_args...); // Call Member Function
 	}
 	
-	void* m_pOwner;
+	void* m_pOwner; // Owner Present if Member Function Bound
 	Callback_t m_Callback;
 };
 

@@ -3,6 +3,13 @@
 #include <string>
 #include "Common.h"
 
+
+//------------
+// Description
+//--------------
+// Base Exception class enhancing the original STD exception.
+//------------
+
 class Exception : public std::exception
 {
 public:

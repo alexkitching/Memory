@@ -5,6 +5,12 @@
 #include "Debug.h"
 #include <imgui.h>
 
+//------------
+// Description
+//--------------
+// Log Window Based on IMGUIs example Implementation, Hooked up to Debug Static class as the log handler.
+//------------
+
 class LogWindow : public IMGUIWindow, public ILogHandler
 {
 public:

@@ -1,5 +1,6 @@
 #include "D3DRenderer.h"
 #include "Profiler.h"
+#include <d3dcompiler.h>
 
 D3DRenderer::D3DRenderer(HWND a_hwnd)
 	:
@@ -8,6 +9,7 @@ m_pSwapChain(nullptr),
 m_pContext(nullptr),
 m_pRenderTarget(nullptr)
 {
+	// Define Swap Chain
 	DXGI_SWAP_CHAIN_DESC sd = {};
 	sd.BufferDesc.Width = 0;
 	sd.BufferDesc.Height = 0;
@@ -153,8 +155,6 @@ void D3DRenderer::DrawCube(float a_x, float a_y, float a_z, float a_scale, float
 		{-1.f, 1.f, 1.f},
 		{1.f, 1.f, 1.f},
 	};
-
-
 
 	Microsoft::WRL::ComPtr<ID3D11Buffer> pVertexBuffer;
 	D3D11_BUFFER_DESC bd =

@@ -4,28 +4,33 @@
 #include "PointerMath.h"
 #include "Debug.h"
 
+//------------
+// Description
+//--------------
+// Pool Allocator Class
+//------------
+
 template<typename ObjectT, uint8 Alignment>
 class PoolAllocator : public AllocatorBase
 {
 public:
 	PoolAllocator(size_t a_capacity,
 		void* a_pStart);
-	virtual~PoolAllocator()
-	{
-		m_pListHead = nullptr;
-	}
+	virtual~PoolAllocator() {}
 
 	
 	PoolAllocator(const PoolAllocator&);
 	PoolAllocator& operator=(const PoolAllocator&) = delete;
 
+	// Base Allocator Interface
 	virtual void* allocate(size_t a_size, uint8 a_alignment) override;
 	virtual void deallocate(void* a_pBlock) override;
 
 private:
+	// Initialise Called On Ctor and Copy Ctor
 	void Initialise();
 	
-	struct FreeList
+	struct FreeList // Simple List Struct for Tracking Blocks
 	{
 		FreeList* m_pNext;
 	};
@@ -56,12 +61,12 @@ void* PoolAllocator<ObjectT, Alignment>::allocate(size_t a_size, uint8 a_alignme
 {
 	ASSERT(a_size == sizeof(ObjectT) && a_alignment == Alignment && "Incorrect Allocation Params for Pool");
 
-	if (m_pListHead == nullptr)
+	if (m_pListHead == nullptr) // Pool is Empty
 	{
 		return nullptr;
 	}
 
-	void* p = m_pListHead;
+	void* p = m_pListHead; // Get Current Head
 	m_pListHead = m_pListHead->m_pNext; // Move Head
 
 	m_usedSize += a_size;
@@ -75,9 +80,10 @@ void* PoolAllocator<ObjectT, Alignment>::allocate(size_t a_size, uint8 a_alignme
 template <typename ObjectT, uint8 Alignment>
 void PoolAllocator<ObjectT, Alignment>::deallocate(void* a_pBlock)
 {
-	FreeList* pNewHead = (FreeList*)a_pBlock;
-	pNewHead->m_pNext = m_pListHead;
-	m_pListHead = pNewHead;
+	// Cast to Free List Pointer to Set as new Head
+	FreeList* pNewHead = static_cast<FreeList*>(a_pBlock);
+	pNewHead->m_pNext = m_pListHead; // Set next to Previous Head
+	m_pListHead = pNewHead; // This is the new head
 
 	m_usedSize -= sizeof(ObjectT);
 #if DEBUG
@@ -88,6 +94,7 @@ void PoolAllocator<ObjectT, Alignment>::deallocate(void* a_pBlock)
 template <typename ObjectT, uint8 Alignment>
 void PoolAllocator<ObjectT, Alignment>::Initialise()
 {
+	// Ensure Start Address is aligned
 	const uint8 adjustment = PointerMath::AlignForwardAdjustment(m_pStart, Alignment);
 
 	union
@@ -97,12 +104,13 @@ void PoolAllocator<ObjectT, Alignment>::Initialise()
 	};
 
 	// Setup Head
-	as_intptr = (uintptr)m_pStart + adjustment;
+	as_intptr = reinterpret_cast<uintptr>(m_pStart) + adjustment;
 	m_pListHead = as_list;
 
 	// Offset to next elem
 	as_intptr += sizeof(ObjectT);
 
+	// Calculate Max Objects we can store
 	const size_t maxObjects = (m_capacity - adjustment) / sizeof(ObjectT);
 
 	// Init List

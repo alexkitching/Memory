@@ -1,6 +1,12 @@
 #pragma once
 #include <chrono>
 
+//------------
+// Description
+//--------------
+// Static Time Class used for global retrieval of common time data.
+//------------
+
 class Time
 {
 public:

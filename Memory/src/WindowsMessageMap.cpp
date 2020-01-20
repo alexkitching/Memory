@@ -198,7 +198,7 @@ std::string WindowsMessageMap::Read(DWORD msg, LPARAM lp, WPARAM wp)
 	return (*s_pMessageMap)(msg, lp, wp);
 }
 
-std::string WindowsMessageMap::operator()( DWORD msg,LPARAM lp,WPARAM wp ) const noexcept
+std::string WindowsMessageMap::operator()( DWORD msg,LPARAM lp,WPARAM wp ) const
 {
 	constexpr int firstColWidth = 25;
 	const auto i = m_MessageMap.find( msg );

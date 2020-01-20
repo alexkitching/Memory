@@ -2,6 +2,12 @@
 #include "Delegate.h"
 #include <vector>
 
+//------------
+// Description
+//--------------
+// Event Class, Stores Delegates and calls them on raising the event.
+//------------
+
 template<typename T>
 class Event;
 
@@ -14,7 +20,7 @@ public:
 	{
 		if (std::find(m_Listeners.begin(), m_Listeners.end(), a_listener) != m_Listeners.end())
 		{
-			return false;
+			return false; // Already Exists
 		}
 
 		m_Listeners.push_back(a_listener);
@@ -26,16 +32,15 @@ public:
 	bool AddListener(T* a_pOwner)
 	{
 		Delegate< RetVal_t(Args_t...)> del = Delegate< RetVal_t(Args_t...)>::template Bind<T, pFunc>(a_pOwner);
-
 		return AddListener(del);
 	}
 
 	bool RemoveListener(Delegate<RetVal_t(Args_t...)> a_listener)
 	{
 		auto it = std::find(m_Listeners.begin(), m_Listeners.end(), a_listener);
-		if (it == m_Listeners.end())
+		if (it == m_Listeners.end()) 
 		{
-			return false;
+			return false; // No delegate found
 		}
 
 		m_Listeners.erase(it);
@@ -46,7 +51,6 @@ public:
 	bool RemoveListener(T* a_pOwner)
 	{
 		Delegate< RetVal_t(Args_t...)> del = Delegate< RetVal_t(Args_t...)>::template Bind<T, pFunc>(a_pOwner);
-
 		return RemoveListener(del);
 	}
 
@@ -75,6 +79,7 @@ private:
 	std::vector<Delegate<RetVal_t(Args_t...)>> m_Listeners;
 };
 
+// Declaration Macros
 #define INTERNAL_DECLARE_EVENT(name, ...) typedef Event<__VA_ARGS__> name
 
 #define DECLARE_EVENT(name, Ret) INTERNAL_DECLARE_EVENT(name, Ret())

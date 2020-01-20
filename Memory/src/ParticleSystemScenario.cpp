@@ -5,6 +5,7 @@
 #include "MemSys.h"
 #include "MemoryManager.h"
 #include "Profiler.h"
+#include "RandomUtility.h"
 
 int ParticleSystemScenario::m_TotalAllocatedParticles = 0;
 ParticleSystemScenario::Config ParticleSystemScenario::Configuration = ParticleSystemScenario::Config();

@@ -1,5 +1,11 @@
 #pragma once
 
+//------------
+// Description
+//--------------
+// Platform Specific Defines
+//------------
+
 #if _WIN64
 #define x64
 #define DEFAULT_ALIGNMENT 8u

@@ -3,6 +3,13 @@
 #include "Debug.h"
 #include "PointerMath.h"
 
+//------------
+// Description
+//--------------
+// Stack Allocator, was used originally with Vertex Data Processing Scenario but later replaced with faster linear.
+// Can only deallocate in reverse order of allocation.
+//------------
+
 class StackAllocator : public AllocatorBase
 {
 public:
@@ -13,6 +20,7 @@ public:
 	StackAllocator(const StackAllocator&) = delete;
 	StackAllocator& operator=(const StackAllocator&) = delete;
 
+	// Base Allocation Interface
 	virtual void* allocate(size_t a_size, uint8 a_alignment) override;
 	virtual void deallocate(void* a_pBlock) override;
 

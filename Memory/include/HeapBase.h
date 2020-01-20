@@ -4,6 +4,12 @@
 
 #define HEAP_MAX_NAME_LEN 64
 
+//------------
+// Description
+//--------------
+// Base Heap Class, Contains Primary Heap Functionality, supports FirstFit/BestFit allocation patterns, Allocations contain Base Header Information with Linked List between Allocations.
+//------------
+
 class HeapBase : public AllocatorBase
 {
 	friend class MemoryManager;
@@ -18,12 +24,12 @@ public:
 
 	struct BaseAllocationHeader
 	{
-		HeapBase* pHeap; // 8 
+		HeapBase* pHeap;
 		size_t Size;
 		BaseAllocationHeader* pNext;
-		BaseAllocationHeader* pPrev; // 32 Bytes
+		BaseAllocationHeader* pPrev; 
 #ifdef x64
-		uint32 padding;
+		uint32 __padding;
 #endif
 		HeapSignature Sig;
 	}; // 24 Bytes
@@ -31,6 +37,7 @@ public:
 	HeapBase();
 	virtual ~HeapBase();
 
+	// Activate/Deactivate serves as init/reset functions since heaps are static within Memory Manager
 	virtual void Activate(Config& a_config);
 	virtual void Deactivate();
 
@@ -38,6 +45,7 @@ public:
 	bool IsActive() const { return m_bActive; }
 	virtual bool IsMoveable() { return false; }
 
+	// Parenting
 	void SetParent(HeapBase* a_pParent);
 
 	const HeapBase* GetParent() const { return m_pParent; }
@@ -50,24 +58,24 @@ public:
 	BaseAllocationHeader* GetHeadAllocation() const { return m_pHeadAlloc; }
 	BaseAllocationHeader* GetTailAllocation() const { return m_pTailAlloc; }
 
-	
 	float CalculateFragmentation() const;
 
 protected:
 	BaseAllocationHeader* TryAllocate(size_t a_size, uint8 a_alignment);
 	BaseAllocationHeader* TryAllocateBestFit(size_t a_size, uint8 a_alignment, BaseAllocationHeader*& a_pPrevClosestAlloc) const;
 	BaseAllocationHeader* TryAllocateFirstFit(size_t a_size, uint8 a_alignment, BaseAllocationHeader*& a_pPrevClosestAlloc);
+
+	BaseAllocationHeader* m_pHeadAlloc;
+	BaseAllocationHeader* m_pTailAlloc;
 	
-	// List
+	// Parenting List
 	HeapBase* m_pParent;
 	HeapBase* m_pChild;
 	HeapBase* m_pNextSibling;
 	HeapBase* m_pPreviousSibling;
 
 	char m_Name[HEAP_MAX_NAME_LEN];
+
 	bool m_bActive : 1;
 	bool m_bFavourBestFit : 1;
-
-	BaseAllocationHeader* m_pHeadAlloc;
-	BaseAllocationHeader* m_pTailAlloc;
 };

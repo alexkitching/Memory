@@ -3,6 +3,15 @@
 #include "Debug.h"
 #include "Platform.h"
 
+//------------
+// Description
+//--------------
+// Moveable Heap & Moveable Pointer Classes, Enhances Default Heap with Defragmentation Functionality.
+// Moveable Pointer works as a Pointer to Pointer. Each Allocation also allocates a "Bridge Pointer"
+// at the end of the heap via Pool Allocator which the returned Moveable Pointer Points to.
+// This Bridge pointer is updated to the new location of the moved memory during defragmentation maintain valid pointers.
+//------------
+
 #define HEAP_MOVEABLE_ALLOC_SIG 0xFEC0FFEE
 
 template<typename T>
@@ -23,7 +32,6 @@ public:
 	{
 
 	}
-
 
 	T* Get()
 	{
@@ -55,11 +63,10 @@ public:
 	bool IsNull() const { return m_p == nullptr; }
 
 private:
-
-
 	T** m_p;
 };
 
+// Forward Declartions
 template<typename T, uint8 Alignment>
 class PoolAllocator;
 
@@ -71,9 +78,9 @@ public:
 		MoveableHeap* pHeap;
 		size_t Size;
 		MoveableAllocationHeader* pNext;
-		MoveableAllocationHeader* pPrev; //32 
-		void** BridgePtr; // 40
-		uint32 Alignment;
+		MoveableAllocationHeader* pPrev; 
+		void** BridgePtr; // Bridge Pointer Pointing to this Allocation
+		uint32 Alignment; // Alignment Should be Stored to ensure alignment is maintained on defrags
 		uint32 Sig;
 	}; // 48 Bytes
 	
@@ -92,13 +99,16 @@ public:
 	
 	void deallocate(MoveableAllocationHeader* a_pHeader);
 
+	// Defragmentation Functions
 	void Defragment();
 	inline void MoveAllocation(MoveableAllocationHeader*& a_pHeader, void* pDestination);
 
 private:
+	// Base Allocator Interface (Private due to replacement by Moveable Pointer versions, still utilised privately
 	void* allocate(size_t a_size, uint8 a_alignment) override;
 	void deallocate(void* a_pBlock) override;
 
+	// Allocator for Bridge Pointers
 	PoolAllocator<void*, DEFAULT_ALIGNMENT>* m_pBridgePointerAllocator;
 };
 
@@ -107,26 +117,27 @@ void MoveablePointer<T>::Release()
 {
 	if(m_p != nullptr)
 	{
-		MoveableHeap::Deallocate(*this);
+		MoveableHeap::Deallocate(*this); // Deallocate this Pointer
 	}
 }
 
 template <typename T>
 MoveablePointer<T> MoveableHeap::allocate(size_t a_size, uint8 a_alignment)
 {
+	// Allocate Header/Block
 	void* pBlock = allocate(a_size, a_alignment);
 
 	if (pBlock == nullptr)
 	{
 		return nullptr;
 	}
-		
 
-	MoveableAllocationHeader* pHeader = (MoveableAllocationHeader*)((char*)pBlock - sizeof(MoveableAllocationHeader));
+	// Get The Header
+	MoveableAllocationHeader* pHeader = reinterpret_cast<MoveableAllocationHeader*>(static_cast<char*>(pBlock) - sizeof(MoveableAllocationHeader));
 	ASSERT(pHeader != nullptr && "Header is null");
 
-	
-	return MoveablePointer<T>((T**)pHeader->BridgePtr);
+	// Return Moveable Pointer Pointing at the Bridge Pointer
+	return MoveablePointer<T>(reinterpret_cast<T**>(pHeader->BridgePtr));
 }
 
 template <typename T>
@@ -134,10 +145,12 @@ void MoveableHeap::Deallocate(MoveablePointer<T> a_p)
 {
 	char* pBlock = a_p.Get();
 
-	MoveableAllocationHeader* pHeader = (MoveableAllocationHeader*)((char*)pBlock - sizeof(MoveableAllocationHeader));
+	// Get The Header
+	MoveableAllocationHeader* pHeader = reinterpret_cast<MoveableAllocationHeader*>(static_cast<char*>(pBlock) - sizeof(MoveableAllocationHeader));
 	ASSERT(pHeader != nullptr && "Header is null");
 	ASSERT(pHeader->Sig == HEAP_MOVEABLE_ALLOC_SIG && "Expected Moveable Heap Signature?");
 
+	// Deallocate Pointer on Heap Instance
 	pHeader->pHeap->deallocate(pHeader);
 }
 

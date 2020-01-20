@@ -1,6 +1,12 @@
 #pragma once
 #include <chrono>
 
+//------------
+// Description
+//--------------
+// 2 Basic Types of Timer Class, Time Point based Timer and a Delta Time Timer requiring Ticking.
+//------------
+
 class TP_Timer
 {
 public:

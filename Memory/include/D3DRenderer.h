@@ -3,7 +3,12 @@
 
 #include "D3D.h"
 #include <wrl.h>
-#include <complex>
+
+//------------
+// Description
+//--------------
+// DirectX Renderer Class, Provides Present/Clear DirectX Functionality with a basic Draw Cube Function
+//------------
 
 class D3DRenderer : public IRenderer
 {
@@ -25,6 +30,7 @@ public:
 	
 private:
 
+	// D3D Com Objects
 	Microsoft::WRL::ComPtr<ID3D11Device> m_pDevice;
 	Microsoft::WRL::ComPtr<IDXGISwapChain> m_pSwapChain;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_pContext;

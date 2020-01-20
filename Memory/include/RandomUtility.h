@@ -1,8 +1,12 @@
 #pragma once
 
 #include <random>
-#include <ctime>
 
+//------------
+// Description
+//--------------
+// Random Utility Class used for Generating Random Integers/Bools/Floats with/without a seed
+//------------
 
 class Random
 {

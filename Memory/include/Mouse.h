@@ -2,6 +2,12 @@
 #include <utility>
 #include <queue>
 
+//------------
+// Description
+//--------------
+// Window Mouse Class, handles mouse events and storing of current mouse state.
+//------------
+
 class Mouse
 {
 	friend class Window;

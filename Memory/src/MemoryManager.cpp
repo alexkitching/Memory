@@ -183,6 +183,11 @@ Heap* MemoryManager::CreateHeap(Heap::Config& a_config, Heap* a_pParent)
 	return pHeap;
 }
 
+MoveableHeap* MemoryManager::CreateMoveableHeapFromGlobal(Heap::Config& a_config)
+{
+	return CreateMoveableHeap(a_config, s_pGlobalHeap);
+}
+
 MoveableHeap* MemoryManager::CreateMoveableHeap(MoveableHeap::Config& a_config, const char* a_pParentName)
 {
 	Heap* pParent = FindActiveHeap(a_pParentName);

@@ -3,10 +3,15 @@
 #include "Event.h"
 #include "Timer.h"
 
+//------------
+// Description
+//--------------
+// Scenario Manager Class is responsible for Starting/Stopping/Ticking of Memory Scenarios.
+//------------
+
 enum class ScenarioType
 {
 	Invalid = -1,
-	
 	ResourceLoadingBootup,
 	ResourceLoadingGameplay,
 	ParticleSystem,
@@ -27,7 +32,7 @@ class ScenarioManager
 public:
 	ScenarioManager();
 	~ScenarioManager();
-
+	
 	void StartScenario(ScenarioType a_type);
 	void StopScenario(ScenarioType a_type);
 
@@ -67,7 +72,8 @@ private:
 	};
 
 	inline IScenario* GetScenario(ScenarioType a_type);
-	
+
+	// Memory Scenarios
 	struct
 	{
 		ResourceLoadingScenario* pResourceLoading;

@@ -2,6 +2,13 @@
 #include "Win.h"
 #include <wrl.h>
 
+//------------
+// Description
+//--------------
+// IMGUI Interface Instance, should have probably refactored this into a D3D IMGUI interface from a base
+// Used as an override for existing imgui functionality with enhancements.
+//------------
+
 class Window;
 struct ID3D11Device;
 struct ID3D11DeviceContext;

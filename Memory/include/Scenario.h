@@ -1,6 +1,11 @@
 #pragma once
 
-#include "MemSys.h"
+//------------
+// Description
+//--------------
+// Base Memory Scenario Interface
+// Contains primary functions for a memory scenario to be called from Scenario Manager
+//------------
 
 class IRenderer;
 class IScenario

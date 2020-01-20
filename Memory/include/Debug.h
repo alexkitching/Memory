@@ -2,9 +2,17 @@
 #include "Exception.h"
 #include <cstdarg>
 
+//------------
+// Description
+//--------------
+// This header contains Common Debug Related Defines and Classes providing a variety of debug functionality.
+//------------
 
+
+// Crashes 'Breaks' the program
 #define BREAK { __asm int 3}
 
+// Assert Fail Exception thrown on Assertion.
 class AssertFailException : public Exception
 {
 public:
@@ -13,10 +21,12 @@ public:
 	const char* what() const override;
 	virtual const char* GetType() const { return TEXT(AssertFailException); }
 	std::string GetFailedExpressionString() const { return m_failedExpression; }
+
 private:
 	std::string m_failedExpression;
 };
 
+// Called within Assert Macro
 static void AssertFail(int a_line, const char* a_fileName, const char* a_expression)
 {
 	throw AssertFailException(a_line, a_fileName, a_expression);
@@ -30,6 +40,9 @@ static void AssertFail(int a_line, const char* a_fileName, const char* a_express
 #define UNREACHABLE(x)
 #endif
 
+// Logging
+
+// Log Handler Interface to recieve log callbacks from define.
 class ILogHandler
 {
 public:
@@ -45,6 +58,7 @@ public:
 #define LOG(x, ...)
 #endif
 
+// Static Debug Class Used to Set Log Handler and Containing the Log Function.
 class Debug
 {
 public:

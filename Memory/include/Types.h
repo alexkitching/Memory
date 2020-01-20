@@ -1,6 +1,11 @@
 #pragma once
 #include <cstdint>
-#include <float.h>
+
+//------------
+// Description
+//--------------
+// Explicit Int Types used within Allocators
+//------------
 
 typedef uint8_t  uint8;
 typedef uint16_t uint16;

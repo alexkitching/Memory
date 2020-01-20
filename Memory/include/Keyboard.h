@@ -3,6 +3,12 @@
 #include <queue>
 #include <bitset>
 
+//------------
+// Description
+//--------------
+// Window Keyboard Class, handles keyboard events and storing of current keys state.
+//------------
+
 class Keyboard
 {
 	friend class Window;

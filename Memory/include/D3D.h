@@ -7,11 +7,17 @@
 #include <vector>
 
 #include <d3d11.h>
-#include <d3dcompiler.h>
 #include <DirectXMath.h>
+
+//------------
+// Description
+//--------------
+// Main D3D Related Include, Contains DirectX Related Includes as well as Exceptions and Debug Defines
+//------------
 
 namespace DX = DirectX;
 
+// Standard DirectX HResult & Info Exception
 class D3DException : public Exception
 {
 public:

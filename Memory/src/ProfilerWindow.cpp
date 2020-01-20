@@ -100,23 +100,23 @@ void ProfilerWindow::DrawHeapTab(const IMGUIInterface& a_gui)
 	
 	ImGui::Separator();
 
-	if (m_HeapData.empty()) // No Blocks, Early out
+	if (m_vHeapData.empty()) // No Blocks, Early out
 	{
 		ImGui::Text("No Data");
 	}
 	else
 	{
-		ImGui::Text("Heap: %s", m_HeapData[m_CurrentHeapIdx].Name.c_str());
-		const float usedSize = m_HeapData[m_CurrentHeapIdx].UsedSize / MB;
-		const float capacity = m_HeapData[m_CurrentHeapIdx].Capacity / MB;
+		ImGui::Text("Heap: %s", m_vHeapData[m_CurrentHeapIdx].Name.c_str());
+		const float usedSize = (float)m_vHeapData[m_CurrentHeapIdx].UsedSize / MB;
+		const float capacity = (float)m_vHeapData[m_CurrentHeapIdx].Capacity / MB;
 		ImGui::Text("%.2f/%.2f Mbs Used", usedSize , capacity);
-		ImGui::Text("Movable: %s", m_HeapData[m_CurrentHeapIdx].Movable ? "True" : "False");
+		ImGui::Text("Movable: %s", m_vHeapData[m_CurrentHeapIdx].Movable ? "True" : "False");
 	}
 	
 	// Draw Frame
 	ImGui::BeginChild("Heap Fragmentation", ImVec2(0, 0), true);
 	
-	if (m_HeapData.empty()) // No Blocks, Early out
+	if (m_vHeapData.empty()) // No Blocks, Early out
 	{
 		ImGui::EndChild();
 		return;
@@ -141,7 +141,7 @@ void ProfilerWindow::DrawRecordFragmentationButton(const IMGUIInterface& a_gui)
 		{
 			MemoryApp::Pause();
 			m_bRecordNext = false;
-			m_HeapData.clear();
+			m_vHeapData.clear();
 			m_CurrentHeapIdx = 0;
 			RecursiveBuildHeapBlocks(MemoryManager::GetDefaultHeap());
 		}
@@ -153,10 +153,10 @@ void ProfilerWindow::DrawCycleHeapButtons(const IMGUIInterface& a_gui)
 	bool bEnableCycleLeft = false;
 	bool bEnableCycleRight = false;
 
-	if(m_HeapData.empty() == false)
+	if(m_vHeapData.empty() == false)
 	{
 		bEnableCycleLeft |= m_CurrentHeapIdx > 0;
-		bEnableCycleRight |= m_CurrentHeapIdx < m_HeapData.size() - 1;
+		bEnableCycleRight |= m_CurrentHeapIdx < m_vHeapData.size() - 1;
 	}
 	
 	
@@ -175,7 +175,7 @@ void ProfilerWindow::DrawCycleHeapButtons(const IMGUIInterface& a_gui)
 
 void ProfilerWindow::DrawCurrentHeapBlocks()
 {
-	std::vector<Block>& Blocks = m_HeapData[m_CurrentHeapIdx].Blocks;
+	std::vector<Block>& Blocks = m_vHeapData[m_CurrentHeapIdx].Blocks;
 	
 	// Get Dimensions
 	const float rowW = ImGui::GetItemRectSize().x;
@@ -274,7 +274,7 @@ void ProfilerWindow::RecursiveBuildHeapBlocks(const HeapBase* a_pHeap)
 
 void ProfilerWindow::BuildHeapBlocks(const HeapBase* a_pHeap)
 {
-	HeapData& data = m_HeapData.emplace_back();
+	HeapData& data = m_vHeapData.emplace_back();
 	data.Name = a_pHeap->GetName();
 	data.UsedSize = a_pHeap->GetUsedMemory();
 	data.Capacity = a_pHeap->GetCapacity();

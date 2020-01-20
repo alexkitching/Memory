@@ -1,5 +1,8 @@
 #include "Profiler.h"
 
+#define OVERHEAD_START RecordCurrentStackTimes(); BeginOverheadTimer
+#define OVERHEAD_END StopOverheadTimer(); ResetCurrentStackTimes
+
 Profiler* Profiler::s_pInstance = nullptr;
  
 void Profiler::Initialise()
@@ -7,6 +10,11 @@ void Profiler::Initialise()
 	ASSERT(s_pInstance == nullptr && "Already Initialised");
 
 	s_pInstance = new Profiler();
+}
+
+void Profiler::Shutdown()
+{
+	delete s_pInstance;
 }
 
 void Profiler::BeginSample(const char* a_pName)
@@ -64,141 +72,134 @@ const Profiler::FrameData& Profiler::GetCurrentFrameData()
 Profiler::Profiler()
 :
 m_bRecording(false),
+m_bRecordNextRequested(false),
 m_bRecordNext(false),
-m_CurrentFrame(1)
+m_CurrentFrame(1),
+m_OverheadTime(0.f)
 {
 }
 
 void Profiler::BeginSampleInternal(const char* a_pName)
 {
-	RecordCurrentStackTimes();
-	BeginOverheadTimer();
+	OVERHEAD_START();
 	
-	if(m_OldScopeStack.empty() == false)
+	if(m_vOldScopeStack.empty() == false) // Previous Scope Exists
 	{
-		SampleScope* pTop = &m_OldScopeStack[(int)m_OldScopeStack.size() - 1];
-		if(pTop != nullptr)
+		// Get Top
+		SampleScope* pTop = &m_vOldScopeStack[static_cast<int>(m_vOldScopeStack.size()) - 1];
+		if(pTop->Sample.Name == a_pName) // Reuse Scope / Same Call as This
 		{
-			if(pTop->Sample.Name == a_pName) // Reuse Scope
-			{
-				m_CurrentScope.push_back(*pTop);
-				m_OldScopeStack.pop_back();
+			// Push back onto Current from Old
+			m_vCurrentScope.push_back(*pTop);
+			m_vOldScopeStack.pop_back();
 
-				StopOverheadTimer();
-				ResetCurrentStackTimes();
-				return;
+			OVERHEAD_END();
+			return;
+		}
+
+		// New Scope - Push Old Scope Data
+		const bool bCurrentEmpty = m_vCurrentScope.empty();
+		while (m_vOldScopeStack.empty() == false) 
+		{
+			SampleScope* pScope = &m_vOldScopeStack.back();
+			
+			SampleData* pData = nullptr;
+			std::vector<SampleData>* pDataContainer = nullptr;
+			if(bCurrentEmpty == false) // Current Scope not empty, we will push to parent data
+			{
+				pDataContainer = &m_vCurrentScope.back().ChildData;
+			}
+			else // We will push directly to frame data
+			{
+				pDataContainer = &m_CurrentFrameData.SampleData;
 			}
 			
-			SampleData data;
-			while (m_OldScopeStack.empty() == false)
+			// Push Data
+			pData = &pDataContainer->emplace_back();
+			pData->Name = pScope->Sample.Name;
+			pData->Depth = pScope->Depth;
+			pData->TimeTaken = pScope->TimeTaken;
+			pData->Calls = pScope->Calls;
+
+			const unsigned int Count = static_cast<unsigned int>(pScope->ChildData.size());
+			for (unsigned int i = 0; i < Count; ++i)
 			{
-				SampleScope* pScope = &m_OldScopeStack.back();
-				data.Name = pScope->Sample.Name;
-				data.Depth = pScope->Depth;
-				data.TimeTaken = pScope->TimeTaken;
-				data.Calls = pScope->Calls;
-
-				std::vector<SampleData>* pDataContainer = nullptr;
-				if(m_CurrentScope.empty() == false)
-				{
-					pDataContainer = &m_CurrentScope.back().ChildData;
-				}
-				else
-				{
-					pDataContainer = &m_CurrentFrameData.SampleData;
-				}
-
-				if(pDataContainer != nullptr)
-				{
-					pDataContainer->push_back(data);
-					for (int i = 0; i < (int)pScope->ChildData.size(); ++i)
-					{
-						pDataContainer->push_back(pScope->ChildData[i]);
-					}
-				}
-					
-				m_OldScopeStack.pop_back();
+				pDataContainer->emplace_back(pScope->ChildData[i]);
 			}
+				
+			m_vOldScopeStack.pop_back();
 		}
 	}
 	
 	// Push New Scope
-	SampleScope newScope;
-	newScope.Sample = Sample::Create(a_pName);
-	newScope.Depth = (int)m_CurrentScope.size();
-	m_CurrentScope.push_back(newScope);
+	m_vCurrentScope.emplace_back(a_pName, static_cast<int>(m_vCurrentScope.size()));
 	
-	StopOverheadTimer();
-	ResetCurrentStackTimes();
+	OVERHEAD_END();
 }
 
 void Profiler::EndSampleInternal()
 {
-	ASSERT(m_CurrentScope.empty() == false && "No Samples Started!");
-	RecordCurrentStackTimes();
-	BeginOverheadTimer();
+	ASSERT(m_vCurrentScope.empty() == false && "No Samples Started!");
+	OVERHEAD_START();
 
 	// Get Current Scope
-	SampleScope* pCurrent = &m_CurrentScope.back();
+	SampleScope* pCurrent = &m_vCurrentScope.back();
 	
-	pCurrent->Calls++;
+	pCurrent->Calls++; // Increment Calls
 
-	if (m_CurrentScope.size() == 1) // At least another Scope
+	if (m_vCurrentScope.size() == 1) // At least another Scope
 	{
-		SampleData data;
-		data.Name = pCurrent->Sample.Name;
-		data.Depth = pCurrent->Depth;
-		data.TimeTaken = pCurrent->TimeTaken;
-		data.Calls = pCurrent->Calls;
-
 		// Push Head
-		m_CurrentFrameData.SampleData.push_back(data);
+		SampleData* data = &m_CurrentFrameData.SampleData.emplace_back(SampleData());
+		data->Name = pCurrent->Sample.Name;
+		data->Depth = pCurrent->Depth;
+		data->TimeTaken = pCurrent->TimeTaken;
+		data->Calls = pCurrent->Calls;
 
 		// Push Mid Child Data
 		for(int i = 0; i < (int)pCurrent->ChildData.size(); ++i)
 		{
-			m_CurrentFrameData.SampleData.push_back(pCurrent->ChildData[i]);
+			m_CurrentFrameData.SampleData.emplace_back(pCurrent->ChildData[i]);
 		}
 
 		// Push Tail
-		while(m_OldScopeStack.empty() == false)
+		while(m_vOldScopeStack.empty() == false)
 		{
-			SampleScope* pScope = &m_OldScopeStack.back();
-			data.Name = pScope->Sample.Name;
-			data.Depth = pScope->Depth;
-			data.TimeTaken = pScope->TimeTaken;
-			data.Calls = pScope->Calls;
-			m_CurrentFrameData.SampleData.push_back(data);
+			SampleScope* pScope = &m_vOldScopeStack.back();
+			
+			data = &m_CurrentFrameData.SampleData.emplace_back(SampleData());
+			data->Name = pScope->Sample.Name;
+			data->Depth = pScope->Depth;
+			data->TimeTaken = pScope->TimeTaken;
+			data->Calls = pScope->Calls;
 			
 			for (int i = 0; i < (int)pScope->ChildData.size(); ++i)
 			{
-				m_CurrentFrameData.SampleData.push_back(pScope->ChildData[i]);
+				m_CurrentFrameData.SampleData.emplace_back(pScope->ChildData[i]);
 			}
 			
-			m_OldScopeStack.pop_back();
+			m_vOldScopeStack.pop_back();
 		}
 	}
-	else
+	else // Move Current to Old
 	{
-		m_OldScopeStack.push_back(m_CurrentScope.back());
+		m_vOldScopeStack.emplace_back(m_vCurrentScope.back());
 	}
-
 	
-	m_CurrentScope.pop_back();
+	m_vCurrentScope.pop_back();
 	
-	StopOverheadTimer();
-	ResetCurrentStackTimes();
+	OVERHEAD_END();
 }
 
 void Profiler::OnFrameStartInternal()
 {
-	ASSERT(m_CurrentScope.empty() && "Cannot Sample Before Frame Start!");
+	ASSERT(m_vCurrentScope.empty() && "Cannot Sample Before Frame Start!");
 	m_FrameStartTime = std::chrono::high_resolution_clock::now();
 }
 
 void Profiler::OnFrameEndInternal()
 {
-	ASSERT(m_CurrentScope.empty() && "Mismatched Samples");
+	ASSERT(m_vCurrentScope.empty() && "Mismatched Samples");
 
 	// Record Total Frame Time
 	const std::chrono::duration<float> duration = std::chrono::high_resolution_clock::now() - m_FrameStartTime;
@@ -209,7 +210,7 @@ void Profiler::OnFrameEndInternal()
 	if (IsRecording())
 	{
 		// Record This Frames Data
-		m_RecordedFrameData.push_back(m_CurrentFrameData);
+		//m_vRecordedFrameData.push_back(m_CurrentFrameData); // Not Supporting More than single frame
 
 		m_SampleRecordedEvent.Raise();
 		
@@ -242,16 +243,18 @@ void Profiler::StopOverheadTimer()
 
 void Profiler::RecordCurrentStackTimes()
 {
-	for(int i = 0; i < m_CurrentScope.size(); ++i)
+	const unsigned int Count = static_cast<unsigned int>(m_vCurrentScope.size());
+	for(unsigned int i = 0; i < Count; ++i)
 	{
-		m_CurrentScope[i].RecordTimer();
+		m_vCurrentScope[i].RecordTimer();
 	}
 }
 
 void Profiler::ResetCurrentStackTimes()
 {
-	for (int i = 0; i < m_CurrentScope.size(); ++i)
+	const unsigned int Count = static_cast<unsigned int>(m_vCurrentScope.size());
+	for (unsigned int i = 0; i < Count; ++i)
 	{
-		m_CurrentScope[i].ResetTimer();
+		m_vCurrentScope[i].ResetTimer();
 	}
 }

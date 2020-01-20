@@ -2,6 +2,12 @@
 
 #include "IMGUIInterface.h"
 
+//------------
+// Description
+//--------------
+// Base IMGUI Window Wrapper Class, reduces work needed to create a IMGUI Window
+//------------
+
 class IMGUIWindow
 {
 public:
@@ -23,6 +29,7 @@ protected:
 
 	void DrawQuad(const IMGUIQuad& a_quad);
 private:
-	bool m_bClosable;
+	
+	bool m_bClosable; // Can this window be closed?
 	std::string m_Name;
 };

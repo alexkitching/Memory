@@ -348,14 +348,14 @@ void ScenarioWindow::DrawVertexDataProcessingScenario(const IMGUIInterface& a_gu
 		}
 
 		if (a_gui.IntSlider("Max Verts Per Vertex Submission", m_bScenarioActive[(int)scenario] == false,
-			&MaxVertsPerSub, 1.f, MinVertsPerSub + 1, 1000))
+			&MaxVertsPerSub, 1.f, MinVertsPerSub + 1, 32000))
 		{
 			config.MaxVertsPerSub = MaxVertsPerSub;
 		}
 
 		int PerFrameDataSize = (int)(config.PerFrameTotalData / MB);
 		if(a_gui.IntSlider("Per Frame Total Data Mbs", m_bScenarioActive[(int)scenario] == false,
-			&PerFrameDataSize, 1.f, 1, 20))
+			&PerFrameDataSize, 1.f, 1, 300))
 		{
 			config.PerFrameTotalData = PerFrameDataSize * MB;
 		}

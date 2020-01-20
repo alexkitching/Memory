@@ -1,11 +1,21 @@
 #pragma once
 #include "Scenario.h"
 #include "Timer.h"
-#include "RandomUtility.h"
 #include <vector>
+#include "MemSys.h"
 #include "MoveableHeap.h"
 
+//------------
+// Description
+//--------------
+// Resource Loading Memory Scenario
+// 2 Run Modes, Bootup(Large Size Allocates until Capacity is reached) and Gameplay(Small-Medium Sized Allocations/Deallocations at interval)
+// Using the Custom Memory System the scenario uses a Moveable Heap Allocator for reduced Fragmentation.
+//------------
+
+#if USE_MEM_SYS
 #define USE_MOVEABLE_HEAP 1
+#endif
 
 class MoveableHeap;
 class ResourceLoadingScenario : public IScenario
@@ -51,7 +61,7 @@ public:
 	
 	~ResourceLoadingScenario() {}
 
-	// Functions
+	// IScenario Interface
 	void Initialise() override;
 	void Run() override;
 	void Reset() override;
@@ -87,10 +97,11 @@ private:
 		char* m_pData;
 #endif
 	};
-	
-	void RunBootType();
 
+	// Run Types
+	void RunBootType();
 	void RunGameplayType();
+	
 	// Used by Both
 	void LoadResource(size_t a_size);
 	// Gameplay Only

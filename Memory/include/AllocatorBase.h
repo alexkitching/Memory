@@ -3,6 +3,12 @@
 #include "Types.h"
 #include "Platform.h"
 
+//------------
+// Description
+//--------------
+// Base Allocator Class containing main allocate/deallocate interface for all allocators.
+//------------
+
 class AllocatorBase
 {
 public:
@@ -14,9 +20,11 @@ public:
 	AllocatorBase(const AllocatorBase&) = delete;
 	AllocatorBase& operator=(const AllocatorBase&) = delete;
 
+	// Primary Allocator Interface
 	virtual void* allocate(size_t a_size, uint8 a_alignment = DEFAULT_ALIGNMENT) = 0;
 	virtual void deallocate(void* a_pBlock) = 0;
 
+	// Properties
 	void* GetStartAddress() const { return m_pStart;  }
 	size_t GetCapacity() const { return m_capacity;  }
 
@@ -26,7 +34,7 @@ public:
 #endif
 protected:
 
-	virtual inline bool CapacityWouldExceed(size_t a_size) const;
+	virtual inline bool CapacityWouldExceed(size_t a_size) const final;
 	
 	void* m_pStart;
 	size_t m_capacity;
