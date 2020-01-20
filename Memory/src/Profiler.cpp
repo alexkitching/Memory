@@ -1,7 +1,7 @@
 #include "Profiler.h"
 
-#define OVERHEAD_START RecordCurrentStackTimes(); BeginOverheadTimer
-#define OVERHEAD_END StopOverheadTimer(); ResetCurrentStackTimes
+#define OVERHEAD_START s_pInstance->RecordCurrentStackTimes(); s_pInstance->BeginOverheadTimer
+#define OVERHEAD_END s_pInstance->StopOverheadTimer(); s_pInstance->ResetCurrentStackTimes
 
 Profiler* Profiler::s_pInstance = nullptr;
  
@@ -20,11 +20,12 @@ void Profiler::Shutdown()
 void Profiler::BeginSample(const char* a_pName)
 {
 	ASSERT(s_pInstance != nullptr);
-	
 	if (s_pInstance->IsRecording() == false)
 		return;
 	
+	OVERHEAD_START();
 	s_pInstance->BeginSampleInternal(a_pName);
+	OVERHEAD_END();
 }
 
 void Profiler::EndSample()
@@ -33,8 +34,10 @@ void Profiler::EndSample()
 
 	if (s_pInstance->IsRecording() == false)
 		return;
-	
+
+	OVERHEAD_START();
 	s_pInstance->EndSampleInternal();
+	OVERHEAD_END();
 }
 
 void Profiler::OnFrameStart()
@@ -80,9 +83,7 @@ m_OverheadTime(0.f)
 }
 
 void Profiler::BeginSampleInternal(const char* a_pName)
-{
-	OVERHEAD_START();
-	
+{	
 	if(m_vOldScopeStack.empty() == false) // Previous Scope Exists
 	{
 		// Get Top
@@ -93,7 +94,6 @@ void Profiler::BeginSampleInternal(const char* a_pName)
 			m_vCurrentScope.push_back(*pTop);
 			m_vOldScopeStack.pop_back();
 
-			OVERHEAD_END();
 			return;
 		}
 
@@ -133,14 +133,11 @@ void Profiler::BeginSampleInternal(const char* a_pName)
 	
 	// Push New Scope
 	m_vCurrentScope.emplace_back(a_pName, static_cast<int>(m_vCurrentScope.size()));
-	
-	OVERHEAD_END();
 }
 
 void Profiler::EndSampleInternal()
 {
 	ASSERT(m_vCurrentScope.empty() == false && "No Samples Started!");
-	OVERHEAD_START();
 
 	// Get Current Scope
 	SampleScope* pCurrent = &m_vCurrentScope.back();
@@ -187,8 +184,6 @@ void Profiler::EndSampleInternal()
 	}
 	
 	m_vCurrentScope.pop_back();
-	
-	OVERHEAD_END();
 }
 
 void Profiler::OnFrameStartInternal()
@@ -243,18 +238,20 @@ void Profiler::StopOverheadTimer()
 
 void Profiler::RecordCurrentStackTimes()
 {
+	std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now();
 	const unsigned int Count = static_cast<unsigned int>(m_vCurrentScope.size());
 	for(unsigned int i = 0; i < Count; ++i)
 	{
-		m_vCurrentScope[i].RecordTimer();
+		m_vCurrentScope[i].RecordTimer(now);
 	}
 }
 
 void Profiler::ResetCurrentStackTimes()
 {
+	std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now();
 	const unsigned int Count = static_cast<unsigned int>(m_vCurrentScope.size());
 	for (unsigned int i = 0; i < Count; ++i)
 	{
-		m_vCurrentScope[i].ResetTimer();
+		m_vCurrentScope[i].ResetTimer(now);
 	}
 }

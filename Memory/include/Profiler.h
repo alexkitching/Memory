@@ -99,14 +99,14 @@ private:
 		{
 		}
 
-		inline void ResetTimer()
+		inline void ResetTimer(const std::chrono::high_resolution_clock::time_point& a_currentTime)
 		{
-			Sample.StartTime = std::chrono::high_resolution_clock::now();
+			Sample.StartTime = a_currentTime;
 		}
 
-		inline void RecordTimer()
+		inline void RecordTimer(const std::chrono::high_resolution_clock::time_point& a_currentTime)
 		{
-			const std::chrono::duration<float> duration = std::chrono::high_resolution_clock::now() - Sample.StartTime;
+			const std::chrono::duration<float> duration = a_currentTime - Sample.StartTime;
 			TimeTaken += duration.count();
 		}
 		
