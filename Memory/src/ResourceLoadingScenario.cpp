@@ -7,7 +7,9 @@
 ResourceLoadingScenario::Config ResourceLoadingScenario::Configuration = {};
 
 #if USE_MOVEABLE_HEAP
-MoveableHeap* ResourceLoadingScenario::DummyResource::s_pMoveableHeap = nullptr;
+MoveableHeap* ResourceLoadingScenario::DummyResource::s_pHeap = nullptr;
+#else
+Heap* ResourceLoadingScenario::DummyResource::s_pHeap = nullptr;
 #endif
 
 void ResourceLoadingScenario::Run()
@@ -34,8 +36,9 @@ void ResourceLoadingScenario::Run()
 void ResourceLoadingScenario::Initialise()
 {
 	m_IntervalTimer.Start();
-#if USE_MEM_SYS && USE_MOVEABLE_HEAP
-	if(DummyResource::s_pMoveableHeap == nullptr)
+#if USE_MEM_SYS
+#if USE_MOVEABLE_HEAP
+	if(DummyResource::s_pHeap == nullptr)
 	{
 		MoveableHeap::Config config;
 		config.Name = "Moveable Resource Heap";
@@ -51,8 +54,28 @@ void ResourceLoadingScenario::Initialise()
 		}
 
 		config.Capacity = capacity + 6 * MB;
-		DummyResource::s_pMoveableHeap = MemoryManager::CreateMoveableHeap(config, MemoryManager::GetDefaultHeap());
+		DummyResource::s_pHeap = MemoryManager::CreateMoveableHeap(config, MemoryManager::GetDefaultHeap());
 	}
+#else
+	if(DummyResource::s_pHeap == nullptr)
+	{
+		Heap::Config config{};
+		config.Name = "Resource Heap";
+		size_t capacity;
+
+		if (m_CurrentType == Type::Bootup)
+		{
+			capacity = Configuration.Bootup.TotalSizeToLoad;
+		}
+		else
+		{
+			capacity = Configuration.Gameplay.AllocatedResourceCap;
+		}
+
+		config.Capacity = capacity + 6 * MB;
+		DummyResource::s_pHeap = MemoryManager::CreateHeap(config, MemoryManager::GetDefaultHeap());
+	}
+#endif
 #endif
 }
 
@@ -72,12 +95,10 @@ void ResourceLoadingScenario::Reset()
 
 	m_LoadedResources.clear();
 	m_CurrentTotalLoadedSize = 0u;
-
-#if USE_MEM_SYS && USE_MOVEABLE_HEAP
-	MemoryManager::ReleaseHeap(DummyResource::s_pMoveableHeap);
-	DummyResource::s_pMoveableHeap = nullptr;
+#if USE_MEM_SYS
+	MemoryManager::ReleaseHeap(DummyResource::s_pHeap);
+	DummyResource::s_pHeap = nullptr;
 #endif
-	
 	PROFILER_END_SAMPLE();
 }
 
@@ -85,8 +106,9 @@ ResourceLoadingScenario::DummyResource::DummyResource(size_t a_size) :
 	m_Size(a_size),
 	m_pData(nullptr)
 {
+#if USE_MEM_SYS
 #if USE_MOVEABLE_HEAP
-	m_pData = s_pMoveableHeap->allocate<char>(a_size);
+	m_pData = s_pHeap->allocate<char>(a_size);
 
 	if(m_pData.IsNull())
 	{
@@ -99,6 +121,9 @@ ResourceLoadingScenario::DummyResource::DummyResource(size_t a_size) :
 
 		std::memcpy(m_pData.Get(), str, size);
 	}
+#else
+	m_pData = static_cast<char*>(s_pHeap->allocate(a_size));
+#endif
 #else
 	m_pData = new char[a_size];
 #endif

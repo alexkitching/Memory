@@ -14,7 +14,7 @@
 //------------
 
 #if USE_MEM_SYS
-#define USE_MOVEABLE_HEAP 1
+#define USE_MOVEABLE_HEAP 0
 #endif
 
 class MoveableHeap;
@@ -87,7 +87,9 @@ private:
 		size_t GetSize() override { return m_Size; }
 
 #if USE_MOVEABLE_HEAP
-		static MoveableHeap* s_pMoveableHeap;
+		static MoveableHeap* s_pHeap;
+#else
+		static Heap* s_pHeap;
 #endif
 	private:
 		size_t m_Size;

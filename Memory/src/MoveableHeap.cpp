@@ -117,14 +117,6 @@ void* MoveableHeap::allocate(size_t a_size, uint8 a_alignment)
 {
 	MoveableAllocationHeader* pHeader = (MoveableAllocationHeader*)TryAllocate(a_size, a_alignment);
 
-	int breakHere = 0;
-	if(pHeader == (MoveableAllocationHeader*)m_pTailAlloc)
-	{
-		breakHere++;
-	}
-
-	int breakHERE = breakHere;
-
 	if (pHeader == nullptr)
 		return nullptr;
 

@@ -16,11 +16,11 @@ Heap::~Heap()
 void* Heap::allocate(size_t a_size, uint8 a_alignment)
 {
 	BaseAllocationHeader* pHeader = TryAllocate(a_size, a_alignment);
-	pHeader->Sig = HEAP_ALLOC_SIG; // Set Unique Sig
-
 	
 	if (pHeader == nullptr)
 		return nullptr;
+
+	pHeader->Sig = HEAP_ALLOC_SIG; // Set Unique Sig
 
 #if DEBUG // Additional Safety Checks
 	if(pHeader->pNext != nullptr)
@@ -65,10 +65,20 @@ void Heap::deallocate(void* a_pBlock)
 	ASSERT(*pEndMark == MEM_END && "Missing End Mark, Corrupt Allocation?");
 
 	// Head------->Tail
-	if (pHeader->pPrev == nullptr) // Must be Head 
+	if (pHeader->pPrev == nullptr &&
+		pHeader->pNext == nullptr)
+	{
+		m_pHeadAlloc = nullptr;
+		m_pTailAlloc = nullptr;
+	}
+	else if (pHeader->pPrev == nullptr) // Must be Head 
 	{
 		ASSERT(pHeader == m_pHeadAlloc && "Expected Header to be Head Allocation");
 		m_pHeadAlloc = pHeader->pNext; // Update New Head
+		if (m_pHeadAlloc == m_pTailAlloc) // Head is now Tail
+		{
+			m_pTailAlloc = nullptr;
+		}
 		m_pHeadAlloc->pPrev = nullptr;
 	}
 	else if (pHeader->pNext == nullptr)
