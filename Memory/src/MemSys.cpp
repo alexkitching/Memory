@@ -52,6 +52,8 @@ void operator delete(void* a_pPtr)
 	{
 		const auto pGlobalHeader = (MemoryManager::GlobalAllocationHeader*)((char*)a_pPtr -
 			sizeof(MemoryManager::GlobalAllocationHeader));
+
+		const auto pDefaultHeader = (HeapBase::BaseAllocationHeader*)((char*)a_pPtr - sizeof(HeapBase::BaseAllocationHeader));
 		
 		if(pGlobalHeader->AllocTypeSig == HEAP_ALLOC_SIG)
 		{

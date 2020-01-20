@@ -83,7 +83,7 @@ void Heap::deallocate(void* a_pBlock)
 	}
 	else if (pHeader->pNext == nullptr)
 	{
-		ASSERT(pHeader == m_pTailAlloc && "Expected Header to be Head Allocation");
+		ASSERT(pHeader == m_pTailAlloc && "Expected Header to be Tail Allocation");
 		m_pTailAlloc = pHeader->pPrev;
 		m_pTailAlloc->pNext = nullptr;
 	}
