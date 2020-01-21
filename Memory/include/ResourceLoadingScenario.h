@@ -14,7 +14,7 @@
 //------------
 
 #if USE_MEM_SYS
-#define USE_MOVEABLE_HEAP 0
+#define USE_MOVEABLE_HEAP 1
 #endif
 
 class MoveableHeap;

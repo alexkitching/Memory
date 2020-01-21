@@ -1,7 +1,7 @@
 #include "HeapBase.h"
-#include <string.h>
 #include "Debug.h"
 #include "PointerMath.h"
+#include <cstring>
 
 #define HEAP_ALLOC_HEADER_FOOTER_SIZE (GetAllocHeaderSize() + sizeof(HeapBase::HeapSignature))
 
@@ -9,15 +9,15 @@ constexpr const char* kInvalidName = "Invalid";
 
 HeapBase::HeapBase()
 	:
+	m_pHeadAlloc(nullptr),
+	m_pTailAlloc(nullptr),
 	m_pParent(nullptr),
 	m_pChild(nullptr),
 	m_pNextSibling(nullptr),
 	m_pPreviousSibling(nullptr),
 	m_Name{  },
 	m_bActive(false),
-	m_bFavourBestFit(true),
-	m_pHeadAlloc(nullptr),
-	m_pTailAlloc(nullptr)
+	m_bFavourBestFit(true)
 {
 	strcpy_s(m_Name, HEAP_MAX_NAME_LEN, kInvalidName);
 }
@@ -98,12 +98,13 @@ float HeapBase::CalculateFragmentation() const
 		return 0.f;
 	}
 
+	// Identify Largest Free Block of Memory Size 
 	size_t largestFreeBlock = 0u;
 	size_t blockSize;
 
 	char* pStart = (char*)m_pStart;
 	char* pEnd = (char*)m_pHeadAlloc;
-	if (m_pStart != m_pHeadAlloc)
+	if (m_pStart != m_pHeadAlloc) // Gap Between Start - Head Alloc
 	{
 		blockSize = pEnd - pStart;
 		if (blockSize > largestFreeBlock)
@@ -121,15 +122,6 @@ float HeapBase::CalculateFragmentation() const
 
 		// Calculate Gap Size
 		blockSize = pEnd - pStart;
-
-		uintptr startIntPtr = (uintptr)pStart;
-		uintptr endIntPtr = (uintptr)pEnd;
-
-		if (pEnd < pStart)
-		{
-			LOG("Oops");
-		}
-
 
 		if (blockSize > largestFreeBlock)
 		{
@@ -152,14 +144,9 @@ float HeapBase::CalculateFragmentation() const
 	}
 
 	const size_t freeSize = m_capacity - m_usedSize;
+	const size_t freeMinLargest = freeSize - largestFreeBlock;
 
-	size_t freeMinLargest = freeSize - largestFreeBlock;
-
-	float div = (float)freeMinLargest / (float)freeSize;
-
-	div *= 100;
-
-	return div;
+	return ((float)freeMinLargest / (float)freeSize) * 100;
 }
 
 HeapBase::BaseAllocationHeader* HeapBase::TryAllocate(size_t a_size, uint8 a_alignment)
@@ -171,6 +158,11 @@ HeapBase::BaseAllocationHeader* HeapBase::TryAllocate(size_t a_size, uint8 a_ali
 		BaseAllocationHeader* as_header;
 	};
 
+	if (CapacityWouldExceed(a_size + HEAP_ALLOC_HEADER_FOOTER_SIZE)) // Ensure Capacity
+	{
+		return nullptr;
+	}
+
 	if (m_pHeadAlloc == nullptr)
 	{
 		// Set Start
@@ -179,11 +171,6 @@ HeapBase::BaseAllocationHeader* HeapBase::TryAllocate(size_t a_size, uint8 a_ali
 		const uint8 adjustment = PointerMath::AlignForwardAdjustment(as_voidPtr, a_alignment);  // Align Memory Block
 		as_intptr -= GetAllocHeaderSize() - adjustment; // Get Header
 
-		if (CapacityWouldExceed(a_size + HEAP_ALLOC_HEADER_FOOTER_SIZE)) // Ensure Capacity
-		{
-			return nullptr;
-		}
-		
 		as_header->pHeap = this;
 		as_header->Size = a_size;
 		as_header->pNext = nullptr;
@@ -202,11 +189,6 @@ HeapBase::BaseAllocationHeader* HeapBase::TryAllocate(size_t a_size, uint8 a_ali
 		as_intptr += GetAllocHeaderSize(); // Get Block Start
 		const uint8 adjustment = PointerMath::AlignForwardAdjustment(as_voidPtr, a_alignment); // Align Memory Block
 		as_intptr -= (GetAllocHeaderSize() - adjustment); // Get Header
-
-		if (CapacityWouldExceed(a_size + HEAP_ALLOC_HEADER_FOOTER_SIZE)) // Ensure Capacity
-		{
-			return nullptr;
-		}
 
 		as_header->pHeap = this;
 		as_header->Size = a_size;
@@ -253,7 +235,7 @@ HeapBase::BaseAllocationHeader* HeapBase::TryAllocate(size_t a_size, uint8 a_ali
 	as_header->pPrev = pPrevClosestAlloc;
 	as_header->pNext = nullptr;
 
-	if (pPrevClosestAlloc != nullptr)
+	if (pPrevClosestAlloc != nullptr) // We are allocating in front of a previous allocation
 	{
 		ASSERT((char*)pPrevClosestAlloc + HEAP_ALLOC_HEADER_FOOTER_SIZE + (uint8)pPrevClosestAlloc->Size <= (char*)as_header);
 		if (pPrevClosestAlloc->pNext == nullptr) // Should Be Tail Alloc
@@ -326,7 +308,7 @@ HeapBase::BaseAllocationHeader* HeapBase::TryAllocateBestFit(size_t a_size, uint
 		const uint8 adjustment = PointerMath::AlignForwardAdjustment(pStart, a_alignment);  // Align Memory Block
 		pStart -= headerSize - adjustment; // Get Header
 
-		if (pStart <= pEnd)
+		if (pStart < pEnd)
 		{
 			// Calculate Gap Size
 			GapSize = pEnd - pStart;
@@ -411,7 +393,7 @@ HeapBase::BaseAllocationHeader* HeapBase::TryAllocateFirstFit(size_t a_size, uin
 		const uint8 adjustment = PointerMath::AlignForwardAdjustment(pStart, a_alignment);  // Align Memory Block
 		pStart -= headerSize - adjustment; // Get Header
 
-		if (pStart <= pEnd)
+		if (pStart < pEnd)
 		{
 			// Calculate Gap Size
 			GapSize = pEnd - pStart;

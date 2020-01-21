@@ -53,7 +53,7 @@ void IMGUIInterface::Initialise(Window* a_pWindow)
 	m_bInitialised = true;
 }
 
-void IMGUIInterface::BeginGUIFrame()
+void IMGUIInterface::BeginGUIFrame() const
 {
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
@@ -67,7 +67,7 @@ void IMGUIInterface::BeginGUIFrame()
 
 	for(unsigned int i = 0; i < Keyboard::s_kNumKeys; ++i)
 	{
-		bool bPressed = m_pWindow->GetKeyboard.KeyPressed((WinKeyCode)i);
+		const bool bPressed = m_pWindow->GetKeyboard.KeyPressed((WinKeyCode)i);
 		
 		io.KeysDown[i] = bPressed;
 	}
@@ -75,46 +75,26 @@ void IMGUIInterface::BeginGUIFrame()
 	io.AddInputCharacter(m_pWindow->GetKeyboard.ReadChar());
 }
 
-char buf[256];
-int counter;
-
-void IMGUIInterface::Test()
-{
-	ImGui::Begin("Hello, world!");
-
-	ImGui::Text("This is some useful text.");
-
-	if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-		counter++;
-	
-	ImGui::SameLine();
-	ImGui::Text("counter = %d", counter);
-
-	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-
-	
-	
-	ImGui::InputText("Input Text:", buf, sizeof(buf));
-	
-	ImGui::End();
-}
-
 void IMGUIInterface::RenderGUIFrame()
 {
 	ImGui::Render();
+
+	// Swap Render Targets
 	ID3D11RenderTargetView* pOldRT;
 	ID3D11DepthStencilView* pOldDS;
 	m_pWindow->GetRenderer().GetContext()->OMGetRenderTargets(1, &pOldRT, &pOldDS);
 	m_pWindow->GetRenderer().GetContext()->OMSetRenderTargets(1, m_pDXRenderTarget.GetAddressOf(), NULL);
 
+	// Render to Target
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
+	// Swap Render Target Back
 	m_pWindow->GetRenderer().GetContext()->OMSetRenderTargets(1, &pOldRT, pOldDS);
 }
 
 bool IMGUIInterface::Button(const char* a_pName, bool a_bEnabled) const
 {
-	if(a_bEnabled == false)
+	if(a_bEnabled == false) // Disabled
 	{
 		ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);

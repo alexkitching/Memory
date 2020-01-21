@@ -18,7 +18,6 @@ public:
 		void* a_pStart);
 	virtual~PoolAllocator() {}
 
-	
 	PoolAllocator(const PoolAllocator&);
 	PoolAllocator& operator=(const PoolAllocator&) = delete;
 

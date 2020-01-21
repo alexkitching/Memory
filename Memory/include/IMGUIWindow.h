@@ -27,7 +27,7 @@ protected:
 
 	bool m_bOpen;
 
-	void DrawQuad(const IMGUIQuad& a_quad);
+	static void DrawQuad(const IMGUIQuad& a_quad);
 private:
 	
 	bool m_bClosable; // Can this window be closed?

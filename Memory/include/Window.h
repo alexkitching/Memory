@@ -75,7 +75,7 @@ public:
 	Keyboard& GetKeyboard;
 	Mouse& GetMouse;
 	
-	D3DRenderer& GetRenderer();
+	D3DRenderer& GetRenderer() const;
 	IMGUIInterface& GetIMGUI();
 	
 	std::string GetName() const { return m_name; }

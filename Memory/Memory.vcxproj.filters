@@ -413,6 +413,9 @@
     <ClInclude Include="include\Delegate.h">
       <Filter>Header Files\EventSystem</Filter>
     </ClInclude>
+    <ClInclude Include="include\D3DCube.h">
+      <Filter>Header Files\Graphics\D3D</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Memory.rc">

@@ -15,6 +15,7 @@ m_bIsInWindow(false)
 
 Mouse::Event Mouse::ReadEvent()
 {
+	// Read Mouse Event from Buffer
 	if(m_EventBuffer.empty() == false)
 	{
 		const Mouse::Event event = m_EventBuffer.front();

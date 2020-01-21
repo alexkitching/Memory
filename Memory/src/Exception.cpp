@@ -12,6 +12,7 @@ m_file(a_File)
 	}
 }
 
+// Format Asset Info into Buffer
 const char* Exception::what() const
 {
 	std::ostringstream oss;

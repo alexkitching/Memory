@@ -29,7 +29,7 @@ void* StackAllocator::allocate(size_t a_size, uint8 a_alignment)
 	const uint8 adjustment = PointerMath::AlignForwardAdjustment(as_voidPtr, a_alignment);
 	as_intptr -= (sizeof(AllocationHeader) - adjustment);
 
-	if (m_usedSize + a_size + adjustment + sizeof(AllocationHeader) > m_capacity)
+	if(CapacityWouldExceed(a_size + adjustment + sizeof(AllocationHeader)))
 	{
 		return nullptr;
 	}

@@ -71,7 +71,7 @@ private:
 		{TEXT(VertexDataProcessing)}
 	};
 
-	inline IScenario* GetScenario(ScenarioType a_type);
+	inline IScenario* GetScenario(ScenarioType a_type) const;
 
 	// Memory Scenarios
 	struct

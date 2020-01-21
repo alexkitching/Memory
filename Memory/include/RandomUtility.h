@@ -6,6 +6,7 @@
 // Description
 //--------------
 // Random Utility Class used for Generating Random Integers/Bools/Floats with/without a seed
+// Used Seed for Dev purposes, memory allocation patterns in scenarios would be the same each run.
 //------------
 
 class Random

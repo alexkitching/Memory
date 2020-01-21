@@ -11,16 +11,11 @@ m_bScenarioActive{false},
 m_ActiveIsolatedScenario(ScenarioType::Invalid),
 m_pScenarioManager(a_pScenarioManager)
 {
+	// Subscribe to Scenario Start/Stop Events
 	m_pScenarioManager->OnScenarioStarted.AddListener<ScenarioWindow, &ScenarioWindow::OnScenarioStarted>(this);
 	m_pScenarioManager->OnScenarioStopped.AddListener<ScenarioWindow, &ScenarioWindow::OnScenarioFinished>(this);
 	m_pScenarioManager->OnScenarioComplete.AddListener<ScenarioWindow, &ScenarioWindow::OnScenarioFinished>(this);
 }
-
-ScenarioWindow::~ScenarioWindow()
-{
-
-}
-
 
 void ScenarioWindow::OnGUIWindow(const IMGUIInterface& a_gui)
 {
@@ -40,7 +35,7 @@ void ScenarioWindow::OnGUIWindow(const IMGUIInterface& a_gui)
 
 void ScenarioWindow::OnScenarioStarted(ScenarioType a_type)
 {
-	if(a_type == ScenarioType::ResourceLoadingBootup)
+	if(a_type == ScenarioType::ResourceLoadingBootup) 
 	{
 		m_ActiveIsolatedScenario = a_type;
 	}

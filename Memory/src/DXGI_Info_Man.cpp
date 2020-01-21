@@ -3,8 +3,6 @@
 #include "Window.h"
 #include "D3D.h"
 
-
-
 #pragma comment(lib, "dxguid.lib")
 
 DXGIInfoManager* g_pInfoMan = nullptr;
@@ -31,7 +29,7 @@ DXGIInfoManager::DXGIInfoManager()
 		throw WND_Last_Except();
 	}
 
-	// Call the function to get the interface
+	// Call the function to get the interface to Info Queue
 #if DEBUG
 	HRESULT hr;
 #endif
@@ -59,7 +57,7 @@ void DXGIInfoManager::Shutdown()
 	delete g_pInfoMan;
 }
 
-void DXGIInfoManager::Set()
+void DXGIInfoManager::Set() // Info Queue is never cleared so we keep bumping the next message index
 {
 	// Set the index of next index
 	m_next = m_pDXGI_InfoQueue->GetNumStoredMessages(DXGI_DEBUG_ALL);

@@ -2,6 +2,11 @@
 #include "Profiler.h"
 #include <d3dcompiler.h>
 
+
+Microsoft::WRL::ComPtr<ID3D11Buffer> Cube::s_pVertexBuffer = nullptr;
+Microsoft::WRL::ComPtr<ID3D11Buffer> Cube::s_pIndexBuffer = nullptr;
+
+
 D3DRenderer::D3DRenderer(HWND a_hwnd)
 	:
 m_pDevice(nullptr),
@@ -100,7 +105,10 @@ m_pRenderTarget(nullptr)
 
 	// Bind Depth Stencil View to Output Merger
 	D3D_THROW_INFO(m_pContext->OMSetRenderTargets(1u, m_pRenderTarget.GetAddressOf(), m_pDepthStencilView.Get()));
+
 	
+	CreateShaders();
+	CreateCubeBuffers();
 }
 
 void D3DRenderer::EndFrame()
@@ -108,9 +116,9 @@ void D3DRenderer::EndFrame()
 	PROFILER_BEGIN_SAMPLE(D3DRenderer::EndFrame());
 	HRESULT hr = m_pSwapChain->Present(1u, 0u); // 1u - 60fps 2u - 30fps
 
-	if(FAILED(hr))
+	if(FAILED(hr)) // Present Failed
 	{
-		if(hr == DXGI_ERROR_DEVICE_REMOVED)
+		if(hr == DXGI_ERROR_DEVICE_REMOVED) // Device Remove - Get Actual Reason
 		{
 			D3D_THROW_DEVICE_REMOVED_EXCEPT(m_pDevice->GetDeviceRemovedReason());
 		}
@@ -125,41 +133,56 @@ void D3DRenderer::EndFrame()
 
 void D3DRenderer::Clear(float a_r, float a_g, float a_b)
 {
+	// Clear Render Targets
 	const float color[] = { a_r, a_g, a_b, 1.f };
 	m_pContext->ClearRenderTargetView(m_pRenderTarget.Get(), color);
 	m_pContext->ClearDepthStencilView(m_pDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.f, 0u);
 }
 
-void D3DRenderer::DrawCube(float a_x, float a_y, float a_z, float a_scale, float a_angle)
+void D3DRenderer::CreateShaders()
 {
-	PROFILER_BEGIN_SAMPLE(D3DRenderer::DrawCube);
-	struct Vertex
+#if DEBUG
+	HRESULT hr;
+#endif
+	Microsoft::WRL::ComPtr<ID3DBlob> pBlob;
+
+	// Create Pixel Shader
+	D3D_THROW_FAILED(D3DReadFileToBlob(L"PixelShader.cso", &pBlob));
+	D3D_THROW_FAILED(m_pDevice->CreatePixelShader(
+		pBlob->GetBufferPointer(),
+		pBlob->GetBufferSize(),
+		nullptr,
+		&m_pPixelShader));
+
+	// Create Vertex Shader
+	D3D_THROW_FAILED(D3DReadFileToBlob(L"VertexShader.cso", &pBlob));
+	D3D_THROW_FAILED(m_pDevice->CreateVertexShader(
+		pBlob->GetBufferPointer(),
+		pBlob->GetBufferSize(),
+		nullptr,
+		&m_pVertexShader));
+
+	// Create Input Layout for Vertex Shader
+	const D3D11_INPUT_ELEMENT_DESC ied[] =
 	{
-		struct
-		{
-			float x;
-			float y;
-			float z;
-		}Pos;
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
 
-	// Create Vertex Buffer for 1D Triangle
-	Vertex vertices[] =
-	{
-		{-1.f, -1.f, -1.f},
-		{1.f, -1.f, -1.f},
-		{-1.f, 1.f, -1.f},
-		{1.f, 1.f, -1.f},
-		{-1.f, -1.f, 1.f},
-		{1.f, -1.f, 1.f},
-		{-1.f, 1.f, 1.f},
-		{1.f, 1.f, 1.f},
-	};
+	D3D_THROW_FAILED(m_pDevice->CreateInputLayout(
+		ied,
+		(UINT)std::size(ied),
+		pBlob->GetBufferPointer(),
+		pBlob->GetBufferSize(),
+		&m_pVertexInputLayout));
+	
+}
 
-	Microsoft::WRL::ComPtr<ID3D11Buffer> pVertexBuffer;
+void D3DRenderer::CreateCubeBuffers()
+{
+	// Create Vertex Buffer
 	D3D11_BUFFER_DESC bd =
 	{
-		sizeof(vertices),
+		sizeof(Cube::s_kVertices),
 		D3D11_USAGE_DEFAULT,
 		D3D11_BIND_VERTEX_BUFFER,
 		0u,
@@ -169,7 +192,7 @@ void D3DRenderer::DrawCube(float a_x, float a_y, float a_z, float a_scale, float
 
 	D3D11_SUBRESOURCE_DATA srd =
 	{
-		vertices,
+		Cube::s_kVertices,
 		0u,
 		0u
 	};
@@ -178,29 +201,12 @@ void D3DRenderer::DrawCube(float a_x, float a_y, float a_z, float a_scale, float
 #if DEBUG
 	HRESULT hr;
 #endif
-	D3D_THROW_FAILED(m_pDevice->CreateBuffer(&bd, &srd, &pVertexBuffer));
-
-
-	// Bind Vertex Buffer to Pipeline
-	UINT stride = sizeof(Vertex);
-	UINT offset = 0u;
-	D3D_THROW_INFO(m_pContext->IASetVertexBuffers(0u, 1u, pVertexBuffer.GetAddressOf(), &stride, &offset));
+	D3D_THROW_FAILED(m_pDevice->CreateBuffer(&bd, &srd, &Cube::s_pVertexBuffer));
 
 	// Create Index Buffer
-	const unsigned short indices[] =
-	{
-		0,2,1, 2,3,1,
-		1,3,5, 3,7,5,
-		2,6,3, 3,6,7,
-		4,5,7, 4,7,6,
-		0,4,2, 2,4,6,
-		0,1,4, 1,5,4
-	};
-
-	Microsoft::WRL::ComPtr<ID3D11Buffer> pIndexBuffer;
 	D3D11_BUFFER_DESC idb =
 	{
-		sizeof(indices),
+		sizeof(Cube::s_kIndices),
 		D3D11_USAGE_DEFAULT,
 		D3D11_BIND_INDEX_BUFFER,
 		0u,
@@ -210,16 +216,33 @@ void D3DRenderer::DrawCube(float a_x, float a_y, float a_z, float a_scale, float
 
 	D3D11_SUBRESOURCE_DATA isd =
 	{
-		indices,
+		Cube::s_kIndices,
 		0u,
 		0u
 	};
 
-	D3D_THROW_FAILED(m_pDevice->CreateBuffer(&idb, &isd, &pIndexBuffer));
+	D3D_THROW_FAILED(m_pDevice->CreateBuffer(&idb, &isd, &Cube::s_pIndexBuffer));
+}
 
+
+void D3DRenderer::DrawCube(float a_x, float a_y, float a_z, float a_scale, float a_angle)
+{
+	PROFILER_BEGIN_SAMPLE(D3DRenderer::DrawCube);
+
+#if DEBUG
+	HRESULT hr;
+#endif
+
+	PROFILER_BEGIN_SAMPLE(D3DRenderer::SetVertexBuffers);
+	// Bind Vertex Buffer to Pipeline
+	UINT stride = sizeof(Vertex);
+	UINT offset = 0u;
+	D3D_THROW_INFO(m_pContext->IASetVertexBuffers(0u, 1u, Cube::s_pVertexBuffer.GetAddressOf(), &stride, &offset));
+	PROFILER_END_SAMPLE();
+	PROFILER_BEGIN_SAMPLE(D3DRenderer::SetIndexBuffer);
 	// Bind Index Buffer to Pipeline
-	D3D_THROW_INFO(m_pContext->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0u));
-
+	D3D_THROW_INFO(m_pContext->IASetIndexBuffer(Cube::s_pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0u));
+	PROFILER_END_SAMPLE();
 
 	// Constant Buffer for Transformation Matrix
 	struct VSConstantBuffer
@@ -243,7 +266,7 @@ void D3DRenderer::DrawCube(float a_x, float a_y, float a_z, float a_scale, float
 	};
 
 	// Create Buffer
-
+	PROFILER_BEGIN_SAMPLE(D3DRenderer::VSCreate/SetConstantBuffers);
 	Microsoft::WRL::ComPtr<ID3D11Buffer> pVSConstantBuffer;
 	D3D11_BUFFER_DESC vscbd =
 	{
@@ -266,6 +289,8 @@ void D3DRenderer::DrawCube(float a_x, float a_y, float a_z, float a_scale, float
 
 	// Bind Buffer to Vertex Shader
 	D3D_THROW_INFO(m_pContext->VSSetConstantBuffers(0u, 1u, pVSConstantBuffer.GetAddressOf()));
+
+	PROFILER_END_SAMPLE();
 
 	struct PSConstantBuffer
 	{
@@ -292,6 +317,8 @@ void D3DRenderer::DrawCube(float a_x, float a_y, float a_z, float a_scale, float
 
 	// Create Buffer
 
+	PROFILER_BEGIN_SAMPLE(D3DRenderer::PSCreate / SetConstantBuffers);
+
 	Microsoft::WRL::ComPtr<ID3D11Buffer> pPSConstantBuffer;
 	D3D11_BUFFER_DESC pscbd =
 	{
@@ -314,49 +341,25 @@ void D3DRenderer::DrawCube(float a_x, float a_y, float a_z, float a_scale, float
 
 	D3D_THROW_INFO(m_pContext->PSSetConstantBuffers(0u, 1u, pPSConstantBuffer.GetAddressOf()));
 
-	// Create Pixel Shader
-	Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShader;
-	Microsoft::WRL::ComPtr<ID3DBlob> pBlob;
-	D3D_THROW_FAILED(D3DReadFileToBlob(L"PixelShader.cso", &pBlob));
-	D3D_THROW_FAILED(m_pDevice->CreatePixelShader(
-		pBlob->GetBufferPointer(),
-		pBlob->GetBufferSize(),
-		nullptr,
-		&pPixelShader));
+	PROFILER_END_SAMPLE();
 
+
+	PROFILER_BEGIN_SAMPLE(D3DRenderer::BindShaders);
 	// Bind Pixel Shader
-	D3D_THROW_INFO(m_pContext->PSSetShader(pPixelShader.Get(), nullptr, 0u));
-
-	// Create Vertex Shader
-	Microsoft::WRL::ComPtr<ID3D11VertexShader> pVertexShader;
-	D3D_THROW_FAILED(D3DReadFileToBlob(L"VertexShader.cso", &pBlob));
-	D3D_THROW_FAILED(m_pDevice->CreateVertexShader(
-		pBlob->GetBufferPointer(),
-		pBlob->GetBufferSize(),
-		nullptr,
-		&pVertexShader));
+	D3D_THROW_INFO(m_pContext->PSSetShader(m_pPixelShader.Get(), nullptr, 0u));
 
 	// Bind Vertex Shader
-	D3D_THROW_INFO(m_pContext->VSSetShader(pVertexShader.Get(), nullptr, 0u));
+	D3D_THROW_INFO(m_pContext->VSSetShader(m_pVertexShader.Get(), nullptr, 0u));
 
-	// Input (Vertex) Layout
-	Microsoft::WRL::ComPtr<ID3D11InputLayout> pInputLayout;
-	const D3D11_INPUT_ELEMENT_DESC ied[] =
-	{
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}
-	};
+	PROFILER_END_SAMPLE();
 
-	D3D_THROW_FAILED(m_pDevice->CreateInputLayout(
-		ied,
-		(UINT)std::size(ied),
-		pBlob->GetBufferPointer(),
-		pBlob->GetBufferSize(),
-		&pInputLayout));
-
-	D3D_THROW_INFO(m_pContext->IASetInputLayout(pInputLayout.Get()));
+	PROFILER_BEGIN_SAMPLE(D3DRenderer::IASetLayout);
+	D3D_THROW_INFO(m_pContext->IASetInputLayout(m_pVertexInputLayout.Get()));
 	
 	// Set Primitive Topology to Triangle List
 	m_pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	PROFILER_END_SAMPLE();
 
 	// Config Viewport
 	D3D11_VIEWPORT vp =
@@ -372,6 +375,10 @@ void D3DRenderer::DrawCube(float a_x, float a_y, float a_z, float a_scale, float
 	// Set Viewports
 	D3D_THROW_INFO(m_pContext->RSSetViewports(1u, &vp));
 
-	D3D_THROW_INFO(m_pContext->DrawIndexed((UINT)std::size(indices), 0u, 0u));
+	PROFILER_BEGIN_SAMPLE(D3DRenderer::DrawIndexed);
+
+	D3D_THROW_INFO(m_pContext->DrawIndexed((UINT)std::size(Cube::s_kIndices), 0u, 0u));
+	PROFILER_END_SAMPLE();
+	
 	PROFILER_END_SAMPLE();
 }

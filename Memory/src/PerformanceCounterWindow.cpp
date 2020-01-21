@@ -19,6 +19,7 @@ PerformanceCounterWindow::~PerformanceCounterWindow()
 
 void PerformanceCounterWindow::OnGUIWindow(const IMGUIInterface& a_interface)
 {
+	// Draw Stats
 	ImGui::Text("FPS: %.1f", PerformanceCounter::FPS());
 	ImGui::Text("CPU Time: %.3f ms", 1000.f / PerformanceCounter::FPS());
 
@@ -29,6 +30,8 @@ void PerformanceCounterWindow::OnGUIWindow(const IMGUIInterface& a_interface)
 	ImGui::Text("Virtual Memory Usage: %.1f Mbs", PerformanceCounter::VirtualMemoryUsed());
 	ImGui::Text("Virtual Memory Capacity: %.1f Mbs", PerformanceCounter::VirtualMemoryTotal());
 	ImGui::Separator();
+
+	// Print Heap Stats
 	
 #if USE_MEM_SYS
 	RecursivePrintHeapStats(MemoryManager::GetDefaultHeap());
@@ -36,7 +39,7 @@ void PerformanceCounterWindow::OnGUIWindow(const IMGUIInterface& a_interface)
 	ImGui::Separator();
 #endif
 	
-	if(a_interface.Button("Toggle Profiler"))
+	if(a_interface.Button("Toggle Profiler")) 
 	{
 		if(m_pProfiler->IsOpen())
 		{
@@ -50,7 +53,7 @@ void PerformanceCounterWindow::OnGUIWindow(const IMGUIInterface& a_interface)
 	
 }
 
-void PerformanceCounterWindow::RecursivePrintHeapStats(const HeapBase* a_Heap) const
+void PerformanceCounterWindow::RecursivePrintHeapStats(const HeapBase* a_Heap)
 {
 	ImGui::Text("Heap:%s Usage: %.1f Mbs", a_Heap->GetName(), (float)((float)a_Heap->GetUsedMemory() / MB));
 	ImGui::Text("Heap:%s Fragmentation: %.1f %s", a_Heap->GetName(), a_Heap->CalculateFragmentation(), "%");

@@ -4,6 +4,7 @@
 #include "MemSys.h"
 #include "Platform.h"
 
+// Define Global Memory Size
 #ifdef x64
 constexpr size_t MM_GLOBAL_MEM_SIZE = (size_t)3 * GB;
 #else
@@ -15,7 +16,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPreviousInstance, LPSTR lpC
 {
 	try
 	{
-#if USE_MEM_SYS
+#if USE_MEM_SYS // Init Memory System Here to ensure no allocations until after 
 		MemoryManager::Initialise(MM_GLOBAL_MEM_SIZE);
 #endif
 	}

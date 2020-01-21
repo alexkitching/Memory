@@ -38,7 +38,6 @@ void MemoryApp::OnPreFrame()
 	// Call Base
 	WinApp::OnPreFrame();
 
-
 	if (s_bPaused)
 	{
 		PROFILER_END_SAMPLE();
@@ -62,16 +61,17 @@ void MemoryApp::OnFrame()
 	
 	WinApp::OnFrame();
 	
-	m_ScenarioManager.Update();
+	m_ScenarioManager.Update(); // Tick Scenarios
 	PROFILER_END_SAMPLE();
 }
 
 void MemoryApp::OnRenderFrame(IRenderer* a_pRenderer)
 {
 	PROFILER_BEGIN_SAMPLE(MemoryApp::OnRenderFrame);
-	WinApp::OnRenderFrame(a_pRenderer);
 	
 	m_ScenarioManager.OnRender(a_pRenderer);
+
+	WinApp::OnRenderFrame(a_pRenderer);
 	PROFILER_END_SAMPLE();
 }
 

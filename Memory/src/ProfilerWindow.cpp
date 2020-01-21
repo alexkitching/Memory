@@ -18,6 +18,7 @@ m_CurrentTab(Tab::FrameProfiler)
 
 void ProfilerWindow::Initialise()
 {
+	// Subscribe to Sample Recorded Event
 	Profiler::OnSampleRecorded()->AddListener<ProfilerWindow, &ProfilerWindow::OnSampleRecorded>(this);
 }
 
@@ -104,7 +105,7 @@ void ProfilerWindow::DrawHeapTab(const IMGUIInterface& a_gui)
 	{
 		ImGui::Text("No Data");
 	}
-	else
+	else // Draw Heap Stats
 	{
 		ImGui::Text("Heap: %s", m_vHeapData[m_CurrentHeapIdx].Name.c_str());
 		const float usedSize = (float)m_vHeapData[m_CurrentHeapIdx].UsedSize / MB;
@@ -425,6 +426,7 @@ bool ProfilerWindow::BuildSampleItemsFromDepth(SampleItem& a_pParent, size_t& a_
 
 void ProfilerWindow::DrawCurrentSampleData()
 {
+	// Draw Column Headers
 	ImGui::Columns(4);
 	ImGui::Text("Sample Name");
 	ImGui::NextColumn();
@@ -435,6 +437,7 @@ void ProfilerWindow::DrawCurrentSampleData()
 	ImGui::Text("Calls");
 	ImGui::NextColumn();
 	ImGui::Separator();
+	// Draw all Samples
 	for(int i = 0; i < (int)m_Root.Children.size(); ++i)
 	{
 		DrawSampleItem(m_Root.Children[i]);
@@ -448,13 +451,13 @@ void ProfilerWindow::DrawCurrentSampleData()
 	ImGui::Text("Profiler Overhead: %0.3f ms", m_CurrentData.ProfilerOverhead);
 }
 
-void ProfilerWindow::DrawSampleItem(SampleItem& a_item)
+void ProfilerWindow::DrawSampleItem(SampleItem& a_item) const
 {
 	if(a_item.Children.empty()) 
 	{
 		ImGui::Text(a_item.Data.Name.c_str());
 		ImGui::NextColumn();
-		ImGui::Text("%0.2f %", a_item.TotalPercent);
+		ImGui::Text("%0.2f", a_item.TotalPercent);
 		ImGui::NextColumn();
 		ImGui::Text("%0.3f ms", a_item.Data.TimeTaken);
 		ImGui::NextColumn();
@@ -463,10 +466,10 @@ void ProfilerWindow::DrawSampleItem(SampleItem& a_item)
 	}
 	else
 	{
-		bool bOpen = ImGui::TreeNode(a_item.Data.Name.c_str());
+		const bool bOpen = ImGui::TreeNode(a_item.Data.Name.c_str());
 
 		ImGui::NextColumn();
-		ImGui::Text("%0.2f %", a_item.TotalPercent);
+		ImGui::Text("%0.2f", a_item.TotalPercent);
 		ImGui::NextColumn();
 		ImGui::Text("%0.3f ms", a_item.Data.TimeTaken);
 		ImGui::NextColumn();

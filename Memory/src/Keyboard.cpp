@@ -7,11 +7,12 @@ bool Keyboard::KeyPressed(WinKeyCode a_key) const
 
 Keyboard::Event Keyboard::ReadKey()
 {
+	// Read Keys from Buffer
 	if(m_keyEventBuffer.empty() == false)
 	{
 		const Event e = m_keyEventBuffer.front();
 		m_keyEventBuffer.pop();
-		return e;
+		return e; 
 	}
 
 	return Event();
@@ -29,6 +30,7 @@ void Keyboard::ClearKey()
 
 char Keyboard::ReadChar()
 {
+	// Read Characters from Buffer
 	if(m_charBuffer.empty() == false)
 	{
 		const char code = m_charBuffer.front();
@@ -59,6 +61,7 @@ void Keyboard::Flush()
 void Keyboard::OnKeyPressed(unsigned char a_keyCode)
 {
 	m_keyStates[a_keyCode] = true;
+	// Push Key Event
 	m_keyEventBuffer.push(Event(Event::Type::Press, a_keyCode));
 	TrimBuffer(m_keyEventBuffer);
 }
@@ -66,6 +69,7 @@ void Keyboard::OnKeyPressed(unsigned char a_keyCode)
 void Keyboard::OnKeyReleased(unsigned char a_keyCode)
 {
 	m_keyStates[a_keyCode] = false;
+	// Push Key Event
 	m_keyEventBuffer.push(Event(Event::Type::Release, a_keyCode));
 	TrimBuffer(m_keyEventBuffer);
 }

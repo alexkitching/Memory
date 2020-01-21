@@ -18,6 +18,7 @@ void ResourceLoadingScenario::Run()
 	// Tick Timers
 	m_IntervalTimer.Tick();
 
+	// Run Current Type
 	switch (m_CurrentType)
 	{
 	case Type::Bootup:
@@ -40,6 +41,7 @@ void ResourceLoadingScenario::Initialise()
 #if USE_MOVEABLE_HEAP
 	if(DummyResource::s_pHeap == nullptr)
 	{
+		// Create Moveable Heap
 		MoveableHeap::Config config;
 		config.Name = "Moveable Resource Heap";
 		size_t capacity;
@@ -59,6 +61,7 @@ void ResourceLoadingScenario::Initialise()
 #else
 	if(DummyResource::s_pHeap == nullptr)
 	{
+		// Create Heap
 		Heap::Config config{};
 		config.Name = "Resource Heap";
 		size_t capacity;
@@ -106,27 +109,33 @@ ResourceLoadingScenario::DummyResource::DummyResource(size_t a_size) :
 	m_Size(a_size),
 	m_pData(nullptr)
 {
+	char* pData = nullptr;
 #if USE_MEM_SYS
 #if USE_MOVEABLE_HEAP
+	// Allocate from  Moveable Heap
 	m_pData = s_pHeap->allocate<char>(a_size);
+	pData = m_pData.Get();
+#else
+	m_pData = static_cast<char*>(s_pHeap->allocate(a_size));
+	pData = m_pData;
+#endif
+#else
+	m_pData = new char[a_size];
+	pData = m_pData;
+#endif
 
-	if(m_pData.IsNull())
+	if(pData == nullptr)
 	{
 		LOG("Failed to Allocate Data \n");
 	}
 	else
 	{
+		// Copy Data
 		char str[] = "DummyResourceData";
 		const size_t size = sizeof(str);
 
-		std::memcpy(m_pData.Get(), str, size);
+		std::memcpy(pData, str, size);
 	}
-#else
-	m_pData = static_cast<char*>(s_pHeap->allocate(a_size));
-#endif
-#else
-	m_pData = new char[a_size];
-#endif
 }
 
 ResourceLoadingScenario::DummyResource::~DummyResource()
@@ -152,8 +161,9 @@ void ResourceLoadingScenario::RunBootType()
 	size_t ResourceSize = Random::IntRangeWithSeed(Configuration.Bootup.MinResourceSize, Configuration.Bootup.MaxResourceSize, m_NextSeed++);
 	if (m_CurrentTotalLoadedSize + ResourceSize > Configuration.Bootup.TotalSizeToLoad)
 	{
-		ResourceSize = Configuration.Bootup.TotalSizeToLoad - m_CurrentTotalLoadedSize;
+		ResourceSize = Configuration.Bootup.TotalSizeToLoad - m_CurrentTotalLoadedSize; // Ensure Capacity not exceeded
 	}
+	
 	LoadResource(ResourceSize);
 
 	
@@ -192,7 +202,7 @@ void ResourceLoadingScenario::RunGameplayType()
 	{
 		// Load Resource
 		size_t ResourceSize = Random::IntRangeWithSeed(Configuration.Bootup.MinResourceSize, Configuration.Bootup.MaxResourceSize, m_NextSeed++);
-		if (m_CurrentTotalLoadedSize + ResourceSize > Configuration.Gameplay.AllocatedResourceCap)
+		if (m_CurrentTotalLoadedSize + ResourceSize > Configuration.Gameplay.AllocatedResourceCap) // Ensure Capacity not exceeded
 		{
 			ResourceSize = Configuration.Gameplay.AllocatedResourceCap - m_CurrentTotalLoadedSize;
 		}

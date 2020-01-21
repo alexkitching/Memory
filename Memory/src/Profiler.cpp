@@ -20,6 +20,7 @@ void Profiler::Shutdown()
 void Profiler::BeginSample(const char* a_pName)
 {
 	ASSERT(s_pInstance != nullptr);
+	
 	if (s_pInstance->IsRecording() == false)
 		return;
 	
@@ -205,7 +206,7 @@ void Profiler::OnFrameEndInternal()
 	if (IsRecording())
 	{
 		// Record This Frames Data
-		//m_vRecordedFrameData.push_back(m_CurrentFrameData); // Not Supporting More than single frame
+		//m_vRecordedFrameData.push_back(m_CurrentFrameData); // Not Supporting More than single frame atm
 
 		m_SampleRecordedEvent.Raise();
 		
@@ -238,7 +239,7 @@ void Profiler::StopOverheadTimer()
 
 void Profiler::RecordCurrentStackTimes()
 {
-	std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now();
+	const std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now(); // Cache Now Time for  accuracy
 	const unsigned int Count = static_cast<unsigned int>(m_vCurrentScope.size());
 	for(unsigned int i = 0; i < Count; ++i)
 	{
@@ -248,7 +249,7 @@ void Profiler::RecordCurrentStackTimes()
 
 void Profiler::ResetCurrentStackTimes()
 {
-	std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now();
+	const std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now(); // Cache Now Time for  accuracy
 	const unsigned int Count = static_cast<unsigned int>(m_vCurrentScope.size());
 	for (unsigned int i = 0; i < Count; ++i)
 	{

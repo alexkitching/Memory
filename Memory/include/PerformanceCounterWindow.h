@@ -19,7 +19,7 @@ public:
 protected:
 	void OnGUIWindow(const IMGUIInterface& a_interface) override;
 
-	void RecursivePrintHeapStats(const HeapBase* a_Heap) const;
+	static void RecursivePrintHeapStats(const HeapBase* a_Heap);
 private:
 	ProfilerWindow* m_pProfiler;
 };

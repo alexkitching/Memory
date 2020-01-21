@@ -12,7 +12,7 @@ ParticleSystemScenario::Config ParticleSystemScenario::Configuration = ParticleS
 
 ParticleSystemScenario::ParticleSystemScenario()
 {
-	m_ParticleSystems.reserve(Configuration.ParticleSystemsCount);
+	m_ParticleSystems.reserve(Configuration.ParticleSystemsCount); 
 }
 
 void ParticleSystemScenario::Run()
@@ -31,6 +31,7 @@ void ParticleSystemScenario::Run()
 void ParticleSystemScenario::OnRender(IRenderer* a_pRenderer)
 {
 	PROFILER_BEGIN_SAMPLE(ParticleSystemScenario::OnRender);
+	// Render Particle Systems
 	for(auto& ps : m_ParticleSystems)
 	{
 		ps.OnRender(a_pRenderer);
@@ -57,7 +58,7 @@ m_ParticlePool(Configuration.ParticleSystem.MaxParticles * sizeof(Particle),
 #endif
 { 
 	PROFILER_BEGIN_SAMPLE(ParticleSystem::_ctor);
-	while ((int)m_Particles.size() != Configuration.ParticleSystem.ParticleStartCount)
+	while ((int)m_Particles.size() != Configuration.ParticleSystem.ParticleStartCount) // Warmup Start Particle Count
 	{
 		SpawnParticle();
 	}
@@ -100,6 +101,8 @@ void ParticleSystemScenario::ParticleSystem::Update()
 		}
 	}
 
+	// Update Particles
+	PROFILER_BEGIN_SAMPLE(ParticleSystem::UpdateParticles);
 	for (auto& p : m_Particles)
 	{
 		p->LiveTime += Time::DeltaTime();
@@ -107,7 +110,9 @@ void ParticleSystemScenario::ParticleSystem::Update()
 		p->Position[1] += p->Velocity[1] += Time::DeltaTime();
 		p->Position[2] += p->Velocity[2] += Time::DeltaTime();
 	}
+	PROFILER_END_SAMPLE();
 
+	// Destroy Dead Particles
 	for (int i = (int)m_Particles.size() - 1; i >= 0; --i)
 	{
 		Particle* p = m_Particles[i];
@@ -126,7 +131,7 @@ void ParticleSystemScenario::ParticleSystem::OnRender(IRenderer* a_pRenderer)
 	for(auto& p : m_Particles)
 	{
 		// TODO Optimise Renderer KILLS FPS probs due to Constant/create/destroy of buffers
-		//a_pRenderer->DrawCube(p.Position[0], p.Position[1], p.Position[2], 0.1f, Time::DeltaTime());
+		//a_pRenderer->DrawCube(p->Position[0], p->Position[1], p->Position[2], 0.1f, Time::DeltaTime());
 	}
 	PROFILER_END_SAMPLE();
 }

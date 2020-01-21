@@ -17,6 +17,8 @@ float PerformanceCounter::s_fVirMemTotal = 0.f;
 void PerformanceCounter::Tick()
 {
 	PROFILER_BEGIN_SAMPLE(PerformanceCounter::Tick);
+
+	// Update Counter Stats
 	s_fDeltaTime = Time::DeltaTime();
 	s_fAccumFPS += s_fDeltaTime;
 	s_FrameCount++;
@@ -29,12 +31,14 @@ void PerformanceCounter::Tick()
 		s_fAccumFPS -= 1.0f / s_fFPSUpdateRate;
 	}
 
+	// Calc Total Memory
 	MEMORYSTATUSEX memInfo;
 	memInfo.dwLength = sizeof(MEMORYSTATUSEX);
 	GlobalMemoryStatusEx(&memInfo);
 	s_fVirMemTotal = (float)memInfo.ullTotalPageFile / MB;
 	s_fPhysMemTotal = (float)memInfo.ullTotalPhys / MB;
 
+	// Calculate Current Memory
 	PROCESS_MEMORY_COUNTERS_EX pmc;
 	GetProcessMemoryInfo(GetCurrentProcess(), (PPROCESS_MEMORY_COUNTERS)&pmc, sizeof(pmc));
 	s_fVirMemUsed = (float)pmc.PrivateUsage / MB;

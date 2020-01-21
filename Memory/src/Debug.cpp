@@ -10,6 +10,7 @@ m_failedExpression(a_expression)
 {
 }
 
+// Format Assert info into Buffer
 const char* AssertFailException::what() const
 {
 	std::ostringstream oss;

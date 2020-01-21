@@ -101,7 +101,7 @@ public:
 
 	// Defragmentation Functions
 	void Defragment();
-	inline void MoveAllocation(MoveableAllocationHeader*& a_pHeader, void* pDestination);
+	static inline void MoveAllocation(MoveableAllocationHeader*& a_pHeader, void* pDestination);
 
 private:
 	// Base Allocator Interface (Private due to replacement by Moveable Pointer versions, still utilised privately

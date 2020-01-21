@@ -84,7 +84,7 @@ void ScenarioManager::StartScenario(ScenarioType a_type)
 		break;
 	}
 
-
+	// Log Scenario Name
 	const char* pName = ScenarioTypeNames[(int)a_type].c_str();
 	SMLOG("Starting Memory Scenario - %s  \n", pName);
 
@@ -106,7 +106,7 @@ void ScenarioManager::StopScenario(ScenarioType a_type)
 		if (active.pScenario == pScenarioToStart)
 		{
 			active.pScenario->Reset();
-			SMLOG("Scenario Stopped - %s AverageFPS - %f.1 \n", ScenarioTypeNames[(int)a_type].c_str(), active.AverageFPS);
+			SMLOG("Scenario Stopped - %s AverageFPS - %f.1 \n", ScenarioTypeNames[(int)a_type].c_str(), active.AverageFPS); // Print Stats
 			m_ActiveScenarios.erase(m_ActiveScenarios.begin() + i);
 
 			OnScenarioStopped(a_type); // Raise Event
@@ -138,7 +138,7 @@ void ScenarioManager::Update()
 
 			m_ActiveScenarios.erase(m_ActiveScenarios.begin() + i);
 
-			SMLOG("Scenario Completed - %s \n - Time Taken - %f.1 s \n AverageFPS - %f.1 \n", ScenarioTypeNames[(int)type].c_str(), fTimeTaken, averageFPS);
+			SMLOG("Scenario Completed - %s \n - Time Taken - %f.1 s \n AverageFPS - %f.1 \n", ScenarioTypeNames[(int)type].c_str(), fTimeTaken, averageFPS); // Print Stats
 			
 			OnScenarioComplete(type); // Raise Event
 		}
@@ -156,7 +156,7 @@ void ScenarioManager::OnRender(IRenderer* a_pRenderer)
 	PROFILER_END_SAMPLE();
 }
 
-IScenario* ScenarioManager::GetScenario(ScenarioType a_type)
+IScenario* ScenarioManager::GetScenario(ScenarioType a_type) const
 {
 	switch (a_type)
 	{

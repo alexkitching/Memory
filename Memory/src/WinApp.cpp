@@ -12,8 +12,10 @@
 WinApp::WinApp()
 	:
 m_pWindow(nullptr),
+m_Result(0),
 m_FrameStage(FrameStage::PreFrame),
-m_bShouldClose(false)
+m_bShouldClose(false),
+m_iExitCode(0)
 {
 }
 
@@ -28,7 +30,7 @@ int WinApp::Run()
 	{
 		ASSERT(Initialise() && "Initialisation Failed");
 
-		while (m_bShouldClose == false)
+		while (m_bShouldClose == false) // Run Program
 		{
 			CycleFrame();
 		}
@@ -72,7 +74,7 @@ void WinApp::OnPreFrame()
 {
 	PROFILER_BEGIN_SAMPLE(WinApp::OnPreFrame);
 	// Process Windows Messages
-	if(const std::optional<int> errorCode = Window::ProcessMessages())
+	if(const std::optional<int> errorCode = Window::ProcessMessages()) // Recieved Error Code
 	{
 		// Optional Has Value
 		SetShouldClose(*errorCode);
@@ -111,15 +113,14 @@ void WinApp::OnRenderFrame(IRenderer* a_pRenderer)
 {
 	// Draw Stuff
 	PROFILER_BEGIN_SAMPLE(WinApp::OnRenderFrame);
+
+	// Draw Visual Cubes for Visible Stutters
+	m_pWindow->GetRenderer().DrawCube(0.f, 0.f, 0.f, 1.f, Angle);
+	m_pWindow->GetRenderer().DrawCube(3.f, 0.f, 0.f, 0.5f, Angle);
 	
-	const float zOffs = 0.f;
-	//m_pWindow->GetRenderer().DrawCube(-MouseX, 0.f, zOffs + MouseY, Time::TimeSinceStartup());
-	m_pWindow->GetRenderer().DrawCube(0.f, 0.f, zOffs, 1.f, Angle);
-	m_pWindow->GetRenderer().DrawCube(3.f, 0.f, zOffs, 0.5f, Angle);
 	// <---- IMGUI ---->
 	m_pWindow->GetIMGUI().BeginGUIFrame();
 	OnGUI(m_pWindow->GetIMGUI());
-	//m_pWindow->GetIMGUI().Test();
 	m_pWindow->GetIMGUI().RenderGUIFrame();
 
 	PROFILER_END_SAMPLE();
@@ -149,6 +150,7 @@ void WinApp::OnExit()
 
 void WinApp::CycleFrame()
 {
+	// Runs Current Frame Stage
 	switch (m_FrameStage)
 	{
 	case FrameStage::PreFrame:

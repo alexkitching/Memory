@@ -10,10 +10,11 @@ D3DException::D3DException(int a_line, const char* a_pfileName, HRESULT a_HR, st
 Exception(a_line, a_pfileName),
 m_hr(a_HR)
 {
+	// Copy Messages into info
 	for(const std::string& message : a_infoMessages)
 	{
 		m_info += message;
-		m_info.push_back('\n');
+		m_info.push_back('\n'); // Format Line ending
 	}
 
 	if(m_info.empty() == false)
@@ -22,6 +23,7 @@ m_hr(a_HR)
 	}
 }
 
+// Format info into Buffer
 const char* D3DException::what() const
 {
 	std::ostringstream oss;
@@ -70,6 +72,7 @@ Exception(a_line, a_file)
 	}
 }
 
+// Format Info into Buffer
 const char* D3DInfoException::what() const
 {
 	std::ostringstream oss;

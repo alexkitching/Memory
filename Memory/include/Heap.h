@@ -16,8 +16,8 @@
 class Heap : public HeapBase
 {
 public:
-	Heap();
-	virtual~Heap();
+	Heap() {}
+	virtual~Heap() {}
 
 	// Allocator Base Interface
 	virtual void* allocate(size_t a_size, uint8 a_alignment = DEFAULT_ALIGNMENT) override;

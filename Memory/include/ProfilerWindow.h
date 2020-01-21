@@ -60,7 +60,7 @@ private:
 	bool BuildSampleItemsFromDepth(SampleItem& a_pParent, size_t& a_idx);
 
 	void DrawCurrentSampleData();
-	void DrawSampleItem(SampleItem& a_item);
+	void DrawSampleItem(SampleItem& a_item) const;
 	
 	bool m_bPauseNext;
 	bool m_bRecordNext;

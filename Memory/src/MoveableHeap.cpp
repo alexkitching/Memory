@@ -29,7 +29,7 @@ void MoveableHeap::deallocate(MoveableAllocationHeader* a_pHeader)
 
 void MoveableHeap::Defragment()
 {
-	if (m_pHeadAlloc == nullptr)
+	if (m_pHeadAlloc == nullptr) // Requires at least 1 Allocation
 		return;
 	
 	union

@@ -21,8 +21,7 @@ public:
 	~IMGUIInterface();
 	void Initialise(Window* a_pWindow);
 
-	void BeginGUIFrame();
-	void Test();
+	void BeginGUIFrame() const;
 	void RenderGUIFrame();
 
 	bool Button(const char* a_pName, bool a_bEnabled = true) const;

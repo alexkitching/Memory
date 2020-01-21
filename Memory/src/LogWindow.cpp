@@ -37,7 +37,7 @@ void LogWindow::OnGUIWindow(const IMGUIInterface& a_interface)
 			const char* buf = m_Buffer.begin();
 			const char* buf_end = m_Buffer.end();
 
-			if (m_Filter.IsActive())
+			if (m_Filter.IsActive()) // Filter Text
 			{
 				for (int line_no = 0; line_no < m_LineOffsets.Size; line_no++)
 				{
@@ -50,7 +50,7 @@ void LogWindow::OnGUIWindow(const IMGUIInterface& a_interface)
 			else
 			{
 				ImGuiListClipper clipper;
-				clipper.Begin(m_LineOffsets.Size);
+				clipper.Begin(m_LineOffsets.Size); // Show Clipped Line Ranges only
 				{
 					while (clipper.Step())
 					{

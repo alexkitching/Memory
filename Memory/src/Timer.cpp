@@ -47,6 +47,7 @@ float TP_Timer::GetTime() const
 
 DT_Timer::DT_Timer(bool a_bStartImme)
 	:
+m_CurrentTime(0.f),
 m_bStarted(false)
 {
 	if (a_bStartImme)

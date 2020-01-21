@@ -19,6 +19,7 @@ Time::~Time()
 
 void Time::Update()
 {
+	// Update Delta Time
 	const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
 	const std::chrono::duration<float> deltaTime = now - m_lastFrameTime;
 	m_deltaTime = deltaTime.count();

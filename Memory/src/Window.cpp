@@ -103,13 +103,13 @@ bool Window::Initialise()
 	// Create Renderer
 	m_pRenderer = std::make_unique<D3DRenderer>(m_hWnd);
 
-
+	// Init IMGUI
 	m_IMGUIInterface.Initialise(this);
 
 	return m_pRenderer != nullptr;
 }
 
-D3DRenderer& Window::GetRenderer()
+D3DRenderer& Window::GetRenderer() const
 {
 	if(m_pRenderer == nullptr)
 	{
@@ -193,7 +193,7 @@ LRESULT Window::HandleMessageInternal(HWND hWnd, UINT msg, WPARAM wParam, LPARAM
 	case WM_KEYDOWN:
 	case WM_SYSKEYDOWN:
 		{
-			if(!(lParam & 0x40000000) || m_keyboard.AutoRepeatEnabled()) // Hex Representation of binary bit 30
+			if(!(lParam & 0x40000000) || m_keyboard.AutoRepeatEnabled()) // Hex Representation of binary bit 30 Checks if Key is maintained
 			{
 				m_keyboard.OnKeyPressed(static_cast<unsigned char>(wParam));
 			}

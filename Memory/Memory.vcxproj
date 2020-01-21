@@ -205,6 +205,7 @@
     <ClInclude Include="include\App.h" />
     <ClInclude Include="include\Common.h" />
     <ClInclude Include="include\D3D.h" />
+    <ClInclude Include="include\D3DCube.h" />
     <ClInclude Include="include\D3DRenderer.h" />
     <ClInclude Include="include\Debug.h" />
     <ClInclude Include="include\HeapBase.h" />

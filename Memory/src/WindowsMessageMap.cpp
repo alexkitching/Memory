@@ -3,7 +3,6 @@
 #include <sstream>
 #include <iomanip>
 
-
 #define WM_UAHDESTROYWINDOW		0x0090
 #define WM_UAHDRAWMENU			0x0091
 #define WM_UAHDRAWMENUITEM		0x0092
@@ -17,7 +16,7 @@ WindowsMessageMap* WindowsMessageMap::s_pMessageMap = nullptr;
 
 WindowsMessageMap::WindowsMessageMap()
 {
-	std::map<DWORD, char[64]> map;
+	// Register messages
 	REGISTER_MESSAGE(WM_CREATE);
 	REGISTER_MESSAGE(WM_DESTROY);
 	REGISTER_MESSAGE(WM_MOVE);
@@ -195,14 +194,16 @@ std::string WindowsMessageMap::Read(DWORD msg, LPARAM lp, WPARAM wp)
 	{
 		s_pMessageMap = new WindowsMessageMap();
 	}
-	return (*s_pMessageMap)(msg, lp, wp);
+	return (*s_pMessageMap)(msg, lp, wp); // Read Message via Map
 }
+
 
 std::string WindowsMessageMap::operator()( DWORD msg,LPARAM lp,WPARAM wp ) const
 {
 	constexpr int firstColWidth = 25;
 	const auto i = m_MessageMap.find( msg );
-
+	
+	// Output Message Data
 	std::ostringstream oss;
 	if( i != m_MessageMap.end() )
 	{

@@ -13,7 +13,7 @@ class ScenarioWindow : public IMGUIWindow
 {
 public:
 	ScenarioWindow(ScenarioManager* a_pScenarioManager);
-	~ScenarioWindow();
+	~ScenarioWindow() {}
 
 protected:
 	void OnGUIWindow(const IMGUIInterface& a_gui) override;

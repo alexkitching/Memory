@@ -16,7 +16,7 @@ void* LinearAllocator::allocate(size_t a_size, uint8 a_alignment)
 	const uint8 adjustment = PointerMath::AlignForwardAdjustment(m_pCurrentPos, a_alignment);
 
 	// Ensure Capacity not exceeded
-	if (m_usedSize + a_size + adjustment > m_capacity)
+	if(CapacityWouldExceed(a_size + adjustment))
 	{
 		return nullptr;
 	}

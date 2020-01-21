@@ -4,34 +4,26 @@
 #include "PointerMath.h"
 #include "GlobalTime.h"
 
-
-Heap::Heap()
-{
-}
-
-Heap::~Heap()
-{
-}
-
 void* Heap::allocate(size_t a_size, uint8 a_alignment)
 {
+	// Try Allocate
 	BaseAllocationHeader* pHeader = TryAllocate(a_size, a_alignment);
 	
 	if (pHeader == nullptr)
 		return nullptr;
 
-	pHeader->Sig = HEAP_ALLOC_SIG; // Set Unique Sig
+	pHeader->Sig = HEAP_ALLOC_SIG; // Set Heap Unique Sig
 
 #if DEBUG // Additional Safety Checks
 	if(pHeader->pNext != nullptr)
 	{
-		bool isValid = ((char*)pHeader + sizeof(BaseAllocationHeader) + sizeof(HeapSignature) + pHeader->Size) <= (char*)pHeader->pNext;
+		const bool isValid = ((char*)pHeader + sizeof(BaseAllocationHeader) + sizeof(HeapSignature) + pHeader->Size) <= (char*)pHeader->pNext;
 		ASSERT(isValid);
 	}
 
 	if(pHeader->pPrev != nullptr)
 	{
-		bool isValid = ((char*)pHeader->pPrev + sizeof(BaseAllocationHeader) + sizeof(HeapSignature) + pHeader->pPrev->Size) <= (char*)pHeader;
+		const bool isValid = ((char*)pHeader->pPrev + sizeof(BaseAllocationHeader) + sizeof(HeapSignature) + pHeader->pPrev->Size) <= (char*)pHeader;
 		ASSERT(isValid);
 	}
 #endif

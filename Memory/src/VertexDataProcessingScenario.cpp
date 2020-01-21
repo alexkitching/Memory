@@ -14,7 +14,7 @@ VertexDataProcessingScenario::VertexDataProcessingScenario()
 void VertexDataProcessingScenario::Initialise()
 {
 #if USE_MEM_SYS
-	m_VertexAllocator = LinearAllocator(Configuration.PerFrameTotalData + (size_t)(0.5 * MB),
+	m_VertexAllocator = LinearAllocator(Configuration.PerFrameTotalData + (size_t)(0.5 * MB), // Extra Capacity to ensure alignment adjustment doesnt exceed
 		MemoryManager::GetDefaultHeap()->allocate(Configuration.PerFrameTotalData + (size_t)(0.5 * MB)));
 #endif
 }
@@ -52,7 +52,7 @@ void VertexDataProcessingScenario::AddSub(uint32 a_VertCount)
 	
 	VertexSub& NewSub = m_Subs.emplace_back();
 	
-PROFILER_BEGIN_SAMPLE(VertexDataProcessingScenario::AllocateVertices); //7ms
+PROFILER_BEGIN_SAMPLE(VertexDataProcessingScenario::AllocateVertices); 
 #if USE_MEM_SYS
 	NewSub.pVerts = static_cast<Vertex*>(m_VertexAllocator.allocate(sizeof(Vertex) * a_VertCount, 4u));
 #else
@@ -70,8 +70,8 @@ void VertexDataProcessingScenario::ClearFrameSubs()
 	PROFILER_BEGIN_SAMPLE(VertexDataProcessingScenario::ClearFrameSubs);
 	while(m_Subs.empty() == false)
 	{
-		VertexSub sub = m_Subs[m_Subs.size() - 1];
 #if !USE_MEM_SYS
+		VertexSub sub = m_Subs[m_Subs.size() - 1];
 		delete[] sub.pVerts;
 #endif
 		m_Subs.pop_back();
